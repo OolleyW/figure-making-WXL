@@ -46,9 +46,14 @@ These rules supersede any conflicting style text in `references/` or in upstream
 4. **Full box on every Cartesian axes.** All four spines drawn at 0.8 pt.
    Exceptions: polar axes (radar), axes with `axison = False` (pie/donut) and
    colorbar axes.
-5. **Legend inside the axes, framed.** `loc="best"` or the emptiest corner,
-   opaque white face, black 0.8 pt border, `framealpha = 1`. If `"best"` would
-   cover bars, move it or use two columns. Never place it outside the figure.
+5. **Legend inside the axes, framed, and never covering data.** Opaque white
+   face, black 0.8 pt border, `framealpha = 1`. Placement is automatic:
+   `prepare_figure` (called by `finalize_figure`) measures the real overlap
+   between the legend box and the plotted lines, bars and points, tries the nine
+   candidate positions, and if none is clear it grows the y-range and retries.
+   `check_wxl_style` reports any legend that still covers more than 2 % of the
+   data. Use `ncol` for long label lists, and fall back to a dedicated legend
+   panel only when no position works. Never place it outside the figure.
 6. **Ticks point inward, no grid, and both axis ends land on a tick value.**
    Ticks are 3 pt long at 0.8 pt width. Every numeric Cartesian axis must start
    and end exactly on its first and last tick label, so a reader never sees an

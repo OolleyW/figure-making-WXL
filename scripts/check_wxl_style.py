@@ -24,8 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "assets"))
 
 from wxl_style import (  # noqa: E402
     WXL_FIGSIZE, WXL_FONTSIZE, WXL_PALETTE, add_caption, apply_wxl_style,
-    check_wxl_style, create_subplots, framed_legend, lock_axis_ends_all,
-    panel_tag,
+    check_wxl_style, create_subplots, framed_legend, panel_tag, prepare_figure,
 )
 
 P = WXL_PALETTE
@@ -74,7 +73,7 @@ def build_reference_figure():
     cb.outline.set_linewidth(0.8)
 
     add_caption(fig, "Fig. 1  Reference figure exercising every WXL style element.")
-    lock_axis_ends_all(fig)
+    prepare_figure(fig)
     return fig
 
 

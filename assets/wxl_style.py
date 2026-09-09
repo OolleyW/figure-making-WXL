@@ -173,13 +173,202 @@ def create_subplots(nrows: int = 1, ncols: int = 1, figsize=None, **kwargs):
 
 
 def framed_legend(ax, **kwargs):
-    """Legend inside the axes with an opaque white face and black 0.8 pt border."""
+    """Legend inside the axes with an opaque white face and black 0.8 pt border.
+
+    The position is refined later by :func:`place_all_legends`, which measures
+    the real overlap between the legend box and the plotted data.
+    """
     kwargs.setdefault("loc", "best")
     leg = ax.legend(frameon=True, **kwargs)
     leg.get_frame().set_edgecolor("black")
     leg.get_frame().set_linewidth(0.8)
     leg.get_frame().set_alpha(1.0)
     return leg
+
+
+#: Legend positions tried by :func:`place_legend_smart`, cheapest first.
+_LEGEND_CANDIDATES = [
+    "best", "upper right", "upper left", "lower left", "lower right",
+    "upper center", "lower center", "center left", "center right",
+]
+
+
+def _legend_overlap_score(ax, bbox) -> float:
+    """Average share of the plotted artists hidden by a legend box, in [0, 1].
+
+    Each line and scatter series contributes the fraction of its points inside
+    the box, each bar or box patch the overlapped area fraction; the result is
+    the mean over all contributing artists. 0.0 means the legend sits on empty
+    canvas.
+    """
+    if bbox is None:
+        return 0.0
+    parts: list[float] = []
+    for line in ax.get_lines():
+        if not line.get_visible():
+            continue
+        xy = line.get_xydata()
+        if xy is None or len(xy) < 2:
+            continue
+        xy = np.asarray(xy, float)
+        step = max(1, len(xy) // 400)
+        disp = ax.transData.transform(xy[::step])
+        inside = ((disp[:, 0] >= bbox.x0) & (disp[:, 0] <= bbox.x1) &
+                  (disp[:, 1] >= bbox.y0) & (disp[:, 1] <= bbox.y1))
+        parts.append(float(inside.mean()))
+    for patch in ax.patches:
+        if not patch.get_visible():
+            continue
+        pb = patch.get_window_extent()
+        if pb.width * pb.height <= 0:
+            continue
+        inter = matplotlib.transforms.Bbox.intersection(pb, bbox)
+        if inter is not None:
+            parts.append((inter.width * inter.height) / (pb.width * pb.height))
+    for coll in ax.collections:
+        if not coll.get_visible():
+            continue
+        get_offsets = getattr(coll, "get_offsets", None)
+        if get_offsets is None:
+            continue
+        try:
+            offs = np.asarray(get_offsets(), float)
+        except Exception:                                  # pragma: no cover
+            continue
+        if offs.ndim != 2 or offs.shape[0] == 0 or offs.shape[1] < 2:
+            continue
+        disp = ax.transData.transform(offs[:, :2])
+        inside = ((disp[:, 0] >= bbox.x0) & (disp[:, 0] <= bbox.x1) &
+                  (disp[:, 1] >= bbox.y0) & (disp[:, 1] <= bbox.y1))
+        parts.append(float(inside.mean()))
+    return float(np.mean(parts)) if parts else 0.0
+
+
+def place_legend_smart(ax, leg=None, candidates=None, fig=None):
+    """Move an existing legend to the candidate position that hides least data.
+
+    Returns ``(score, loc)`` for the chosen position.
+    """
+    leg = leg if leg is not None else ax.get_legend()
+    if leg is None:
+        return None
+    fig = fig if fig is not None else ax.get_figure()
+    candidates = candidates or _LEGEND_CANDIDATES
+    best = None
+    for loc in candidates:
+        leg.set_loc(loc)
+        fig.canvas.draw()
+        score = _legend_overlap_score(ax, leg.get_window_extent())
+        if best is None or score < best[0] - 1e-9:
+            best = (score, loc)
+        if score <= 1e-9:
+            break
+    leg.set_loc(best[1])
+    fig.canvas.draw()
+    return best
+
+
+def _data_y_range(ax):
+    """Data extent of the axes in y, from lines and bar/box patches."""
+    lo, hi = np.inf, -np.inf
+    for line in ax.get_lines():
+        yd = np.asarray(line.get_ydata(), float)
+        yd = yd[np.isfinite(yd)]
+        if yd.size:
+            lo, hi = min(lo, float(yd.min())), max(hi, float(yd.max()))
+    for patch in ax.patches:
+        try:
+            lo = min(lo, float(patch.get_y()))
+            hi = max(hi, float(patch.get_y()) + float(patch.get_height()))
+        except Exception:                                  # pragma: no cover
+            pass
+    return lo, hi
+
+
+def _expand_axis_for_legend(ax, leg, cap: float = 0.35):
+    """Grow the y-range on the side where the legend sits, to make room.
+
+    Expansion is capped at ``cap`` of the data span on each side, so a bar chart
+    can never end up as mostly empty canvas just to host a legend. Returns True
+    when the limits actually changed.
+    """
+    bbox = leg.get_window_extent()
+    ab = ax.get_window_extent()
+    if ab.height <= 0:
+        return False
+    rel = ((bbox.y0 + bbox.y1) / 2 - ab.y0) / ab.height
+    lo, hi = (float(v) for v in ax.get_ylim())
+    span = hi - lo
+    if span <= 0:
+        return False
+    dlo, dhi = _data_y_range(ax)
+    if not (np.isfinite(dlo) and np.isfinite(dhi)):
+        return False
+    dspan = (dhi - dlo) or span
+    limit_lo = dlo - cap * dspan
+    limit_hi = dhi + cap * dspan
+    if rel >= 0.5:
+        new_hi = min(hi + 0.35 * span, limit_hi)
+        if new_hi <= hi + 1e-9:
+            return False
+        ax.set_ylim(lo, new_hi)
+    else:
+        new_lo = max(lo - 0.35 * span, limit_lo)
+        if new_lo >= lo - 1e-9:
+            return False
+        ax.set_ylim(new_lo, hi)
+    return True
+
+
+def place_all_legends(fig, rounds: int = 2, candidates=None):
+    """Refine every in-axes legend so it covers as little data as possible.
+
+    Tries the candidate positions, grows the y-range and retries, then flattens a
+    legend with three or more entries into two columns. Polar axes, colorbar axes
+    and axes with ``axison == False`` keep their hand-placed legend.
+    Returns ``[(axes, (score, loc)), ...]``.
+    """
+    out = []
+    for ax in fig.get_axes():
+        if not ax.axison or _is_polar(ax) or hasattr(ax, "_colorbar"):
+            continue
+        leg = ax.get_legend()
+        if leg is None:
+            continue
+        res = place_legend_smart(ax, leg, candidates, fig)
+        tries = 0
+        while res is not None and res[0] > 1e-9 and tries < rounds:
+            if not _expand_axis_for_legend(ax, leg):
+                break
+            lock_axis_ends(ax)
+            res = place_legend_smart(ax, leg, candidates, fig)
+            tries += 1
+        # flatten a long legend into two columns when that hides less data
+        if res is not None and res[0] > 1e-9 and len(leg.get_texts()) >= 3:
+            set_ncols = getattr(leg, "set_ncols", None)
+            if set_ncols is not None:
+                set_ncols(2)
+                flat = place_legend_smart(ax, leg, candidates, fig)
+                if flat is not None and flat[0] < res[0]:
+                    res = flat
+                elif flat is not None:
+                    set_ncols(1)
+                    place_legend_smart(ax, leg, candidates, fig)
+        out.append((ax, res))
+    return out
+
+
+def prepare_figure(fig, lock_ends: bool = True, auto_legend: bool = True):
+    """Bring a figure to contract state: axis ends locked, legends deconflicted.
+
+    Call this before :func:`check_wxl_style` when you audit a figure yourself.
+    :func:`finalize_figure` calls it automatically.
+    """
+    if lock_ends:
+        lock_axis_ends_all(fig)
+    if auto_legend:
+        place_all_legends(fig)
+    return fig
 
 
 def add_caption(fig, text: str, fontsize: float | None = None, y: float = -0.045, **kwargs):
@@ -319,7 +508,7 @@ def measure_width_mm(path, dpi: int | None = None) -> float:
 def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                     close: bool = True, pad: float = 0.06, layout: bool = True,
                     target_width_mm: float | None = None, tol_mm: float = 0.5,
-                    lock_ends: bool = True):
+                    lock_ends: bool = True, auto_legend: bool = True):
     """Save the figure to one or more formats and return the list of paths.
 
     Saving always uses ``bbox_inches="tight"`` so a caption placed below the
@@ -346,23 +535,36 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
             except Exception:
                 pass
 
-    if lock_ends:
-        lock_axis_ends_all(fig)
+    def _prepare():
+        # Axis-end locking and legend placement must run AFTER any canvas resize:
+        # resizing changes how much of the axes a fixed 10 pt legend occupies.
+        if lock_ends or auto_legend:
+            prepare_figure(fig, lock_ends=lock_ends, auto_legend=auto_legend)
 
-    _relayout()
+    w0, h0 = (float(v) for v in fig.get_size_inches())
+    aspect = h0 / w0 if w0 else 1.0
 
     if target_width_mm:
+        # Alternate calibration and layout until both the trimmed width and the
+        # legend placement are stable, because moving a legend changes the tight
+        # bounding box.
         probe = stem.with_suffix(".probe.png")
-        w0, h0 = (float(v) for v in fig.get_size_inches())
-        for _ in range(6):
+        for _ in range(5):
+            _prepare()
+            _relayout()
             fig.savefig(probe, dpi=dpi, bbox_inches="tight", pad_inches=pad)
             m = measure_width_mm(probe, dpi)
             if abs(m - target_width_mm) <= tol_mm:
                 break
             w = float(fig.get_size_inches()[0]) * target_width_mm / m
-            fig.set_size_inches(w, h0 * w / w0)
+            fig.set_size_inches(w, w * aspect)
+        else:
+            _prepare()
             _relayout()
         probe.unlink(missing_ok=True)
+    else:
+        _prepare()
+        _relayout()
 
     saved = []
     for ext in formats:
@@ -481,20 +683,18 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
             problems.append(f"axes[{i}]: legend border is {ec}, expected #000000")
         if float(frame.get_alpha() or 1.0) < 0.999:
             problems.append(f"axes[{i}]: legend frame is transparent")
-        # soft check: a legend should not sit on top of bars / boxes
+        # soft check: the legend should sit on empty canvas
         try:
-            leg_bbox = leg.get_window_extent()
-            leg_area = max(leg_bbox.width * leg_bbox.height, 1e-9)
-            for patch in ax.patches:
-                if not patch.get_visible():
-                    continue
-                inter = matplotlib.transforms.Bbox.intersection(
-                    patch.get_window_extent(), leg_bbox)
-                if inter is None:
-                    continue
-                if (inter.width * inter.height) > 0.05 * leg_area:
-                    soft.append(f"axes[{i}]: legend may overlap a bar/box patch")
-                    break
+            score = _legend_overlap_score(ax, leg.get_window_extent())
+            if score > 0.02:
+                ab = ax.get_window_extent()
+                lb = leg.get_window_extent()
+                share = (lb.width * lb.height) / max(ab.width * ab.height, 1e-9)
+                soft.append(
+                    f"axes[{i}]: legend covers about {score * 100:.0f}% of the "
+                    f"plotted data and takes {share * 100:.0f}% of the panel. "
+                    f"Widen the figure, drop the legend for direct labels, or "
+                    f"give it a dedicated panel")
         except Exception:
             pass
 

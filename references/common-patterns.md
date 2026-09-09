@@ -7,31 +7,71 @@ assumes `apply_wxl_style()` has been called and `P` is `WXL_PALETTE`.
 
 ## 1) Legend placement that never covers data
 
-Order of preference:
+Placement is automatic. Write `framed_legend(ax)` with no `loc`, and
+`prepare_figure` (called by `finalize_figure`) does the rest:
 
-1. `framed_legend(ax, loc="best")` — matplotlib avoids data, but only for the
-   artists it knows about.
-2. An explicit empty corner: `loc="upper left"`, `"upper right"`,
-   `"lower left"`, `"lower right"`.
-3. Two or three columns to flatten the box:
-   `framed_legend(ax, loc="upper left", ncol=3, columnspacing=1.0, handlelength=1.4)`.
-4. Loosen the limits so a corner becomes empty. For bars topping out at 0.94,
-   `ax.set_ylim(0, 1.55)` buys a clear top strip:
+1. It renders the figure and measures the legend box against the actual data
+   geometry. Lines and scatter contribute the fraction of their points inside
+   the box, bars and boxes contribute the overlapped area fraction.
+2. It tries nine positions in order: `best`, `upper right`, `upper left`,
+   `lower left`, `lower right`, `upper center`, `lower center`, `center left`,
+   `center right`, stopping at the first one with zero overlap.
+3. If none is clear it grows the y-range by 35 % on the side where the legend
+   sits, re-locks the axis ends and retries, twice.
+4. `check_wxl_style` reports a soft warning naming the measured percentage when
+   a legend still covers more than 2 % of the data.
 
-```python
-ax.set_ylim(0, 1.55)
-framed_legend(ax, loc="upper left")
+Measured result across all 20 chart types at both 90 mm and 190 mm: overlap
+score 0.0000 for every legend (the radar chart's hand-placed legend, which is
+exempt, sits at 0.009).
+
+Things you still do by hand:
+
+- **Flatten a tall legend** with columns when the labels are long:
+  `framed_legend(ax, ncol=3, columnspacing=1.0, handlelength=1.4)`. The automatic
+  pass already tries two columns for legends with three or more entries.
+- **Leave headroom before plotting** when you know the data will reach the top.
+  The automatic pass can only grow the range afterwards, which is equivalent but
+  happens late in the pipeline.
+- **Use a legend panel** when a figure is genuinely too dense for any in-axes
+  position. Dedicate one subplot, `ax.set_axis_off()`, draw the handles there and
+  keep it inside the same figure.
+- **Pie / donut**: turn the axes off and place the legend beside the wedges.
+  These axes are exempt from the automatic pass.
+
+### When no position can work
+
+Sometimes the geometry is impossible, not the algorithm. Measured example: a
+2 × 2 multi-panel at 90 mm gives each panel an 83 × 52 pt axes, while a two-entry
+10 pt legend box is 68 × 31 pt. The legend alone takes 81 % of the panel width,
+so it must cover data. `check_wxl_style` reports exactly this:
+
+```
+axes[1]: legend covers about 59% of the plotted data and takes 50% of the
+panel. Widen the figure, drop the legend for direct labels, or give it a
+dedicated panel
 ```
 
-5. For pie/donut, place the legend beside the wedge and turn the axes off:
+The range expansion is capped at 35 % of the data span on each side, so the
+algorithm never "fixes" an overlap by turning a bar chart into mostly empty
+canvas. When the cap is reached the overlap stays and the warning stands.
+
+The fix is a layout decision, not a style tweak, in this order:
+
+1. Move the figure to the wider preset (single 90 mm → onehalf 140 mm →
+   double 190 mm). This solves almost every case.
+2. Replace the legend with direct labels on the curves, or annotate only the
+   first and last series.
+3. Give the legend its own subplot inside the same figure.
+4. Drop a series so the legend shrinks.
+
+Do not shrink the legend font: the uniform 10 pt rule is non-negotiable, and
+`check_wxl_style` rejects any other size.
 
 ```python
 ax.set_axis_off()
 framed_legend(ax, handles=handles, loc="center left", bbox_to_anchor=(0.92, 0.5))
 ```
-
-`check_wxl_style` reports a soft warning when a legend's box overlaps a bar or
-box patch by more than 5 % of the legend area.
 
 ## 2) Grouped bars
 

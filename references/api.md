@@ -98,10 +98,41 @@ vector export options, `pdf.fonttype = 42`). Call once before creating figures.
 ### framed_legend(ax, **kwargs)
 
 Builds a legend **inside** the axes with an opaque white face and a black
-0.8 pt border. Pass `loc`, `ncol`, `handles`, `labels` as usual.
+0.8 pt border. Pass `loc`, `ncol`, `handles`, `labels` as usual. The position is
+refined later by `place_all_legends`, so `loc="best"` is a fine starting point.
 
 ```python
 framed_legend(ax, loc="upper left", ncol=2, columnspacing=1.0, handlelength=1.6)
+```
+
+### place_legend_smart(ax, leg=None, candidates=None, fig=None) -> (score, loc)
+
+Moves an existing legend to the candidate position that hides least data.
+Candidates are tried in this order: `best`, `upper right`, `upper left`,
+`lower left`, `lower right`, `upper center`, `lower center`, `center left`,
+`center right`. The score is computed by `_legend_overlap_score`; the search
+stops at the first position with score 0.
+
+### place_all_legends(fig, rounds=2, candidates=None)
+
+Refines every in-axes legend of a figure. If no candidate is clear, it grows the
+y-range on the side where the legend sits (35 % of the span), re-locks the axis
+ends and retries, up to `rounds` times. Polar axes, colorbar axes and axes with
+`axison == False` keep their hand-placed legend.
+
+### prepare_figure(fig, lock_ends=True, auto_legend=True)
+
+Puts a figure into contract state: locks axis ends and deconflicts legends.
+Call it before `check_wxl_style` when you audit a figure yourself;
+`finalize_figure` calls it automatically.
+
+```python
+fig = build_my_figure()
+prepare_figure(fig)
+report = check_wxl_style(fig)
+assert report["ok"], report["problems"]
+finalize_figure(fig, "figures/result", dpi=600,
+                target_width_mm=WXL_WIDTH_MM["double"])
 ```
 
 ### add_caption(fig, text, fontsize=None, y=-0.045, **kwargs)
@@ -188,6 +219,8 @@ Checks performed:
   and last tick carry a label (image, polar, colorbar and pie/donut axes are
   exempt);
 - every legend has a visible frame, black border and no transparency;
+- no legend covers more than 2 % of the plotted data (soft warning, reported
+  with the measured percentage);
 - every `Line2D`, `Patch` and `PathCollection` color comes from the palette
   plus black/white.
 
