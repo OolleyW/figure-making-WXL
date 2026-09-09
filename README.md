@@ -8,6 +8,15 @@ inserted at its original size.
 论文配图样式技能：Times New Roman 统一 11 pt、深蓝主色系、四边全包围、图例带黑框、
 刻度朝内、无网格，图幅按 90 / 140 / 190 mm 印刷宽度校准。
 
+<p align="center">
+  <img src="preview/grouped_bar.png" width="46%">
+  <img src="preview/line_trend.png" width="46%">
+</p>
+<p align="center">
+  <img src="preview/heatmap.png" width="46%">
+  <img src="preview/multi_panel.png" width="46%">
+</p>
+
 ## Install for an agent
 
 The skill is a plain directory: no build step, no absolute paths, no config file.
@@ -163,7 +172,7 @@ python "<skill-dir>/examples/word_report.py" --out ./wxl_report
 ```
 
 
-## Chart types (20)
+## Chart types (21)
 
 Bar: grouped with error bars, stacked, horizontal.
 Line: multi-series trend, trend + uncertainty band, stacked area.
@@ -176,6 +185,56 @@ Runnable code for all of them is in `examples/gallery.py`; rendered previews are
 in `preview/`. `heatmap`, `radar` and `donut` are rendered in single column only;
 `multi_panel` and `multi_panel_1x3` in double column only. The `double` preset is
 deliberately short (190 × 66 mm) with the 11 pt text unchanged.
+
+## Gallery
+
+Every chart type rendered with the WXL style, straight from `preview/`
+(300 dpi, shown at each type's recommended width).
+
+### Bar
+
+| Grouped bar (error bars) | Stacked bar | Horizontal bar (sorted) |
+|---|---|---|
+| <img src="preview/grouped_bar.png" width="300"> | <img src="preview/stacked_bar.png" width="300"> | <img src="preview/horizontal_bar.png" width="300"> |
+
+### Line
+
+| Multi-series trend | Trend + uncertainty band | Stacked area |
+|---|---|---|
+| <img src="preview/line_trend.png" width="300"> | <img src="preview/line_band.png" width="300"> | <img src="preview/stacked_area.png" width="300"> |
+
+### Relationship
+
+| Scatter + fit | Bubble (size + colour) | Error bars (x, y) |
+|---|---|---|
+| <img src="preview/scatter_fit.png" width="300"> | <img src="preview/bubble.png" width="300"> | <img src="preview/errorbar.png" width="300"> |
+
+### Distribution
+
+| Box plot | Violin | Histogram + KDE |
+|---|---|---|
+| <img src="preview/boxplot.png" width="300"> | <img src="preview/violin.png" width="300"> | <img src="preview/hist_kde.png" width="300"> |
+
+| ECDF | Strip + mean | |
+|---|---|---|
+| <img src="preview/ecdf.png" width="300"> | <img src="preview/strip_mean.png" width="300"> | |
+
+### Matrix
+
+| Annotated heatmap | Filled contour |
+|---|---|
+| <img src="preview/heatmap.png" width="300"> | <img src="preview/contour.png" width="300"> |
+
+### Special
+
+| Radar (polar) | Donut / pie | Dual axis |
+|---|---|---|
+| <img src="preview/radar.png" width="300"> | <img src="preview/donut.png" width="300"> | <img src="preview/dual_axis.png" width="300"> |
+
+| 2 × 2 multi-panel | 1 × 3 one-row multi-panel |
+|---|---|
+| <img src="preview/multi_panel.png" width="330"> | <img src="preview/multi_panel_1x3.png" width="330"> |
+
 
 ## Files
 
