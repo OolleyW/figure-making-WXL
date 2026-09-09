@@ -632,6 +632,9 @@ def prepare_figure(fig, lock_ends: bool = True, auto_legend: bool = True,
         center = bool(getattr(fig, "_wxl_center", False))
     if center:
         center_grid(fig)
+        caption = getattr(fig, "_wxl_caption", None)
+        if caption is not None:
+            _caption_below(fig, caption[0], caption[1], caption[2])
     return fig
 
 
@@ -641,6 +644,48 @@ def add_caption(fig, text: str, fontsize: float | None = None, y: float = -0.045
     kwargs.setdefault("va", "top")
     return fig.text(0.5, y, text,
                     fontsize=fontsize or WXL_FONTSIZE["caption"], **kwargs)
+
+
+#: how far the figure caption sits below the grid, in points
+WXL_CAPTION_PAD_PT = 14.0
+
+
+def _caption_below(fig, text, pad_pt: float = WXL_CAPTION_PAD_PT,
+                   fontsize: float | None = None):
+    """Place the caption ``pad_pt`` points below the grid's lowest label."""
+    old = getattr(fig, "_wxl_caption_artist", None)
+    if old is not None:
+        try:
+            old.remove()
+        except Exception:                                 # pragma: no cover
+            pass
+    fig.canvas.draw()
+    boxes = [ax.get_tightbbox() for ax in fig.get_axes()
+             if ax.get_visible() and ax.get_tightbbox() is not None]
+    if not boxes:
+        artist = fig.text(0.5, 0.01, text, ha="center", va="top",
+                          fontsize=fontsize or WXL_FONTSIZE["caption"])
+    else:
+        Hpx = fig.get_size_inches()[1] * fig.dpi
+        y_bottom = min(b.y0 for b in boxes) / Hpx
+        y = y_bottom - pad_pt * fig.dpi / 72.0 / Hpx
+        artist = fig.text(0.5, y, text, ha="center", va="top",
+                          fontsize=fontsize or WXL_FONTSIZE["caption"])
+    fig._wxl_caption_artist = artist
+    return artist
+
+
+def add_caption_below(fig, text: str, pad_pt: float = WXL_CAPTION_PAD_PT,
+                      fontsize: float | None = None):
+    """Caption close below the grid, re-applied after grid centering.
+
+    Records the caption on the figure so :func:`prepare_figure` re-places it
+    after :func:`center_grid` moves the axes. Use this for a centered multi-panel
+    figure where the default ``add_caption`` (placed below the canvas) would end
+    up far from the grid.
+    """
+    fig._wxl_caption = (text, pad_pt, fontsize)
+    return _caption_below(fig, text, pad_pt, fontsize)
 
 
 def _nice_axis(lo: float, hi: float, min_ticks: int = 4, max_ticks: int = 8):

@@ -71,7 +71,16 @@ def render_variant(spec, preset, outdir: Path, reuse: bool = False):
         return png, mm, report, ok
     apply_wxl_style()
     fig = spec["fn"]()
-    fig.set_size_inches(*WXL_FIGSIZE[preset])
+    # Use the figure's own designed aspect for the double-column variant, so a
+    # 2x2 grid keeps its tall 190 x 173 mm layout and the top-row panel labels
+    # stay clear of the bottom row. The single-column variant uses the compact
+    # 90 mm aspect.
+    if preset == "single":
+        base = WXL_FIGSIZE["single"]
+    else:
+        base = WXL_FIGSIZE[spec["width"]] if spec["width"] in ("double", "double_tall") \
+            else WXL_FIGSIZE["double"]
+    fig.set_size_inches(*base)
     prepare_figure(fig)
     report = check_wxl_style(fig)
     finalize_figure(fig, png.with_suffix(""), formats=["png"], dpi=DPI,

@@ -25,9 +25,9 @@ sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (  # noqa: E402
     WXL_CMAP, WXL_FIGSIZE, WXL_FONTSIZE, WXL_PALETTE, WXL_WIDTH_MM, add_caption,
-    annotate_bars, apply_wxl_style, center_grid, check_wxl_style,
-    create_subplots, finalize_figure, framed_legend, measure_width_mm, panel_tag,
-    prepare_figure,
+    add_caption_below, annotate_bars, apply_wxl_style, center_grid,
+    check_wxl_style, create_subplots, finalize_figure, framed_legend,
+    measure_width_mm, panel_tag, prepare_figure,
 )
 
 P = WXL_PALETTE
@@ -596,7 +596,7 @@ def fig_multi_panel():
     framed_legend(ax, loc="upper left")
     panel_tag(ax, "(d)", "Scatter")
 
-    add_caption(fig, "Fig. 20  Multi-panel figure with four chart types.")
+    add_caption_below(fig, "Fig. 20  Multi-panel figure with four chart types.")
     return fig
 
 
