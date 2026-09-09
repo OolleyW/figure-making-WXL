@@ -2,9 +2,8 @@
 name: figure-making-WXL
 description: >-
   Publication-ready matplotlib figures in the WXL house style for Elsevier,
-  IEEE and Springer submissions: every text element is Times New Roman at a
-  uniform 11 pt (so figure text matches Word 11 pt body text when the figure is
-  inserted at its original size), a deep-blue semantic palette, full-box axes,
+  IEEE and Springer submissions: every text element is Times New Roman at
+  11 pt (legend at 10 pt), with a deep-blue semantic palette, full-box axes,
   framed in-plot legends, inward ticks, no grid, captions below the figure, and
   figure widths fixed to the final print width (90 / 140 / 190 mm). Before
   plotting it always asks the user for the chart type, the x/y axis labels (and
@@ -59,8 +58,9 @@ These rules supersede any conflicting style text in `references/` or in upstream
    `axes.unicode_minus = False` because Times New Roman lacks U+2212. Bold and
    italic Times faces are allowed; never Helvetica, Arial or DejaVu Sans. CJK
    text falls back to SimSun.
-2. **Uniform 11 pt.** Caption, axis label, tick, legend and annotation are all
-   11 pt. The contract is checked; do not hand-tune individual sizes.
+2. **11 pt body, 10 pt legend.** Caption, axis label, tick and annotation are
+   11 pt; the legend text is 10 pt. The contract is checked; do not hand-tune
+   individual sizes.
 3. **Figure width = final print width.** `single` = 90 mm (3.54 in),
    `onehalf` = 140 mm (5.51 in), `double` = 190 mm (7.48 in). 11 pt in the
    figure equals Word 11 pt only when the image is inserted at its original

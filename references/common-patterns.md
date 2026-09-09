@@ -65,8 +65,8 @@ The fix is a layout decision, not a style tweak, in this order:
 3. Give the legend its own subplot inside the same figure.
 4. Drop a series so the legend shrinks.
 
-Do not shrink the legend font: the uniform 11 pt rule is non-negotiable, and
-`check_wxl_style` rejects any other size.
+Do not shrink the legend font below 10 pt: the 11 pt body / 10 pt legend
+contract is non-negotiable, and `check_wxl_style` rejects any other size.
 
 ```python
 ax.set_axis_off()

@@ -39,7 +39,7 @@ Ordered color cycle used when a helper is called without explicit colors:
 {"caption": 11, "label": 11, "tick": 11, "legend": 11, "annot": 11, "panel": 11}
 ```
 
-Uniform 11 pt. This is the W1 contract; the audit fails on any other size.
+Uniform 11 pt for body text, 10 pt for the legend. The audit fails on any other size.
 
 ### WXL_FIGSIZE
 

@@ -72,7 +72,7 @@ the colours — the skill never decides these for them. See `references/preferen
 |---|---|
 | Target | Elsevier / IEEE / Springer |
 | Font | Times New Roman + STIX math, SimSun for CJK |
-| Type scale | uniform 11 pt (caption / label / tick / legend / annotation) |
+| Type scale | 11 pt body, legend 10 pt |
 | Palette | deep blue `#1F4E79` primary, `#B64342` contrast, `#2E8B7A` improve, `#E0A030` accent, `#7B7B7B` neutral, `#C9DCF0` light |
 | Axes | full box, 0.8 pt spines |
 | Legend | inside the axes, white face, black 0.8 pt border |

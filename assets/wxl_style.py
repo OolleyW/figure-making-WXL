@@ -56,10 +56,10 @@ WXL_SERIES = [
     WXL_PALETTE["accent"], WXL_PALETTE["secondary"], WXL_PALETTE["neutral"],
 ]
 
-#: Uniform 11 pt type scale (10 pt increased by one step).
+#: 11 pt type scale for body text, with the legend restored to 10 pt.
 WXL_FONTSIZE = {
     "caption": 11, "label": 11, "tick": 11,
-    "legend": 11, "annot": 11, "panel": 11,
+    "legend": 10, "annot": 11, "panel": 11,
 }
 
 #: Figure width = final print width, so 11 pt stays 11 pt after insertion.
@@ -119,7 +119,7 @@ class WXLStyle:
     font_size: float = 11.0        # base text size (pt)
     caption_size: float = 11.0
     tick_size: float = 11.0
-    legend_size: float = 11.0
+    legend_size: float = 10.0
     annot_size: float = 11.0
     axes_linewidth: float = 0.8
     line_width: float = 1.5
@@ -1078,6 +1078,18 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
     soft: list[str] = []
     fonts: set[str] = set()
     sizes: set[float] = set()
+    legend_sizes: set[float] = set()
+
+    # legend text objects are verified separately at legend_size
+    try:
+        fig.canvas.draw()
+        legend_text_ids = set()
+        for ax in fig.get_axes():
+            leg = ax.get_legend()
+            if leg is not None:
+                legend_text_ids.update(id(t) for t in leg.get_texts())
+    except Exception:                                  # pragma: no cover
+        legend_text_ids = set()
 
     # ---- text: font file and size -------------------------------------
     for t in fig.findobj(lambda a: isinstance(a, mtext.Text)):
@@ -1085,18 +1097,28 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
             continue
         fp = t.get_fontproperties()
         fonts.add(Path(findfont(fp)).name.lower())
-        sizes.add(round(float(fp.get_size()), 2))
+        s = round(float(fp.get_size()), 2)
+        if id(t) in legend_text_ids:
+            legend_sizes.add(s)
+        else:
+            sizes.add(s)
     for f in sorted(fonts):
         if not _font_is_allowed(f):
             problems.append(
                 f"non-house font in use: {f} (expected a Times New Roman file or "
                 f"a metric-compatible serif fallback)")
 
-    allowed_sizes = {round(float(st.font_size), 2)}
     if strict_sizes:
+        want = round(float(st.font_size), 2)
         for s in sorted(sizes):
-            if s not in allowed_sizes:
-                problems.append(f"font size {s} pt is outside the uniform {st.font_size:g} pt scale")
+            if abs(s - want) > 1e-9:
+                problems.append(
+                    f"font size {s} pt is outside the uniform {st.font_size:g} pt scale")
+        want_leg = round(float(st.legend_size), 2)
+        for s in sorted(legend_sizes):
+            if abs(s - want_leg) > 1e-9:
+                problems.append(
+                    f"legend font size {s} pt is outside {st.legend_size:g} pt")
 
     # ---- missing glyphs ----------------------------------------------
     with warnings.catch_warnings(record=True) as wlist:

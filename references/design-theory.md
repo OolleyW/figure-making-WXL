@@ -56,7 +56,7 @@ Verify after saving: `measure_width_mm("figures/result.png", 600)` should return
 | Figure caption | 11 pt | below the figure, centered |
 | Axis label | 11 pt | |
 | Tick label | 11 pt | |
-| Legend text | 11 pt | |
+| Legend text | 10 pt | |
 | Data annotation | 11 pt | |
 | Panel label `(a) Grouped bars` | 11 pt, not bold | centered below its own panel |
 
