@@ -150,9 +150,7 @@ and more contrast is needed.
   (190 × 66 mm, half the old 190 × 132 mm height). The 11 pt text is unchanged,
   so it reads larger relative to the shorter plot. This suits a wide, flat
   comparison figure. The 2 × 2 multi-panel grid stays tall via `double_tall`
-  (190 × 173 mm) but brings every panel to the 62 × 44 mm single-column box
-  (`_wxl_panel_axes_mm`), so each subplot's black frame is the same size as a
-  single-column figure.
+  (190 × 173 mm).
 - **Legends**: inside the axes, `loc="best"` first, then the emptiest corner,
   then two columns. `ylim` is deliberately loosened (for example to 1.55 for
   bars topping out at 0.94) so the legend never sits on data.

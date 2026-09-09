@@ -232,12 +232,6 @@ in-axes (the right-panel fallback is disabled at this size: a 62 × 44 box plus 
 panel would overflow the column). Set `fig._wxl_skip_std_axes = True` before
 calling `finalize_figure` to opt a figure out of the standard box.
 
-A multi-panel figure is brought to the same box per panel: set
-`fig._wxl_panel_axes_mm = WXL_AXES_PANEL_MM` (also 62 × 44 mm) and
-`finalize_figure` resizes every subplot of a grid to that box about its own grid
-cell (never stacking them), then re-centres the grid. This makes each subplot's
-black frame the same size as a single-column figure.
-
 ```python
 finalize_figure(fig, "figures/result", formats=["png", "pdf"], dpi=600,
                 target_width_mm=WXL_WIDTH_MM["double"])

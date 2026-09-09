@@ -1021,27 +1021,13 @@ def _standardize_axes_box(fig, w_mm: float, h_mm: float) -> int:
         except Exception:                                  # pragma: no cover
             pass
         a.set_position([x0, y0, wf, hf])
-    # Tuck every colorbar against its host axes. The host cannot be inferred
-    # from ``ax.images`` (``contourf`` builds a collection, not an image), so
-    # read it from each colorbar's mappable instead.
-    for a in fig.get_axes():
-        cb = getattr(a, "_colorbar", None)
-        if cb is None:
-            continue
-        mob = getattr(cb, "mappable", None)
-        host = getattr(mob, "axes", None) if mob is not None else None
-        if host is None or host not in targets:
-            continue
+    host = next((t for t in targets if t.images), None)
+    if host is not None:
         hp = host.get_position()
-        # keep the colorbar slim: the standard single-column box leaves only
-        # ~10 mm beside the box, and a wide bar plus its tick labels would push
-        # the figure past the 90 mm column
-        a.set_position([hp.x1 + 0.008 * hp.width, hp.y0,
-                        0.035 * hp.width, hp.height])
-        try:
-            cb.set_label(cb.ax.get_ylabel(), labelpad=2)
-        except Exception:                                  # pragma: no cover
-            pass
+        for a in fig.get_axes():
+            if hasattr(a, "_colorbar"):
+                a.set_position([hp.x1 + 0.015 * hp.width, hp.y0,
+                                0.05 * hp.width, hp.height])
     fig._wxl_no_tight = True
     # A single-column figure has only ~10 mm of spare width once the standard
     # 62 x 44 box and its axis labels are in place, so a right legend panel
@@ -1067,44 +1053,6 @@ def _standardize_axes_box(fig, w_mm: float, h_mm: float) -> int:
                     lg.get_frame().set_linewidth(0.8)
                     lg.get_frame().set_alpha(1.0)
             fig.delaxes(a)
-    return len(targets)
-
-
-#: standard box for each panel of a multi-panel figure (mm), so every subplot's
-#: black frame matches a single-column figure of the same style.
-WXL_AXES_PANEL_MM = (62.0, 44.0)
-
-
-def _standardize_grid_boxes(fig, w_mm: float, h_mm: float) -> int:
-    """Force every panel of a grid figure to the same physical box.
-
-    Unlike :func:`_standardize_axes_box`, which stacks every axes onto one
-    shared box (correct for a single-subplot figure), this keeps each panel in
-    its own grid cell and only rescales its axes to ``w_mm x h_mm`` about that
-    cell's centre. Used for multi-panel figures so each subplot's black frame is
-    the same size as a single-column figure. Returns the number of axes resized.
-    """
-    fw, fh = (float(v) for v in fig.get_size_inches())
-    W, H = fw * 25.4, fh * 25.4
-    targets = [a for a in fig.get_axes()
-               if a.axison and not _is_polar(a) and not hasattr(a, "_colorbar")]
-    if not targets:
-        return 0
-    wf = w_mm / W
-    hf = h_mm / H
-    if wf >= 1.0 or hf >= 1.0:
-        return 0
-    for a in targets:
-        try:
-            a.set_aspect("auto")
-        except Exception:                                  # pragma: no cover
-            pass
-        p = a.get_position()
-        # keep the panel's cell centre, only resize the box around it
-        cx = p.x0 + p.width / 2.0
-        cy = p.y0 + p.height / 2.0
-        a.set_position([cx - wf / 2.0, cy - hf / 2.0, wf, hf])
-    fig._wxl_no_tight = True
     return len(targets)
 
 
@@ -1201,17 +1149,6 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
         if _standardize_axes_box(fig, *WXL_AXES_SINGLE_MM):
             _prepare()
             _relayout()
-
-    # a multi-panel figure brings every panel to the same box as a single-column
-    # figure, so each subplot's black frame matches; only resize, never stack
-    panel_box = getattr(fig, "_wxl_panel_axes_mm", None)
-    if panel_box and not getattr(fig, "_wxl_skip_std_axes", False):
-        if _standardize_grid_boxes(fig, *panel_box):
-            _prepare()
-            _relayout()
-            # recentre the whole grid after the panels shrank
-            if getattr(fig, "_wxl_center", False):
-                center_grid(fig)
 
     saved = []
     for ext in formats:

@@ -66,9 +66,7 @@ the layouts it suits).
 
 Note: the `double` preset is deliberately short — 190 × 66 mm, half the height it
 used to be — while every text element stays 11 pt. `double_tall` (190 × 173 mm)
-is the tall 2 × 2 multi-panel preset and is unchanged, but each of its panels is
-brought to the 62 × 44 mm single-column box (`_wxl_panel_axes_mm`), so a subplot
-is the same size as a single-column figure. `double_1x3`
+is the tall 2 × 2 multi-panel preset and is unchanged. `double_1x3`
 (190 × 41 mm) is the 1 × 3 row preset, sized so each panel keeps the
 single-column aspect ratio (50.4 × 38.5 mm, 1.31).
 
