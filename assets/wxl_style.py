@@ -1071,7 +1071,9 @@ def _standardize_axes_box(fig, w_mm: float, h_mm: float) -> int:
         if host is None or host not in targets:
             continue
         hp = host.get_position()
-        a.set_position([hp.x1 + 0.008 * hp.width, hp.y0,
+        # leave a clear gap between the frame and the bar (0.008 of the host
+        # width was visually touching); 0.05 reads as a proper separation
+        a.set_position([hp.x1 + 0.05 * hp.width, hp.y0,
                         0.035 * hp.width, hp.height])
         try:
             cb.set_label(cb.ax.get_ylabel(), labelpad=2)
