@@ -109,6 +109,15 @@ and more contrast is needed.
   bounded region and matches the table rules used in the same manuscripts.
 - **Ticks**: inward, 3 pt long, 0.8 pt wide. Inward ticks keep the outer canvas
   clean and avoid collisions with adjacent panels.
+- **Axis ends**: every numeric axis starts and ends exactly on a tick label.
+  Matplotlib's default autoscaling leaves a 5 % margin, so the last tick often
+  falls short of the axis end and the reader sees an unlabelled strip on the
+  right or top. `lock_axis_ends_all` rounds the limits outward to a
+  1 / 2 / 2.5 / 5 / 10 step grid, sets the ticks explicitly and installs a plain
+  formatter, so the first and last labels sit on the spines. Steps are chosen to
+  keep four to eight ticks while minimising padding. Non-negative data keeps a
+  zero lower bound, which is why a strain axis spanning 10 to 410 mm is drawn as
+  0 to 500 mm rather than −100 to 500 mm.
 - **Grid**: none. Tick values plus the full box carry the reading task. The only
   exception is the radar chart, where a light `neutral` grid at 35 % alpha is
   required to read values off the polar axes.
@@ -149,6 +158,7 @@ fixed bounding box would clip it.
 |---|---|---|
 | Radar (polar) | keeps a light grid, no rectangular spines | polar axes have no four-spine frame, and values are unreadable without a grid |
 | Pie / donut | `ax.set_axis_off()` | there are no axes to frame |
+| Categorical axes | not end-locked | category labels sit at bar / box centers, and locking the ends would clip half of the first and last category |
 | Colorbar | spines not checked | the colorbar draws its own 0.8 pt outline |
 | Slide export | `WXL_FIGSIZE["slide"]` | slides are viewed, not printed, so the 10 pt/print-width contract does not apply |
 

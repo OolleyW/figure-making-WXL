@@ -190,6 +190,112 @@ def add_caption(fig, text: str, fontsize: float | None = None, y: float = -0.045
                     fontsize=fontsize or WXL_FONTSIZE["caption"], **kwargs)
 
 
+def _nice_axis(lo: float, hi: float, min_ticks: int = 4, max_ticks: int = 8):
+    """Return ``(lo2, hi2, step)`` so that lo2/hi2 sit exactly on tick values."""
+    span = hi - lo
+    raw = span / max(max_ticks - 1, 1)
+    mag = 10.0 ** np.floor(np.log10(raw)) if raw > 0 else 1.0
+    best = None
+    for m in (1, 2, 2.5, 5, 10, 20, 25, 50):
+        step = m * mag
+        lo2 = np.floor(lo / step) * step
+        hi2 = np.ceil(hi / step) * step
+        count = int(round((hi2 - lo2) / step)) + 1
+        if count < min_ticks or count > max_ticks:
+            continue
+        pad = (lo - lo2) + (hi2 - hi)
+        score = pad / span + 0.05 * abs(count - 6)
+        if best is None or score < best[0]:
+            best = (score, float(lo2), float(hi2), float(step))
+    if best is None:
+        step = raw if raw > 0 else 1.0
+        return float(lo), float(hi), float(step)
+    _, lo2, hi2, step = best
+    # keep essentially non-negative data axes starting at zero
+    if lo2 < 0 and lo > -0.05 * span:
+        lo2 = 0.0
+    if hi2 > 0 and hi < 0.05 * span and hi <= 0:
+        hi2 = 0.0
+    return lo2, hi2, step
+
+
+def _axis_is_categorical(axis) -> bool:
+    """True when an axis carries category names rather than plain numbers.
+
+    A label counts as categorical when it is not numeric, or when its numeric
+    value does not match the tick position (years 2021..2024 placed at 0..3, for
+    example).
+    """
+    try:
+        ticks = [float(t) for t in axis.get_majorticklocs()]
+        labels = [t.get_text().strip() for t in axis.get_majorticklabels()]
+    except Exception:                                      # pragma: no cover
+        return False
+    if not ticks or len(ticks) != len(labels):
+        return False
+    for t, s in zip(ticks, labels):
+        if not s:
+            continue
+        try:
+            v = float(s.replace("\u2212", "-").replace(",", ""))
+        except ValueError:
+            return True
+        if abs(v - t) > 1e-6 * max(1.0, abs(t)):
+            return True
+    return False
+
+
+def lock_axis_ends(ax, max_ticks: int = 8, min_ticks: int = 4) -> int:
+    """Make both axis ends land exactly on the first and last tick label.
+
+    Expands the current limits outward to the nearest tick grid, sets the ticks
+    explicitly and uses a plain formatter (no offset, no scientific notation).
+    Categorical axes (bar categories, box labels, specimen names) are left alone
+    so their text labels survive. Returns the number of axes modified.
+    """
+    from matplotlib.ticker import FuncFormatter
+    n = 0
+    for name in ("x", "y"):
+        scale = ax.get_xscale() if name == "x" else ax.get_yscale()
+        if scale != "linear":
+            continue
+        get_lim = ax.get_xlim if name == "x" else ax.get_ylim
+        set_lim = ax.set_xlim if name == "x" else ax.set_ylim
+        set_ticks = ax.set_xticks if name == "x" else ax.set_yticks
+        axis = ax.xaxis if name == "x" else ax.yaxis
+        if _axis_is_categorical(axis):
+            continue
+        lo, hi = sorted(float(v) for v in get_lim())
+        if not (np.isfinite(lo) and np.isfinite(hi)) or hi <= lo:
+            continue
+        lo2, hi2, step = _nice_axis(lo, hi, min_ticks, max_ticks)
+        if hi2 <= lo2:
+            continue
+        ticks = np.arange(lo2, hi2 + step * 0.5, step)
+        set_lim(lo2, hi2)
+        set_ticks(ticks)
+        decimals = max(0, int(np.ceil(-np.log10(step)))) if step < 1 else 0
+        fmt = f"{{:.{decimals}f}}"
+        axis.set_major_formatter(FuncFormatter(lambda v, _pos: fmt.format(v)))
+        n += 1
+    return n
+
+
+def lock_axis_ends_all(fig, max_ticks: int = 8, min_ticks: int = 4) -> int:
+    """Apply :func:`lock_axis_ends` to every numeric Cartesian axes of a figure.
+
+    Image axes (``imshow`` heatmaps), polar axes, colorbar axes and axes with
+    ``axison == False`` (pie/donut) are skipped: their ticks are categorical and
+    already span the full extent.
+    """
+    n = 0
+    for ax in fig.get_axes():
+        if not ax.axison or _is_polar(ax) or hasattr(ax, "_colorbar") or ax.images:
+            continue
+        n += lock_axis_ends(ax, max_ticks=max_ticks, min_ticks=min_ticks)
+    return n
+
+
 def panel_tag(ax, tag: str, y: float = -0.32):
     """Panel label such as ``(a)`` placed just BELOW its own panel."""
     return ax.text(0.0, y, tag, transform=ax.transAxes, ha="left", va="top",
@@ -212,7 +318,8 @@ def measure_width_mm(path, dpi: int | None = None) -> float:
 
 def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                     close: bool = True, pad: float = 0.06, layout: bool = True,
-                    target_width_mm: float | None = None, tol_mm: float = 0.5):
+                    target_width_mm: float | None = None, tol_mm: float = 0.5,
+                    lock_ends: bool = True):
     """Save the figure to one or more formats and return the list of paths.
 
     Saving always uses ``bbox_inches="tight"`` so a caption placed below the
@@ -238,6 +345,9 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                 fig.tight_layout(pad=1.0)
             except Exception:
                 pass
+
+    if lock_ends:
+        lock_axis_ends_all(fig)
 
     _relayout()
 
@@ -330,10 +440,31 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
             if getattr(tk, "_tickdir", "in") != "in":
                 problems.append(f"axes[{i}]: tick direction is not 'in'")
                 break
-        if ax.get_xlabel() and not ax.xaxis.label.get_text().strip() == "":
-            pass
-        if ax.get_ylabel() and not ax.yaxis.label.get_text().strip() == "":
-            pass
+        # axis ends must land exactly on the first and last tick label
+        if not ax.images:
+            for name in ("x", "y"):
+                axis = ax.xaxis if name == "x" else ax.yaxis
+                if _axis_is_categorical(axis):
+                    continue                      # categorical axis
+                lims = sorted(float(v) for v in
+                              (ax.get_xlim() if name == "x" else ax.get_ylim()))
+                span = lims[1] - lims[0]
+                if span <= 0:
+                    continue
+                locs = sorted(float(t) for t in axis.get_majorticklocs()
+                              if lims[0] - 1e-9 <= float(t) <= lims[1] + 1e-9)
+                if not locs:
+                    problems.append(f"axes[{i}]: {name}-axis has no tick labels")
+                    continue
+                tol = max(1e-6 * span, 1e-9)
+                if abs(locs[0] - lims[0]) > tol or abs(locs[-1] - lims[1]) > tol:
+                    problems.append(
+                        f"axes[{i}]: {name}-axis ends {lims[0]:g}..{lims[1]:g} do not "
+                        f"sit on tick values {locs[0]:g}..{locs[-1]:g}")
+                labels = [t.get_text().strip() for t in axis.get_majorticklabels()]
+                labels = [l for l in labels if l]
+                if len(labels) < 2:
+                    problems.append(f"axes[{i}]: {name}-axis ends are unlabelled")
 
     # ---- legends: framed, inside, opaque ------------------------------
     n_legends = 0

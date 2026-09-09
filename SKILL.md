@@ -49,9 +49,15 @@ These rules supersede any conflicting style text in `references/` or in upstream
 5. **Legend inside the axes, framed.** `loc="best"` or the emptiest corner,
    opaque white face, black 0.8 pt border, `framealpha = 1`. If `"best"` would
    cover bars, move it or use two columns. Never place it outside the figure.
-6. **Ticks point inward, no grid.** Ticks 3 pt long at 0.8 pt width. The only
-   grid exception is the radar chart, which keeps a light neutral grid so the
-   values stay readable.
+6. **Ticks point inward, no grid, and both axis ends land on a tick value.**
+   Ticks are 3 pt long at 0.8 pt width. Every numeric Cartesian axis must start
+   and end exactly on its first and last tick label, so a reader never sees an
+   unlabelled strip at either end. `finalize_figure` calls `lock_axis_ends_all`
+   automatically, and `check_wxl_style` fails a figure whose axis ends are not on
+   tick values. The only grid exception is the radar chart, which keeps a light
+   neutral grid so the values stay readable. Image axes (heatmaps), polar axes,
+   colorbar axes and pie/donut axes are exempt because their ticks are
+   categorical and already span the full extent.
 7. **Caption below the figure**, centered, via `add_caption`. Never
    `fig.suptitle` and never a title on top of the axes. Panel tags `(a)`, `(b)`
    go just below their own panel.

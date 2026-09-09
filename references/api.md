@@ -114,12 +114,16 @@ Places the figure caption centered **below** the whole figure and returns the
 Places `(a)`, `(b)`, ... just below the panel. With an x-label present, use
 `y=-0.42` so the tag clears the label.
 
-### finalize_figure(fig, out_path, formats=None, dpi=None, close=True, pad=0.06, layout=True, target_width_mm=None, tol_mm=0.5)
+### finalize_figure(fig, out_path, formats=None, dpi=None, close=True, pad=0.06, layout=True, target_width_mm=None, tol_mm=0.5, lock_ends=True)
 
 Saves to one or more formats (`png`, `pdf`, `svg`, `eps`, `tif`), creates parent
 directories, applies `tight_layout(pad=1.0)` unless `layout=False`, and always
 uses `bbox_inches="tight"`. Returns the list of saved paths. Use
 `dpi=600` for submission and `dpi=300` for HTML previews.
+
+`lock_ends=True` (default) runs `lock_axis_ends_all` before saving, so every
+numeric axis ends exactly on a tick label. Set it to `False` only for a figure
+whose axes must keep hand-set limits.
 
 `target_width_mm` iteratively calibrates the canvas width (up to six probe
 renders) so the **trimmed** image is exactly that wide while keeping the text at
@@ -131,6 +135,23 @@ about 8.3 pt.
 finalize_figure(fig, "figures/result", formats=["png", "pdf"], dpi=600,
                 target_width_mm=WXL_WIDTH_MM["double"])
 ```
+
+### lock_axis_ends(ax, max_ticks=8, min_ticks=4) -> int
+
+Expands the current limits outward to the nearest tick grid, sets the ticks
+explicitly, and installs a plain formatter with no offset and no scientific
+notation, so the axis starts and ends exactly on its first and last tick label.
+Essentially non-negative data keeps a zero lower bound. Returns the number of
+axes modified.
+
+### lock_axis_ends_all(fig, max_ticks=8, min_ticks=4) -> int
+
+Applies `lock_axis_ends` to every numeric Cartesian axes of a figure. Image axes
+(`imshow` heatmaps), polar axes, colorbar axes and axes with `axison == False`
+are skipped because their ticks are categorical and already span the full
+extent. `finalize_figure` calls this automatically, so figures produced through
+the normal path are compliant. Call it yourself only when you audit a figure with
+`check_wxl_style` before saving.
 
 ### measure_width_mm(path, dpi=None) -> float
 
@@ -163,6 +184,9 @@ Checks performed:
   colorbar axes are exempt);
 - no visible grid lines;
 - tick direction is `in`;
+- both ends of every numeric Cartesian axis sit on tick values, and the first
+  and last tick carry a label (image, polar, colorbar and pie/donut axes are
+  exempt);
 - every legend has a visible frame, black border and no transparency;
 - every `Line2D`, `Patch` and `PathCollection` color comes from the palette
   plus black/white.

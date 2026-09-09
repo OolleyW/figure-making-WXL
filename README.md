@@ -18,7 +18,7 @@ inserted at its original size.
 | Palette | deep blue `#1F4E79` primary, `#B64342` contrast, `#2E8B7A` improve, `#E0A030` accent, `#7B7B7B` neutral, `#C9DCF0` light |
 | Axes | full box, 0.8 pt spines |
 | Legend | inside the axes, white face, black 0.8 pt border |
-| Ticks | inward, no grid |
+| Ticks | inward, no grid, both axis ends land on a tick label |
 | Caption | below the figure, centered |
 | Width | single 90 mm / onehalf 140 mm / double 190 mm |
 | Export | PNG 600 dpi + vector PDF |

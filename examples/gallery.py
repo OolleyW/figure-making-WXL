@@ -26,7 +26,7 @@ sys.path.insert(0, str(SKILL / "assets"))
 from wxl_style import (  # noqa: E402
     WXL_CMAP, WXL_FIGSIZE, WXL_FONTSIZE, WXL_PALETTE, WXL_WIDTH_MM, add_caption,
     apply_wxl_style, check_wxl_style, create_subplots, finalize_figure,
-    framed_legend, measure_width_mm, panel_tag,
+    framed_legend, lock_axis_ends_all, measure_width_mm, panel_tag,
 )
 
 P = WXL_PALETTE
@@ -724,6 +724,7 @@ def build(outdir: Path):
     for spec in FIGS:
         apply_wxl_style()
         fig = spec["fn"]()
+        lock_axis_ends_all(fig)
         report = check_wxl_style(fig)
         paths = finalize_figure(fig, figs_dir / spec["id"],
                                 formats=["png", "pdf"], dpi=300,
