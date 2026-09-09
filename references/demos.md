@@ -2,8 +2,8 @@
 
 All 20 are implemented in `examples/gallery.py` and rendered by
 
-```powershell
-python C:\Users\24976\.dsh\skills\figure-making-WXL\examples\gallery.py --out C:\DSH_work\wxl_gallery
+```bash
+python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
 ```
 
 The generated `index.html` shows every figure with its audit result. Each entry

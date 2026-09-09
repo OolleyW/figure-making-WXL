@@ -1,7 +1,7 @@
 """WXL style gallery: every supported chart type rendered under the house style.
 
 Usage:
-    python gallery.py --out C:\\DSH_work\\wxl_gallery
+    python gallery.py --out ./wxl_gallery        # defaults to ~/wxl_gallery
 
 Produces <out>/figs/<id>.png (300 dpi, for the HTML preview),
 <out>/figs/<id>.pdf (vector) and <out>/index.html.

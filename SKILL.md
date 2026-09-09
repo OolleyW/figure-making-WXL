@@ -77,9 +77,16 @@ These rules supersede any conflicting style text in `references/` or in upstream
 ## Quickstart
 
 ```python
+import os
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(r"C:\Users\24976\.dsh\skills\figure-making-WXL\assets")))
+
+# Point this at wherever the skill is installed. Your skill loader knows the
+# directory; WXL_SKILL_DIR overrides it, and the default assumes ~/.dsh/skills.
+SKILL = Path(os.environ.get(
+    "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-WXL"))
+sys.path.insert(0, str(SKILL / "assets"))
+
 from wxl_style import (WXL_PALETTE as P, WXL_FIGSIZE, apply_wxl_style,
                        create_subplots, framed_legend, add_caption,
                        finalize_figure, check_wxl_style)
@@ -102,6 +109,28 @@ finalize_figure(fig, "figures/accuracy", formats=["png", "pdf"], dpi=600)
 The 20 chart types the style covers, each with its core call, are listed in
 `references/demos.md`; runnable code for all of them lives in
 `examples/gallery.py`.
+
+## Portability (another machine or another agent)
+
+The skill is self-contained and has no absolute paths. Scripts resolve the skill
+directory from `__file__`; the docs use `<skill-dir>`. Install it by copying the
+whole `figure-making-WXL` directory into the target agent's skills directory,
+then run `scripts/check_wxl_style.py` to confirm the machine can reproduce the
+style.
+
+| Requirement | Behaviour |
+|---|---|
+| Python | 3.9 or newer. |
+| `matplotlib` ≥ 3.5, `numpy`, `Pillow` | See `requirements.txt`. Pillow is only used to measure saved image width. |
+| Times New Roman | Mandatory **by name**. Present on Windows and on macOS with Office. On Linux the stack falls back to Nimbus Roman No9 L or Liberation Serif, which are metric-compatible Times clones, and `check_wxl_style` accepts them. A few glyph details differ. |
+| CJK text | SimSun on Windows. Elsewhere install a CJK serif (Noto Serif CJK, Songti) or keep figure text in English. |
+| `legend.set_ncols` | Used for the flatten fallback when available (matplotlib ≥ 3.6); skipped silently otherwise. |
+| `python-docx` | Never imported by the skill. Only needed by Word-assembly scripts you write yourself. |
+
+What is guaranteed on any conforming machine: 10 pt Times text, the deep-blue
+palette, full-box axes, framed legends placed by measured overlap, inward ticks,
+axis ends on tick values, the 90 / 140 / 190 mm width calibration, and a
+`check_wxl_style` audit that fails on any deviation.
 
 ## When to load this skill
 

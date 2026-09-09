@@ -35,9 +35,14 @@ target.
 ## Usage
 
 ```python
+import os
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(r"C:\Users\24976\.dsh\skills\figure-making-WXL\assets")))
+
+SKILL = Path(os.environ.get(
+    "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-WXL"))
+sys.path.insert(0, str(SKILL / "assets"))
+
 from wxl_style import (WXL_PALETTE as P, WXL_FIGSIZE, WXL_WIDTH_MM, apply_wxl_style,
                        create_subplots, framed_legend, add_caption,
                        finalize_figure, check_wxl_style)
@@ -87,18 +92,30 @@ in `preview/`.
 
 ## Regenerate
 
-```powershell
+```bash
 # installation self-test
-python scripts\check_wxl_style.py
+python "<skill-dir>/scripts/check_wxl_style.py"
 
-# all 20 figures + HTML gallery
-python examples\gallery.py --out C:\DSH_work\wxl_gallery
+# all 20 figures + HTML gallery (default output ~/wxl_gallery)
+python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
 ```
 
 ## Requirements
 
-Python 3.10+, `matplotlib`, `numpy`, `Pillow` (width measurement). The Word
-preview script additionally needs `python-docx`.
+Python 3.9+, `matplotlib` ≥ 3.5, `numpy`, `Pillow` (width measurement) — see
+`requirements.txt`. Times New Roman is mandatory by name; on machines without it
+the stack falls back to the metric-compatible Nimbus Roman No9 L or Liberation
+Serif, which the audit accepts.
+
+## Installing for another agent or machine
+
+Copy the whole `figure-making-WXL` directory into the target agent's skills
+directory. There is nothing else to configure and no absolute path to edit.
+Verify with:
+
+```bash
+python "<skill-dir>/scripts/check_wxl_style.py"     # expects RESULT: PASS
+```
 
 ## Notes
 

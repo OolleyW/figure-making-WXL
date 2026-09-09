@@ -82,10 +82,30 @@ WXL_WIDTH_MM = {
 }
 
 _FONT_STACK = ["Times New Roman", "Nimbus Roman No9 L", "Liberation Serif", "SimSun"]
+
+#: Accepted font files, by lowercase filename prefix. Times New Roman is
+#: mandatory in name, but the metric-compatible serif fallbacks are accepted so
+#: the skill works on machines that do not ship the Microsoft font
+#: (Nimbus Roman No9 L and Liberation Serif are metric-compatible with Times).
+_ALLOWED_FONT_PREFIXES = (
+    "times",            # times.ttf, timesbd.ttf, "Times New Roman.ttf"
+    "simsun",           # simsun.ttc (Windows CJK)
+    "nimbusroman",      # NimbusRoman-Regular.otf (Linux)
+    "liberationserif",  # LiberationSerif-Regular.ttf (Linux)
+    "notoserifcjk",     # NotoSerifCJK*.ttc (Linux CJK)
+    "songti", "stsong",  # macOS / Linux CJK serif
+)
+
+#: Backwards-compatible explicit set (Windows install).
 _ALLOWED_FONT_FILES = {
-    "times.ttf", "timesbd.ttf", "timesi.ttf", "timesbi.ttf",   # Times New Roman family
-    "simsun.ttc", "simsunb.ttf",                               # CJK fallback
+    "times.ttf", "timesbd.ttf", "timesi.ttf", "timesbi.ttf",
+    "simsun.ttc", "simsunb.ttf",
 }
+
+
+def _font_is_allowed(filename: str) -> bool:
+    name = filename.lower().replace(" ", "")
+    return any(name.startswith(p) for p in _ALLOWED_FONT_PREFIXES)
 
 
 @dataclass(frozen=True)
@@ -605,8 +625,10 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
         fonts.add(Path(findfont(fp)).name.lower())
         sizes.add(round(float(fp.get_size()), 2))
     for f in sorted(fonts):
-        if f not in _ALLOWED_FONT_FILES:
-            problems.append(f"non-house font in use: {f}")
+        if not _font_is_allowed(f):
+            problems.append(
+                f"non-house font in use: {f} (expected a Times New Roman file or "
+                f"a metric-compatible serif fallback)")
 
     allowed_sizes = {round(float(st.font_size), 2)}
     if strict_sizes:

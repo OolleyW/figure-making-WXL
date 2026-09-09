@@ -4,6 +4,7 @@ Three end-to-end walkthroughs plus how to run the gallery. Every example starts
 from the same import block:
 
 ```python
+import os
 import sys
 from pathlib import Path
 
@@ -12,10 +13,14 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.insert(0, str(Path(r"C:\Users\24976\.dsh\skills\figure-making-WXL\assets")))
-from wxl_style import (WXL_PALETTE as P, WXL_FIGSIZE, add_caption,
+SKILL = Path(os.environ.get(
+    "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-WXL"))
+sys.path.insert(0, str(SKILL / "assets"))
+
+from wxl_style import (WXL_PALETTE as P, WXL_FIGSIZE, WXL_WIDTH_MM, add_caption,
                        apply_wxl_style, check_wxl_style, create_subplots,
-                       finalize_figure, framed_legend, panel_tag)
+                       finalize_figure, framed_legend, panel_tag,
+                       prepare_figure)
 ```
 
 ---
@@ -142,9 +147,13 @@ Points worth noticing:
 
 ## Running the full gallery
 
-```powershell
-python C:\Users\24976\.dsh\skills\figure-making-WXL\examples\gallery.py --out C:\DSH_work\wxl_gallery
+```bash
+python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
 ```
+
+`<skill-dir>` is wherever the skill is installed, for example
+`~/.dsh/skills/figure-making-WXL`. The default `--out` is `~/wxl_gallery`, so
+the flag is optional.
 
 This renders all 20 chart types to `<out>/figs/*.png` (300 dpi) and
 `*.pdf` (vector), runs `check_wxl_style` on each, and writes
@@ -155,11 +164,12 @@ module.
 
 ## Verifying an installation
 
-```powershell
-python C:\Users\24976\.dsh\skills\figure-making-WXL\scripts\check_wxl_style.py
+```bash
+python "<skill-dir>/scripts/check_wxl_style.py"
 ```
 
-Expected tail: `RESULT: PASS`, with `font files: ['times.ttf', ...]` and
+Expected tail: `RESULT: PASS`, with `font files: ['times.ttf', ...]` on Windows
+or a metric-compatible fallback such as `nimbusroman-regular.otf` elsewhere, and
 `font sizes (pt): [10.0]`.
 
 ## Related files
