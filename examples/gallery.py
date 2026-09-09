@@ -106,8 +106,10 @@ def fig_stacked_bar():
     ax.set_xticks(x)
     ax.set_xticklabels(cats)
     ax.set_ylabel("Mass fraction (%)")
-    ax.set_ylim(0, 118)
-    framed_legend(ax, loc="upper left", ncol=3, columnspacing=1.0, handlelength=1.4)
+    # raise the upper y-limit so a vertical legend fits in the headroom above
+    # the bars (the stack tops out at 100)
+    ax.set_ylim(0, 165)
+    framed_legend(ax, loc="upper left", ncol=1, handlelength=1.8, handletextpad=0.6)
     add_caption_below(fig, r"$\mathbf{Fig.}$  2  Stacked bars of mixture composition by year.")
     return fig
 
