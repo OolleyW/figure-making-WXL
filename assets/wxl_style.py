@@ -973,6 +973,11 @@ def measure_width_mm(path, dpi: int | None = None) -> float:
 #: every subplot is the same size as a single-column figure.
 WXL_AXES_PANEL_MM = (75.0, 55.0)
 
+#: one shared black frame for every single-column figure (width x height, mm).
+#: The box is fixed, so it does not grow or shrink with the tick labels; the
+#: figure width then follows the labels and may exceed the 90 mm column.
+WXL_AXES_SINGLE_MM = (75.0, 55.0)
+
 #: overall (trimmed) size of a single-column figure in millimetres, so every
 #: single-column figure is the same size on the page. Figures that carry a
 #: colorbar are exempt: a slim bar plus its tick labels and title cannot fit the
@@ -1028,6 +1033,52 @@ def _png_height_mm(path, dpi: int) -> float:
         import matplotlib.image as mpimg
         px = mpimg.imread(str(path)).shape[0]
     return px / dpi * 25.4
+
+
+def _standardize_axes_box(fig, w_mm: float, h_mm: float) -> int:
+    """Force every rectilinear Cartesian axes onto one fixed physical box.
+
+    The box is the same for every figure, so it never grows or shrinks with the
+    tick labels or the legend. Axes are centred horizontally; polar axes, pies
+    and colorbar axes are skipped, and each colorbar is tucked against its host
+    (read from the colorbar's mappable, which works for ``contourf`` too).
+    Returns the number of axes resized.
+    """
+    fw, fh = (float(v) for v in fig.get_size_inches())
+    W, H = fw * 25.4, fh * 25.4
+    targets = [a for a in fig.get_axes()
+               if a.axison and not _is_polar(a) and not hasattr(a, "_colorbar")]
+    if not targets:
+        return 0
+    wf = w_mm / W
+    hf = h_mm / H
+    if wf >= 1.0 or hf >= 1.0:
+        return 0
+    x0 = (1.0 - wf) / 2.0
+    y0 = 0.07
+    for a in targets:
+        # an imshow axes would otherwise override the box with its own aspect
+        try:
+            a.set_aspect("auto")
+        except Exception:                              # pragma: no cover
+            pass
+        a.set_position([x0, y0, wf, hf])
+    for a in fig.get_axes():
+        cb = getattr(a, "_colorbar", None)
+        if cb is None:
+            continue
+        host = getattr(getattr(cb, "mappable", None), "axes", None)
+        if host is None or host not in targets:
+            continue
+        hp = host.get_position()
+        a.set_position([hp.x1 + 0.008 * hp.width, hp.y0,
+                        0.035 * hp.width, hp.height])
+        try:
+            cb.set_label(cb.ax.get_ylabel(), labelpad=2)
+        except Exception:                              # pragma: no cover
+            pass
+    fig._wxl_no_tight = True
+    return len(targets)
 
 
 def _resize_grid_panels(fig, w_mm: float, h_mm: float) -> int:
@@ -1219,24 +1270,15 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                 _prepare()
                 _relayout()
 
-    # every single-column figure gets the same overall (trimmed) size, so a set
-    # of them reads as one consistent size on the page. Figures that carry a
-    # colorbar (the bar plus its labels cannot fit the column) and the
-    # polar/pie figures (a circle cannot fill a 90 x 76 box) are exempt.
-    _all_axes = fig.get_axes()
-    _uniform_ok = (target_width_mm == 90.0
-                   and not getattr(fig, "_wxl_skip_std_axes", False)
-                   and not getattr(fig, "_wxl_skip_uniform_size", False)
-                   and not any(hasattr(a, "_colorbar") for a in _all_axes)
-                   and not any(_is_polar(a) for a in _all_axes)
-                   and any(a.axison and not hasattr(a, "_colorbar")
-                           for a in _all_axes))
-    if _uniform_ok:
-        probe_h = stem.with_suffix(".probe_h.png")
-        if _fit_trimmed_height(fig, WXL_SIZE_SINGLE_MM[1], probe_h, dpi, pad=pad,
-                               caption_max_mm=target_width_mm):
+    # every single-column figure shares one fixed black frame, so the axes box is
+    # the same size in all of them and never adapts to the tick labels; the
+    # figure width then follows the labels and may exceed the 90 mm column
+    if (target_width_mm == 90.0
+            and not getattr(fig, "_wxl_skip_std_axes", False)
+            and not getattr(fig, "_wxl_skip_uniform_size", False)):
+        if _standardize_axes_box(fig, *WXL_AXES_SINGLE_MM):
+            _prepare()
             _relayout()
-        probe_h.unlink(missing_ok=True)
 
     # The caption must keep its 14 pt gap after the last layout pass: the
     # tight_layout in _relayout() (and any later axes move) shifts the grid

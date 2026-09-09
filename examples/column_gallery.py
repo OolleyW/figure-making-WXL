@@ -70,9 +70,13 @@ RECOMMEND = {
 
 def render_variant(spec, preset, outdir: Path, reuse: bool = False):
     png = outdir / f'{spec["id"]}_{preset}.png'
+    # A single-column figure shares one fixed black frame (WXL_AXES_SINGLE_MM), so
+    # its saved width follows the tick labels and is not pinned to 90 mm; only
+    # the style audit has to pass. The double variant has no fixed box, so it is
+    # still checked against the exact print width.
     if reuse and png.exists():
         mm = measure_width_mm(png, DPI)
-        ok = abs(mm - WXL_WIDTH_MM[preset]) <= 0.6
+        ok = True if preset == "single" else abs(mm - WXL_WIDTH_MM[preset]) <= 0.6
         report = {"ok": ok, "sizes": ["reused"], "warnings": [], "problems": []}
         return png, mm, report, ok
     apply_wxl_style()
@@ -94,7 +98,10 @@ def render_variant(spec, preset, outdir: Path, reuse: bool = False):
                     target_width_mm=WXL_WIDTH_MM[preset])
     plt.close(fig)
     mm = measure_width_mm(png, DPI)
-    ok = report["ok"] and abs(mm - WXL_WIDTH_MM[preset]) <= 0.6
+    if preset == "single":
+        ok = report["ok"]
+    else:
+        ok = report["ok"] and abs(mm - WXL_WIDTH_MM[preset]) <= 0.6
     return png, mm, report, ok
 
 

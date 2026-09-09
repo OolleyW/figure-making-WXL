@@ -79,6 +79,7 @@ def fig_grouped_bar():
         annotate_bars(ax, bars, y_offset_frac=0.035)   # skipped when too wide
     ax.set_xticks(x)
     ax.set_xticklabels(cats)
+    ax.set_xlabel("Scenario")
     ax.set_ylabel("Accuracy")
     ax.set_ylim(0, 1.55)
     framed_legend(ax, loc="upper left")
@@ -105,6 +106,7 @@ def fig_stacked_bar():
         bottom += v
     ax.set_xticks(x)
     ax.set_xticklabels(cats)
+    ax.set_xlabel("Year")
     ax.set_ylabel("Mass fraction (%)")
     # raise the upper y-limit so a vertical legend fits in the headroom above
     # the bars (the stack tops out at 100)
@@ -510,14 +512,14 @@ def fig_donut():
 def fig_dual_axis():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     x = np.arange(6)
-    labels = ["0 h", "2 h", "4 h", "6 h", "8 h", "10 h"]
     load = np.array([12, 26, 41, 55, 68, 74], float)
     temp = np.array([22, 35, 52, 68, 79, 84], float)
     ax.bar(x, load, 0.5, color=P["light"], edgecolor="black", linewidth=0.8,
            label="Load")
     ax.set_ylabel("Load (kN)")
     ax.set_xticks(x)
-    ax.set_xticklabels(labels)
+    ax.set_xticklabels(["0", "2", "4", "6", "8", "10"])
+    ax.set_xlabel("Time (h)")
     ax.set_ylim(0, 95)
     ax2 = ax.twinx()
     ax2.plot(x, temp, "-o", color=P["contrast"], lw=1.5, ms=4, mfc="white",
@@ -815,7 +817,10 @@ def build(outdir: Path):
         report["width_mm"] = round(width_mm, 2)
         report["target_mm"] = target
         report["preset"] = "double" if spec["id"] in COMPOSITE else "single"
-        if abs(width_mm - report["target_mm"]) > 0.6:
+        # a single-column figure shares one fixed black frame, so its width
+        # follows the tick labels; only the composite layout is width-checked
+        if (spec["id"] in COMPOSITE
+                and abs(width_mm - report["target_mm"]) > 0.6):
             report["problems"].append(
                 f"saved width {width_mm:.2f} mm misses target "
                 f"{report['target_mm']:.0f} mm")
