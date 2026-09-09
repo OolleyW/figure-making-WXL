@@ -25,8 +25,9 @@ sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (  # noqa: E402
     WXL_CMAP, WXL_FIGSIZE, WXL_FONTSIZE, WXL_PALETTE, WXL_WIDTH_MM, add_caption,
-    annotate_bars, apply_wxl_style, check_wxl_style, create_subplots,
-    finalize_figure, framed_legend, measure_width_mm, panel_tag, prepare_figure,
+    annotate_bars, apply_wxl_style, center_grid, check_wxl_style,
+    create_subplots, finalize_figure, framed_legend, measure_width_mm, panel_tag,
+    prepare_figure,
 )
 
 P = WXL_PALETTE
@@ -533,12 +534,16 @@ def fig_dual_axis():
 
 
 @figure("multi_panel", "多子图（2x2 混合排版）", "special",
-        "四种图型拼版，每个子图下方居中放编号加标题，整图共用一个图题。",
+        "四种图型拼版，网格在画布中水平竖直居中，每个子图下方居中放编号加标题。"
+        "热图不放进拼版，单独作为图型 15 展示。",
         'fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])\n'
-        'panel_tag(axes[0], "(a)", "Grouped bars", y=-0.42)\n'
+        'panel_tag(axes[0], "(a)", "Grouped bars")\n'
+        'center_grid(fig)          # centre the grid horizontally and vertically\n'
         'add_caption(fig, "Fig. 20  Multi-panel figure.")', width="double_tall")
 def fig_multi_panel():
     fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])
+    fig._wxl_no_tight = True      # keep the manual centering
+    fig._wxl_center = True        # centre the grid at every layout pass
 
     ax = axes[0]
     cats = ["A", "B", "C"]
@@ -548,10 +553,11 @@ def fig_multi_panel():
                color=P[key], edgecolor="black", linewidth=0.8)
     ax.set_xticks(np.arange(3))
     ax.set_xticklabels(cats)
+    ax.set_xlabel("Scenario")
     ax.set_ylabel("Score")
     ax.set_ylim(0, 1.1)
     framed_legend(ax, loc="upper left")
-    panel_tag(ax, "(a)", "Grouped bars", y=-0.42)
+    panel_tag(ax, "(a)", "Grouped bars")
 
     ax = axes[1]
     x = np.linspace(0, 10, 11)
@@ -562,7 +568,7 @@ def fig_multi_panel():
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
     framed_legend(ax, loc="upper left")
-    panel_tag(ax, "(b)", "Trend lines", y=-0.42)
+    panel_tag(ax, "(b)", "Trend lines")
 
     ax = axes[2]
     data = [RNG.normal(m, 1.0, 50) for m in (0, 1, 2)]
@@ -574,20 +580,21 @@ def fig_multi_panel():
     for patch, key in zip(bp["boxes"], ["primary", "contrast", "improve"]):
         patch.set_facecolor(P[key])
     ax.set_xticklabels(["G1", "G2", "G3"])
+    ax.set_xlabel("Group")
     ax.set_ylabel("Value")
-    panel_tag(ax, "(c)", "Box plots", y=-0.42)
+    panel_tag(ax, "(c)", "Box plots")
 
     ax = axes[3]
-    m = RNG.uniform(-1, 1, (5, 5))
-    m = (m + m.T) / 2
-    np.fill_diagonal(m, 1.0)
-    im = ax.imshow(m, cmap=WXL_CMAP, vmin=-1, vmax=1)
-    ax.set_xticks(range(5), [f"V{i + 1}" for i in range(5)])
-    ax.set_yticks(range(5), [f"V{i + 1}" for i in range(5)])
-    cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
-    cb.ax.tick_params(direction="in", width=0.8)
-    cb.outline.set_linewidth(0.8)
-    panel_tag(ax, "(d)", "Correlation heatmap", y=-0.42)
+    for name, key, slope, noise in [("Set 1", "primary", 1.0, 0.7),
+                                    ("Set 2", "accent", 0.85, 0.9)]:
+        xs = RNG.uniform(2, 9, 40)
+        ys = slope * xs + RNG.normal(0, noise, xs.size)
+        ax.scatter(xs, ys, s=14, color=P[key], edgecolor="black", linewidth=0.4,
+                   alpha=0.85, label=name)
+    ax.set_xlabel("Measured")
+    ax.set_ylabel("Predicted")
+    framed_legend(ax, loc="upper left")
+    panel_tag(ax, "(d)", "Scatter")
 
     add_caption(fig, "Fig. 20  Multi-panel figure with four chart types.")
     return fig

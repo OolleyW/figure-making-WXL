@@ -163,16 +163,39 @@ that had to be thinned.
 Places the figure caption centered **below** the whole figure and returns the
 `Text` artist. Never use `fig.suptitle`.
 
-### panel_tag(ax, tag, title=None, y=-0.32, bold=False)
+### panel_tag(ax, tag, title=None, pad_pt=5.0, bold=False)
 
 Panel label below its own panel, centered on the panel, **not bold** by default.
-Pass a `title` to get `(a) Grouped bars` instead of a bare `(a)`. Use `y=-0.42`
-when the panel has an x-label, and give every panel in a grid the same `y` so the
-labels line up.
+Pass a `title` to get `(a) Grouped bars` instead of a bare `(a)`. The label sits
+`pad_pt` points below the lowest text already under the axes (x-label and tick
+labels included), so it stays close to the panel instead of drifting away with
+the axes height.
 
 ```python
-panel_tag(ax, "(a)", "Grouped bars", y=-0.42)
+panel_tag(ax, "(a)", "Grouped bars")
 ```
+
+### center_grid(fig, pad_frac=0.01, max_shift=0.2)
+
+Shifts every axes by the same amount so the union of their tight bounding boxes
+(tick labels, axis labels and panel labels included) is centered horizontally and
+vertically in the canvas. The shift is capped at `max_shift` of the canvas and
+skipped in a dimension whose content already exceeds the canvas, so repeated
+calls converge instead of drifting.
+
+Pair it with `fig._wxl_no_tight = True` (so `finalize_figure` does not re-run
+`tight_layout` and undo the centering) and `fig._wxl_center = True` (so
+`prepare_figure` re-centers after every canvas resize):
+
+```python
+fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])
+fig._wxl_no_tight = True
+fig._wxl_center = True
+# ... draw the panels and their labels ...
+```
+
+Measured on the 2 × 2 demo: left/right margins 0.0826/0.0826 and top/bottom
+0.0770/0.0770 of the canvas.
 
 ### finalize_figure(fig, out_path, formats=None, dpi=None, close=True, pad=0.06, layout=True, target_width_mm=None, tol_mm=0.5, lock_ends=True)
 

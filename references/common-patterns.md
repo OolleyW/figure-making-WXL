@@ -153,11 +153,13 @@ ax.text(x, y, f"{v:.2f}", ha="center", va="bottom")   # 10 pt by rcParams
 
 ```python
 fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])
-# ... draw each panel ...
-panel_tag(axes[0], "(a)", "Grouped bars", y=-0.42)
-panel_tag(axes[1], "(b)", "Trend lines", y=-0.42)
-panel_tag(axes[2], "(c)", "Box plots", y=-0.42)
-panel_tag(axes[3], "(d)", "Correlation heatmap", y=-0.42)
+fig._wxl_no_tight = True      # keep the manual centering
+fig._wxl_center = True        # re-center after every canvas resize
+# ... draw each panel, each with its own x-label ...
+panel_tag(axes[0], "(a)", "Grouped bars")
+panel_tag(axes[1], "(b)", "Trend lines")
+panel_tag(axes[2], "(c)", "Box plots")
+panel_tag(axes[3], "(d)", "Scatter")
 add_caption(fig, "Fig. 4  Multi-panel comparison of the four settings.")
 ```
 
@@ -165,12 +167,20 @@ add_caption(fig, "Fig. 4  Multi-panel comparison of the four settings.")
 - Same limits across panels that share a quantity, so the reader can compare
   visually.
 - Panel labels carry a number **and** a short title, are centered under their own
-  panel, and are **not bold**. Use `y=-0.42` when the panel has an x-label and the
-  same `y` for every panel in the grid so the labels line up.
+  panel, and are **not bold**. They sit a fixed 5 pt below the panel's own
+  x-label, so they stay close to the figure at any canvas size.
+- Give every panel an x-label. Then the labels all sit at the same height and line
+  up in a row, and the reader knows what each axis is.
+- The grid is centered horizontally and vertically with `center_grid`
+  (`fig._wxl_center = True`). Measured margins on the demo: 0.0826 left/right and
+  0.0770 top/bottom of the canvas.
 - A 2 × 2 grid only works at the full 190 mm width: at 90 mm each panel is about
   40 mm wide, which cannot hold a 10 pt legend. Render multi-panel figures in
   double column only.
-- Mixing types in one grid (bar + line + box + heatmap) is fine as long as the
+- Keep a heatmap out of the grid. A colorbar adds a fifth axes, its aspect is
+  fixed, and the shared `RdBu_r` scale competes with the other panels. Show it as
+  its own figure instead.
+- Mixing types in one grid (bar + line + box + scatter) is fine as long as the
   type scale, spine width and color semantics stay identical.
 
 ## 7) Heatmaps and fields

@@ -611,12 +611,14 @@ def _enforce_label_fit(fig) -> int:
 
 
 def prepare_figure(fig, lock_ends: bool = True, auto_legend: bool = True,
-                   auto_text: bool = True):
+                   auto_text: bool = True, center=None):
     """Bring a figure to contract state.
 
     Locks axis ends, deconflicts legends, thins crowded tick labels and nudges
-    colliding annotations. Call this before :func:`check_wxl_style` when you
-    audit a figure yourself; :func:`finalize_figure` calls it automatically.
+    colliding annotations. Set ``fig._wxl_center = True`` (or pass
+    ``center=True``) to also center the axes grid horizontally and vertically.
+    Call this before :func:`check_wxl_style` when you audit a figure yourself;
+    :func:`finalize_figure` calls it automatically.
     """
     if lock_ends:
         lock_axis_ends_all(fig)
@@ -626,6 +628,10 @@ def prepare_figure(fig, lock_ends: bool = True, auto_legend: bool = True,
         _enforce_label_fit(fig)
         fix_tick_label_overlap(fig)
         place_annotations(fig)
+    if center is None:
+        center = bool(getattr(fig, "_wxl_center", False))
+    if center:
+        center_grid(fig)
     return fig
 
 
@@ -743,19 +749,77 @@ def lock_axis_ends_all(fig, max_ticks: int = 8, min_ticks: int = 4) -> int:
     return n
 
 
-def panel_tag(ax, tag: str, title: str | None = None, y: float = -0.32,
+def panel_tag(ax, tag: str, title: str | None = None, pad_pt: float = 5.0,
               bold: bool = False):
     """Panel label below its own panel, centered on the panel.
 
     Pass a ``title`` to get ``(a) Grouped bars`` instead of a bare ``(a)``. The
-    label is centered under the panel and is NOT bold by default, so it reads as
-    a small caption rather than a heading. Use ``y=-0.42`` when the panel has an
-    x-label, and give every panel in a grid the same ``y`` so the labels line up.
+    label sits ``pad_pt`` points below the lowest text already under the axes
+    (x-label and tick labels included), so it stays close to the panel instead of
+    drifting away with the axes height. Centered, and NOT bold by default.
     """
     text = f"{tag} {title}".strip() if title else tag
-    return ax.text(0.5, y, text, transform=ax.transAxes, ha="center", va="top",
-                   fontsize=WXL_FONTSIZE["panel"],
-                   fontweight="bold" if bold else "normal")
+    fig = ax.get_figure()
+    fig.canvas.draw()
+    extra_pt = max(ax.get_window_extent().y0 - ax.get_tightbbox().y0, 0.0) \
+        / fig.dpi * 72.0
+    return ax.annotate(text, xy=(0.5, 0.0), xycoords="axes fraction",
+                       xytext=(0, -(extra_pt + pad_pt)),
+                       textcoords="offset points", ha="center", va="top",
+                       fontsize=WXL_FONTSIZE["panel"],
+                       fontweight="bold" if bold else "normal")
+
+
+def center_grid(fig, pad_frac: float = 0.01, max_shift: float = 0.2):
+    """Center the whole axes grid horizontally and vertically in the canvas.
+
+    Shifts every axes by the same amount so the union of their tight bounding
+    boxes (tick labels, axis labels and panel labels included) sits centered,
+    with at least ``pad_frac`` of the canvas left on each side. Pair it with
+    ``fig._wxl_no_tight = True`` so ``finalize_figure`` does not re-run
+    tight_layout and undo the centering, and set ``fig._wxl_center = True`` so it
+    runs again after every canvas resize. The shift is capped at ``max_shift`` of
+    the canvas and skipped in a dimension whose content already exceeds the
+    canvas, which keeps repeated calls from drifting.
+    """
+    fig.canvas.draw()
+    boxes = [ax.get_tightbbox() for ax in fig.get_axes()
+             if ax.get_visible() and ax.get_tightbbox() is not None]
+    if not boxes:
+        return False
+    x0 = min(b.x0 for b in boxes)
+    x1 = max(b.x1 for b in boxes)
+    y0 = min(b.y0 for b in boxes)
+    y1 = max(b.y1 for b in boxes)
+    W = fig.get_size_inches()[0] * fig.dpi
+    H = fig.get_size_inches()[1] * fig.dpi
+    if W <= 0 or H <= 0:
+        return False
+
+    dx = 0.0
+    if (x1 - x0) <= W:
+        left, right = x0 / W, 1.0 - x1 / W
+        # moving the grid right by dx turns (left, right) into
+        # (left + dx, right - dx); equalising them needs dx = (right - left)/2
+        dx = (right - left) / 2.0
+        dx = min(max(dx, -max_shift), max_shift)
+        lo, hi = pad_frac - left, right - pad_frac
+        if lo <= hi:                      # only clamp when it is consistent
+            dx = min(max(dx, lo), hi)
+    dy = 0.0
+    if (y1 - y0) <= H:
+        bottom, top = y0 / H, 1.0 - y1 / H
+        dy = (top - bottom) / 2.0
+        dy = min(max(dy, -max_shift), max_shift)
+        lo, hi = pad_frac - bottom, top - pad_frac
+        if lo <= hi:
+            dy = min(max(dy, lo), hi)
+    if abs(dx) < 1e-6 and abs(dy) < 1e-6:
+        return False
+    for ax in fig.get_axes():
+        pos = ax.get_position()
+        ax.set_position([pos.x0 + dx, pos.y0 + dy, pos.width, pos.height])
+    return True
 
 
 def measure_width_mm(path, dpi: int | None = None) -> float:
@@ -797,17 +861,17 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
     stem.parent.mkdir(parents=True, exist_ok=True)
 
     def _relayout():
-        if layout:
+        if layout and not getattr(fig, "_wxl_no_tight", False):
             try:
                 fig.tight_layout(pad=1.0)
             except Exception:
                 pass
 
     def _prepare():
-        # Axis-end locking, legend placement and annotation nudging must run
-        # AFTER any canvas resize: resizing changes how much of the axes a fixed
-        # 10 pt text box occupies.
-        if lock_ends or auto_legend or auto_text:
+        # Axis-end locking, legend placement, annotation nudging and grid
+        # centering must run AFTER any canvas resize: resizing changes how much
+        # of the axes a fixed 10 pt text box occupies.
+        if lock_ends or auto_legend or auto_text or getattr(fig, "_wxl_center", False):
             prepare_figure(fig, lock_ends=lock_ends, auto_legend=auto_legend,
                            auto_text=auto_text)
 

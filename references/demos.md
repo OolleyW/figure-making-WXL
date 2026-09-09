@@ -57,7 +57,7 @@ below gives the figure id, the width preset used, and the core call to copy.
 | `radar` | Radar / polar multi-index | double | `fig.add_subplot(projection="polar"); ax.plot(theta, v, "-o")` |
 | `donut` | Donut / pie with framed legend | single | `ax.pie(vals, wedgeprops=dict(width=0.42)); ax.set_axis_off()` |
 | `dual_axis` | Dual y-axis (bars + line) | double | `ax2 = ax.twinx(); ax2.plot(...)` |
-| `multi_panel` | 2 × 2 mixed-type grid | double_tall | `create_subplots(2, 2); panel_tag(axes[0], "(a)", "Grouped bars", y=-0.42)` |
+| `multi_panel` | 2 × 2 mixed-type grid | double_tall | `create_subplots(2, 2); panel_tag(axes[0], "(a)", "Grouped bars"); center_grid(fig)` |
 
 ## Choosing a type
 

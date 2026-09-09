@@ -50,7 +50,7 @@ def build_reference_figure():
     ax.set_ylim(0, 1.35)
     ax.text(0.02, 0.98, "n = 30", transform=ax.transAxes, va="top")
     framed_legend(ax, loc="upper left")
-    panel_tag(ax, "(a)", y=-0.28)
+    panel_tag(ax, "(a)", "Grouped bars")
 
     ax = axes[1]
     xv = np.linspace(0, 10, 11)
@@ -64,7 +64,7 @@ def build_reference_figure():
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Score")
     framed_legend(ax, loc="upper left", ncol=2, columnspacing=1.0, handlelength=1.6)
-    panel_tag(ax, "(b)", y=-0.28)
+    panel_tag(ax, "(b)", "Trend lines")
 
     im = ax.scatter(rng.random(5), rng.random(5), s=14, color=P["accent"],
                     edgecolor="black", linewidth=0.4)
