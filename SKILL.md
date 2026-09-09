@@ -96,6 +96,13 @@ These rules supersede any conflicting style text in `references/` or in upstream
    the below-figure caption survives.
 10. **Run the audit.** Call `check_wxl_style(fig)` before saving and fix every
     reported problem.
+11. **No text over the data.** Legends, value labels, annotations and tick labels
+    must not cover the plotted artists. `prepare_figure` measures every text box
+    against the lines, bars, points and other text: it nudges colliding
+    annotations to a free offset, thins crowded tick labels by increasing the
+    step, and drops bar labels that are wider than their own bar at the final
+    canvas size. `check_wxl_style` reports any remaining collision. When a label
+    cannot be placed legibly, drop it rather than printing overlapping numbers.
 
 ## Quickstart
 

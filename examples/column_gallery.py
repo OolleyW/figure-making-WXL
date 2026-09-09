@@ -32,7 +32,7 @@ from wxl_style import (  # noqa: E402
 )
 from wxl_docx import (  # noqa: E402
     add_caption, add_figure, add_heading, add_page_break, add_paragraph,
-    add_three_line_table, add_title, new_document,
+    add_three_line_table, add_title, new_document, save_document,
 )
 
 DPI = 600
@@ -143,9 +143,9 @@ def main():
         add_paragraph(doc, note, size=9, spacing=1.0, indent_chars=0, space_after=0)
 
     out = outdir / "WXL_chart_types_single_and_double_column.docx"
-    doc.save(out)
+    saved = save_document(doc, out)
     print(f"\ntypes: {len(records)}  renders: {len(records) * 2}  failures: {failures}")
-    print("docx:", out, f"{out.stat().st_size / 1024 / 1024:.2f} MB")
+    print("docx:", saved, f"{saved.stat().st_size / 1024 / 1024:.2f} MB")
     sys.stdout.flush()
     return 1 if failures else 0
 

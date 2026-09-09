@@ -17,6 +17,7 @@ the skill's ``assets`` directory to ``sys.path``.
 
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 
 from docx import Document
@@ -36,7 +37,7 @@ CJK_FONT = "SimSun"
 __all__ = [
     "TNR", "CJK_FONT", "new_document", "add_title", "add_heading",
     "add_paragraph", "add_caption", "add_figure", "add_figure_block",
-    "add_three_line_table", "add_page_break",
+    "add_three_line_table", "add_page_break", "save_document",
 ]
 
 
@@ -110,6 +111,27 @@ def add_caption(doc, text, size=10.0, spacing=1.5, space_after=6.0):
 
 def add_page_break(doc):
     doc.add_page_break()
+
+
+def save_document(doc, path):
+    """Save ``doc`` to ``path``, falling back to a timestamped name if locked.
+
+    Word keeps an exclusive lock on an open document, so re-running a build
+    script while the previous output is open raises ``PermissionError``. In that
+    case the document is written next to it with a timestamp suffix and the path
+    actually used is returned.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        doc.save(path)
+        return path
+    except PermissionError:
+        stamped = path.with_name(
+            f"{path.stem}_{datetime.now():%Y%m%d-%H%M%S}{path.suffix}")
+        doc.save(stamped)
+        print(f"note: {path.name} is locked (open in Word?), wrote {stamped.name}")
+        return stamped
 
 
 def add_figure(doc, png, dpi: int = 600, space_after: float = 4.0) -> float:

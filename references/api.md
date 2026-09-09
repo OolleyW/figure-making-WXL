@@ -120,11 +120,12 @@ y-range on the side where the legend sits (35 % of the span), re-locks the axis
 ends and retries, up to `rounds` times. Polar axes, colorbar axes and axes with
 `axison == False` keep their hand-placed legend.
 
-### prepare_figure(fig, lock_ends=True, auto_legend=True)
+### prepare_figure(fig, lock_ends=True, auto_legend=True, auto_text=True)
 
-Puts a figure into contract state: locks axis ends and deconflicts legends.
-Call it before `check_wxl_style` when you audit a figure yourself;
-`finalize_figure` calls it automatically.
+Puts a figure into contract state: locks axis ends, deconflicts legends, thins
+crowded tick labels and nudges colliding annotations. Call it before
+`check_wxl_style` when you audit a figure yourself; `finalize_figure` calls it
+automatically.
 
 ```python
 fig = build_my_figure()
@@ -134,6 +135,28 @@ assert report["ok"], report["problems"]
 finalize_figure(fig, "figures/result", dpi=600,
                 target_width_mm=WXL_WIDTH_MM["double"])
 ```
+
+### annotate_bars(ax, bars, fmt="{:.2f}", fontsize=None, y_offset_frac=0.02, skip_if_wider=True)
+
+Labels bars above their top edge and returns `(kept, skipped)`. With
+`skip_if_wider=True` any label wider than its own bar is dropped, and every label
+is tagged so `prepare_figure` re-checks it at the final canvas size. This is what
+makes the same figure code produce labelled bars at 190 mm and clean bars at
+90 mm, where a 10 pt label is wider than the bar underneath.
+
+### place_annotations(fig, rounds=2)
+
+Nudges plain `ax.text` annotations off the data. For each annotation that touches
+a line, a bar or another text box it tries the offsets in `_ANNOT_OFFSETS`
+(above, below, left, right, diagonals), keeps the one with the fewest
+collisions, and if none is clear it grows the y-range (capped at 35 % of the data
+span) and retries. Returns the annotations that still collide.
+
+### fix_tick_label_overlap(fig, tries=(8, 6, 5, 4))
+
+Thins out major ticks until no two adjacent tick labels touch. The 10 pt size is
+fixed, so tick density is the only lever. Returns `[(axes, ticks)]` for the axes
+that had to be thinned.
 
 ### add_caption(fig, text, fontsize=None, y=-0.045, **kwargs)
 
@@ -269,6 +292,8 @@ Checks performed:
 - every legend has a visible frame, black border and no transparency;
 - no legend covers more than 2 % of the plotted data (soft warning, reported
   with the measured percentage);
+- no annotation touches a plotted artist or another annotation, and no two
+  adjacent tick labels share pixels (soft warnings);
 - every `Line2D`, `Patch` and `PathCollection` color comes from the palette
   plus black/white.
 

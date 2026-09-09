@@ -378,16 +378,254 @@ def place_all_legends(fig, rounds: int = 2, candidates=None):
     return out
 
 
-def prepare_figure(fig, lock_ends: bool = True, auto_legend: bool = True):
-    """Bring a figure to contract state: axis ends locked, legends deconflicted.
+#: Display offsets, in points, tried for a colliding annotation.
+_ANNOT_OFFSETS = [(0, 5), (0, -13), (7, 5), (-7, 5), (7, -13), (-7, -13),
+                  (0, 16), (0, -24)]
 
-    Call this before :func:`check_wxl_style` when you audit a figure yourself.
-    :func:`finalize_figure` calls it automatically.
+
+def _bbox_area(box) -> float:
+    return max(box.width * box.height, 1e-9)
+
+
+def _text_collision_count(ax, box, others, min_share: float = 0.02) -> float:
+    """How many artists a text box touches: lines (point inside), patches and
+    other text boxes (area share above ``min_share``)."""
+    hits = 0.0
+    for line in ax.get_lines():
+        if not line.get_visible():
+            continue
+        xy = line.get_xydata()
+        if xy is None or len(xy) < 2:
+            continue
+        disp = ax.transData.transform(np.asarray(xy, float))
+        inside = ((disp[:, 0] >= box.x0) & (disp[:, 0] <= box.x1) &
+                  (disp[:, 1] >= box.y0) & (disp[:, 1] <= box.y1))
+        if inside.any():
+            hits += 1.0
+    area = _bbox_area(box)
+    for patch in ax.patches:
+        if not patch.get_visible():
+            continue
+        inter = matplotlib.transforms.Bbox.intersection(
+            patch.get_window_extent(), box)
+        if inter is not None and (inter.width * inter.height) / area > min_share:
+            hits += 1.0
+    for other in others:
+        inter = matplotlib.transforms.Bbox.intersection(other, box)
+        if inter is not None and (inter.width * inter.height) / area > min_share:
+            hits += 1.0
+    return hits
+
+
+def _data_annotation_texts(ax):
+    """Plain ``ax.text`` annotations, excluding panel tags and axis labels."""
+    out = []
+    for t in ax.texts:
+        if not isinstance(t, mtext.Text) or isinstance(t, mtext.Annotation):
+            continue
+        if not t.get_text().strip():
+            continue
+        if t.get_transform() is not ax.transData:
+            continue                       # panel tags / axes-coordinate text
+        out.append(t)
+    return out
+
+
+def _tick_labels_overlap(ax) -> bool:
+    """True when two adjacent major tick labels share pixels."""
+    for axis in (ax.xaxis, ax.yaxis):
+        boxes = [t.get_window_extent() for t in axis.get_majorticklabels()
+                 if t.get_text().strip()]
+        for a, b in zip(boxes, boxes[1:]):
+            if a.overlaps(b):
+                return True
+    return False
+
+
+def fix_tick_label_overlap(fig, tries=(8, 6, 5, 4)):
+    """Thin out ticks until no two adjacent tick labels touch.
+
+    The 10 pt size is fixed, so the only lever is tick density. Returns a list of
+    ``(axes, ticks_per_axis)`` for the axes that had to be thinned.
+    """
+    changed = []
+    for ax in fig.get_axes():
+        if not ax.axison or _is_polar(ax) or hasattr(ax, "_colorbar") or ax.images:
+            continue
+        if not _tick_labels_overlap(ax):
+            continue
+        for n in tries:
+            lock_axis_ends(ax, max_ticks=n)
+            fig.canvas.draw()
+            if not _tick_labels_overlap(ax):
+                changed.append((ax, n))
+                break
+    return changed
+
+
+def place_annotations(fig, rounds: int = 2):
+    """Nudge data annotations off the data they cover.
+
+    For every plain ``ax.text`` annotation that touches a line, a bar or another
+    text box, the candidate offsets in ``_ANNOT_OFFSETS`` are tried and the one
+    with the fewest collisions is kept. If every offset still collides, the
+    y-range is grown (capped at 35 % of the data span) and the search repeats.
+    Returns ``[(text, collisions)]`` for the annotations that still collide.
+    """
+    unresolved = []
+    for ax in fig.get_axes():
+        if not ax.axison or _is_polar(ax) or hasattr(ax, "_colorbar"):
+            continue
+        texts = _data_annotation_texts(ax)
+        if not texts:
+            continue
+        for text in texts:
+            fig.canvas.draw()
+            others = [t.get_window_extent() for t in texts if t is not text]
+            box = text.get_window_extent()
+            best = _text_collision_count(ax, box, others)
+            if best <= 0:
+                continue
+            pos = text.get_position()
+            disp = ax.transData.transform(pos)
+            ppp = fig.dpi / 72.0
+            for dx, dy in _ANNOT_OFFSETS:
+                text.set_position(ax.transData.inverted().transform(
+                    (disp[0] + dx * ppp, disp[1] + dy * ppp)))
+                fig.canvas.draw()
+                box = text.get_window_extent()
+                score = _text_collision_count(ax, box, others)
+                if score < best:
+                    best = score
+                    if score <= 0:
+                        break
+            if best > 0:
+                for _ in range(rounds):
+                    if not _expand_axis_for_text(ax, text):
+                        break
+                    lock_axis_ends(ax)
+                    fig.canvas.draw()
+                    box = text.get_window_extent()
+                    if _text_collision_count(ax, box, others) <= 0:
+                        best = 0.0
+                        break
+            if best > 0:
+                unresolved.append((text, best))
+    return unresolved
+
+
+def _expand_axis_for_text(ax, text, cap: float = 0.35) -> bool:
+    """Grow the y-range when a text box sticks out or still collides."""
+    box = text.get_window_extent()
+    ab = ax.get_window_extent()
+    if ab.height <= 0:
+        return False
+    lo, hi = (float(v) for v in ax.get_ylim())
+    span = hi - lo
+    if span <= 0:
+        return False
+    dlo, dhi = _data_y_range(ax)
+    if not (np.isfinite(dlo) and np.isfinite(dhi)):
+        return False
+    dspan = (dhi - dlo) or span
+    if box.y1 > ab.y1 or box.y0 < ab.y0:
+        need_up = box.y1 > ab.y1
+    else:
+        need_up = (box.y0 + box.y1) / 2 >= (ab.y0 + ab.y1) / 2
+    if need_up:
+        new_hi = min(hi + 0.25 * span, dhi + cap * dspan)
+        if new_hi <= hi + 1e-9:
+            return False
+        ax.set_ylim(lo, new_hi)
+    else:
+        new_lo = max(lo - 0.25 * span, dlo - cap * dspan)
+        if new_lo >= lo - 1e-9:
+            return False
+        ax.set_ylim(new_lo, hi)
+    return True
+
+
+def annotate_bars(ax, bars, fmt: str = "{:.2f}", fontsize: float | None = None,
+                  y_offset_frac: float = 0.02, skip_if_wider: bool = True):
+    """Label bars above their top edge, skipping labels that do not fit.
+
+    A 10 pt value label is about 10 mm wide, so in a 90 mm panel with narrow
+    grouped bars the labels would cover each other and the neighbouring bars.
+    With ``skip_if_wider=True`` (the default) any label wider than its own bar is
+    dropped, which makes the same figure code produce labelled bars at 190 mm and
+    clean bars at 90 mm. Returns ``(kept, skipped)``.
+    """
+    fig = ax.get_figure()
+    lo, hi = (float(v) for v in ax.get_ylim())
+    pad = y_offset_frac * (hi - lo) if hi > lo else 0.0
+    pairs = []
+    for bar in bars:
+        height = float(bar.get_height())
+        text = ax.text(bar.get_x() + bar.get_width() / 2.0, height + pad,
+                       fmt.format(height), ha="center", va="bottom",
+                       fontsize=fontsize or WXL_FONTSIZE["annot"])
+        # tag the label so _enforce_label_fit can re-check it at the final
+        # canvas size, where the bars are narrower than when it was created
+        text._wxl_bar = bar
+        pairs.append((text, bar))
+    kept, skipped = 0, 0
+    if skip_if_wider and pairs:
+        fig.canvas.draw()
+        for text, bar in pairs:
+            if text.get_window_extent().width > bar.get_window_extent().width:
+                text.remove()
+                skipped += 1
+            else:
+                kept += 1
+    else:
+        kept = len(pairs)
+    return kept, skipped
+
+
+def _enforce_label_fit(fig) -> int:
+    """Drop tagged bar labels that no longer fit their bar at the current size.
+
+    :func:`annotate_bars` tags every label it creates. A figure is often authored
+    at 190 mm and later resized to 90 mm, where a 10 pt label is wider than the
+    bar underneath; this pass removes those labels so they cannot cover the
+    neighbouring bars. Returns the number of labels removed.
+    """
+    removed = 0
+    texts = []
+    for ax in fig.get_axes():
+        for text in ax.texts:
+            if getattr(text, "_wxl_bar", None) is not None:
+                texts.append(text)
+    if not texts:
+        return 0
+    fig.canvas.draw()
+    for text in texts:
+        bar = text._wxl_bar
+        try:
+            if text.get_window_extent().width > bar.get_window_extent().width:
+                text.remove()
+                removed += 1
+        except Exception:                                  # pragma: no cover
+            continue
+    return removed
+
+
+def prepare_figure(fig, lock_ends: bool = True, auto_legend: bool = True,
+                   auto_text: bool = True):
+    """Bring a figure to contract state.
+
+    Locks axis ends, deconflicts legends, thins crowded tick labels and nudges
+    colliding annotations. Call this before :func:`check_wxl_style` when you
+    audit a figure yourself; :func:`finalize_figure` calls it automatically.
     """
     if lock_ends:
         lock_axis_ends_all(fig)
     if auto_legend:
         place_all_legends(fig)
+    if auto_text:
+        _enforce_label_fit(fig)
+        fix_tick_label_overlap(fig)
+        place_annotations(fig)
     return fig
 
 
@@ -528,7 +766,8 @@ def measure_width_mm(path, dpi: int | None = None) -> float:
 def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                     close: bool = True, pad: float = 0.06, layout: bool = True,
                     target_width_mm: float | None = None, tol_mm: float = 0.5,
-                    lock_ends: bool = True, auto_legend: bool = True):
+                    lock_ends: bool = True, auto_legend: bool = True,
+                    auto_text: bool = True):
     """Save the figure to one or more formats and return the list of paths.
 
     Saving always uses ``bbox_inches="tight"`` so a caption placed below the
@@ -556,10 +795,12 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                 pass
 
     def _prepare():
-        # Axis-end locking and legend placement must run AFTER any canvas resize:
-        # resizing changes how much of the axes a fixed 10 pt legend occupies.
-        if lock_ends or auto_legend:
-            prepare_figure(fig, lock_ends=lock_ends, auto_legend=auto_legend)
+        # Axis-end locking, legend placement and annotation nudging must run
+        # AFTER any canvas resize: resizing changes how much of the axes a fixed
+        # 10 pt text box occupies.
+        if lock_ends or auto_legend or auto_text:
+            prepare_figure(fig, lock_ends=lock_ends, auto_legend=auto_legend,
+                           auto_text=auto_text)
 
     w0, h0 = (float(v) for v in fig.get_size_inches())
     aspect = h0 / w0 if w0 else 1.0
@@ -719,6 +960,21 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
                     f"give it a dedicated panel")
         except Exception:
             pass
+
+    # ---- text: annotations and crowded tick labels ---------------------
+    for i, ax in enumerate(axes):
+        if not ax.axison or _is_polar(ax) or hasattr(ax, "_colorbar"):
+            continue
+        texts = _data_annotation_texts(ax)
+        for text in texts:
+            others = [t.get_window_extent() for t in texts if t is not text]
+            hits = _text_collision_count(ax, text.get_window_extent(), others)
+            if hits > 0:
+                soft.append(
+                    f"axes[{i}]: annotation '{text.get_text()[:18]}' touches "
+                    f"{hits:.0f} plotted artist(s)")
+        if _tick_labels_overlap(ax):
+            soft.append(f"axes[{i}]: adjacent tick labels overlap")
 
     # ---- colours -------------------------------------------------------
     allowed_colors = {v.upper() for v in WXL_PALETTE.values()} | {"#000000", "#FFFFFF"}

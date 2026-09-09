@@ -25,8 +25,8 @@ sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (  # noqa: E402
     WXL_CMAP, WXL_FIGSIZE, WXL_FONTSIZE, WXL_PALETTE, WXL_WIDTH_MM, add_caption,
-    apply_wxl_style, check_wxl_style, create_subplots, finalize_figure,
-    framed_legend, measure_width_mm, panel_tag, prepare_figure,
+    annotate_bars, apply_wxl_style, check_wxl_style, create_subplots,
+    finalize_figure, framed_legend, measure_width_mm, panel_tag, prepare_figure,
 )
 
 P = WXL_PALETTE
@@ -75,9 +75,7 @@ def fig_grouped_bar():
         bars = ax.bar(x + (i - 1) * w, v, w, yerr=e, label=name,
                       color=P[key], edgecolor="black", linewidth=0.8,
                       error_kw=dict(elinewidth=0.8, capsize=2, ecolor=P[key]))
-        for b, val in zip(bars, v):
-            ax.text(b.get_x() + b.get_width() / 2, val + 0.05, f"{val:.2f}",
-                    ha="center", va="bottom")
+        annotate_bars(ax, bars, y_offset_frac=0.035)   # skipped when too wide
     ax.set_xticks(x)
     ax.set_xticklabels(cats)
     ax.set_ylabel("Accuracy")

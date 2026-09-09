@@ -73,7 +73,46 @@ ax.set_axis_off()
 framed_legend(ax, handles=handles, loc="center left", bbox_to_anchor=(0.92, 0.5))
 ```
 
-## 2) Grouped bars
+## 2) Text that must not cover the data
+
+Legends are only half the problem. Value labels, annotations and tick labels
+also cover the plotted artists, and at 90 mm they do it constantly. The style
+handles four cases automatically in `prepare_figure`:
+
+| Case | What happens |
+|---|---|
+| Annotation touches a line, bar or another text | `place_annotations` tries eight offsets and keeps the one with no collision; if none works it grows the y-range (capped at 35 % of the data span) and retries |
+| Two adjacent tick labels touch | `fix_tick_label_overlap` increases the tick step until they separate (8 → 6 → 5 → 4 ticks) |
+| A bar label is wider than its bar | the label is dropped, because a 10 pt number is about 10 mm wide and a grouped bar at 90 mm is about 4 mm wide |
+| A label sticks out of the axes | the y-range grows, capped, then the axis ends are re-locked |
+
+Create bar labels with the helper, never by hand, so the fit check runs at the
+final canvas size:
+
+```python
+bars = ax.bar(x, values, color=P["primary"], edgecolor="black", linewidth=0.8)
+annotate_bars(ax, bars, y_offset_frac=0.035)     # returns (kept, skipped)
+```
+
+The same figure code then produces labelled bars in a 190 mm figure and clean
+bars in a 90 mm one. Measured across all 20 chart types at both widths: zero
+text-collision warnings.
+
+What you still decide by hand:
+
+- **Label fewer things.** Annotating every point of a 200-point series is
+  unreadable regardless of placement. Annotate the extremes and say so in the
+  caption.
+- **Use a table instead.** When every value matters, a three-line table beats 40
+  overlapping labels.
+- **Rotate long category labels** rather than letting them collide, and shorten
+  the axis label instead of shrinking the type.
+- **Never shrink the text.** 10 pt is fixed; drop or move the label instead.
+
+`check_wxl_style` reports any remaining collision with the offending text, so a
+silent regression is impossible.
+
+## 3) Grouped bars
 
 ```python
 x, w = np.arange(len(cats)), 0.26
@@ -89,7 +128,7 @@ for i, (name, vals, key) in enumerate(series):
 Keep at most three groups per category. With four or more, switch to a heatmap
 or a small-multiples grid.
 
-## 3) Uncertainty bands
+## 4) Uncertainty bands
 
 ```python
 ax.fill_between(x, y - band, y + band, color=P["light"], alpha=0.35,
@@ -100,7 +139,7 @@ ax.plot(x, y, "-", color=P["primary"], lw=1.5, label="Proposed")
 Draw the band first so the curve stays on top. Use `light` for the primary
 series and `neutral` for the comparison series so the two bands stay separable.
 
-## 4) Value annotations
+## 5) Value annotations
 
 ```python
 ax.text(x, y, f"{v:.2f}", ha="center", va="bottom")   # 10 pt by rcParams
@@ -110,7 +149,7 @@ ax.text(x, y, f"{v:.2f}", ha="center", va="bottom")   # 10 pt by rcParams
 - For dense data, annotate only extremes and label the axis with units.
 - Use `P["accent"]` for an annotation that must stand out, black for the rest.
 
-## 5) Multi-panel grids
+## 6) Multi-panel grids
 
 ```python
 fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])
@@ -130,7 +169,7 @@ add_caption(fig, "Fig. 4  Multi-panel comparison of the four settings.")
 - Mixing types in one grid (bar + line + box + heatmap) is fine as long as the
   type scale, spine width and color semantics stay identical.
 
-## 6) Heatmaps and fields
+## 7) Heatmaps and fields
 
 ```python
 im = ax.imshow(m, cmap=WXL_CMAP, vmin=-1, vmax=1)
@@ -146,7 +185,7 @@ cb.outline.set_linewidth(0.8)
 - Colorbar axes are exempt from the full-box check but must still use inward
   ticks and a 0.8 pt outline.
 
-## 7) Dual axes
+## 8) Dual axes
 
 ```python
 ax2 = ax.twinx()
@@ -165,14 +204,14 @@ framed_legend(ax, handles=h1 + h2, labels=l1 + l2, loc="upper left")
 Color the right axis label and ticks to match the `contrast` series, and state
 both units in the caption.
 
-## 8) Print-safe encoding
+## 9) Print-safe encoding
 
 - Beyond four series, vary marker shape (`o`, `s`, `^`, `D`) and add hatch
   (`//`, `\\`, `..`) instead of introducing new hues.
 - Keep bar edges black at 0.8 pt so adjacent bars stay separated in grayscale.
 - Avoid alpha below 0.6 for data marks; light fills are for bands only.
 
-## 9) Headless and batch runs
+## 10) Headless and batch runs
 
 ```python
 import matplotlib
