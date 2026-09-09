@@ -252,6 +252,26 @@ def _legend_overlap_score(ax, bbox) -> float:
     for coll in ax.collections:
         if not coll.get_visible():
             continue
+        get_paths = getattr(coll, "get_paths", None)
+        if get_paths is not None:
+            # PolyCollection (stackplot / fill_between / contourf) and
+            # ContourSet: sample the filled polygon vertices
+            pts = []
+            try:
+                for path in get_paths():
+                    verts = getattr(path, "vertices", None)
+                    if verts is not None and len(verts):
+                        pts.append(verts[:, :2])
+            except Exception:                                  # pragma: no cover
+                pass
+            if pts:
+                verts = np.vstack(pts)
+                step = max(1, len(verts) // 600)
+                disp = ax.transData.transform(verts[::step])
+                inside = ((disp[:, 0] >= bbox.x0) & (disp[:, 0] <= bbox.x1) &
+                          (disp[:, 1] >= bbox.y0) & (disp[:, 1] <= bbox.y1))
+                parts.append(float(inside.mean()))
+            continue
         get_offsets = getattr(coll, "get_offsets", None)
         if get_offsets is None:
             continue
@@ -344,13 +364,45 @@ def _expand_axis_for_legend(ax, leg, cap: float = 0.35):
     return True
 
 
-def place_all_legends(fig, rounds: int = 2, candidates=None):
+def _legend_right_panel(fig, ax, leg):
+    """Move a legend that cannot fit inside the axes into a dedicated axes on the
+    right, so it never covers the data. Returns the new legend."""
+    handles, labels = ax.get_legend_handles_labels()
+    if leg is not None:
+        try:
+            leg.remove()
+        except Exception:                                  # pragma: no cover
+            pass
+    pos = ax.get_position()
+    leg_w = 0.30 * pos.width
+    data_w = pos.width - leg_w - 0.02 * pos.width
+    ax.set_position([pos.x0, pos.y0, data_w, pos.height])
+    leg_ax = fig.add_axes([pos.x0 + data_w + 0.02 * pos.width, pos.y0,
+                           leg_w, pos.height])
+    leg_ax.set_axis_off()
+    leg_ax.set_facecolor("none")
+    new_leg = leg_ax.legend(handles, labels, loc="center", frameon=True,
+                            fontsize=WXL_FONTSIZE["legend"], ncol=1,
+                            handlelength=1.6, handletextpad=0.6,
+                            borderaxespad=0.0)
+    new_leg.get_frame().set_edgecolor("black")
+    new_leg.get_frame().set_linewidth(0.8)
+    new_leg.get_frame().set_alpha(1.0)
+    # tight_layout would reset the manual positions and hide the panel again
+    fig._wxl_no_tight = True
+    return new_leg
+
+
+def place_all_legends(fig, rounds: int = 2, candidates=None,
+                      panel_threshold: float = 0.01):
     """Refine every in-axes legend so it covers as little data as possible.
 
     Tries the candidate positions, grows the y-range and retries, then flattens a
-    legend with three or more entries into two columns. Polar axes, colorbar axes
-    and axes with ``axison == False`` keep their hand-placed legend.
-    Returns ``[(axes, (score, loc)), ...]``.
+    legend with three or more entries into two columns. If a legend still covers
+    more than ``panel_threshold`` of the data, it is moved into a dedicated axes
+    on the right (``_legend_right_panel``) so it never covers the plot. Polar
+    axes, colorbar axes and axes with ``axison == False`` keep their hand-placed
+    legend. Returns ``[(axes, (score, loc)), ...]``.
     """
     out = []
     for ax in fig.get_axes():
@@ -378,6 +430,9 @@ def place_all_legends(fig, rounds: int = 2, candidates=None):
                 elif flat is not None:
                     set_ncols(1)
                     place_legend_smart(ax, leg, candidates, fig)
+        if res is not None and res[0] > panel_threshold:
+            _legend_right_panel(fig, ax, leg)
+            res = (0.0, "panel")
         out.append((ax, res))
     return out
 
