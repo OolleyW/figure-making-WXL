@@ -26,22 +26,22 @@ Copy it into the skills folder the agent scans and it is live.
 
 | Runtime | Skills directory |
 |---|---|
-| DSH | `~/.dsh/skills/figure-making-WXL` |
-| Claude Code | `~/.claude/skills/figure-making-WXL` |
+| DSH | `~/.dsh/skills/figure-making-wxl` |
+| Claude Code | `~/.claude/skills/figure-making-wxl` |
 | Other loaders | wherever the loader scans for `SKILL.md` |
 
 ```bash
 git clone https://github.com/OolleyW/figure-making-WXL.git \
-  ~/.dsh/skills/figure-making-WXL
+  ~/.dsh/skills/figure-making-wxl
 ```
 
-Keep the directory name `figure-making-WXL`: loaders match it against the `name`
+Keep the directory name `figure-making-wxl`: loaders match it against the `name`
 field in `SKILL.md`.
 
 ### 2. Install the Python dependencies
 
 ```bash
-pip install -r ~/.dsh/skills/figure-making-WXL/requirements.txt
+pip install -r ~/.dsh/skills/figure-making-wxl/requirements.txt
 ```
 
 matplotlib ≥ 3.5, numpy, Pillow. `python-docx` is only used by the Word
@@ -50,7 +50,7 @@ assembly module; figures work without it.
 ### 3. Verify the machine can reproduce the style
 
 ```bash
-python ~/.dsh/skills/figure-making-WXL/scripts/check_wxl_style.py
+python ~/.dsh/skills/figure-making-wxl/scripts/check_wxl_style.py
 ```
 
 `RESULT: PASS` confirms the audit runs and the fonts resolve. If it reports a
@@ -127,7 +127,7 @@ from pathlib import Path
 
 # Wherever the skill is installed; WXL_SKILL_DIR overrides the default.
 SKILL = Path(os.environ.get(
-    "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-WXL"))
+    "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-wxl"))
 sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (WXL_PALETTE as P, WXL_FIGSIZE, WXL_WIDTH_MM, apply_wxl_style,

@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 SKILL = Path(os.environ.get(
-    "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-WXL"))
+    "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-wxl"))
 sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (WXL_PALETTE as P, WXL_FIGSIZE, WXL_WIDTH_MM, add_caption,
@@ -152,7 +152,7 @@ python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
 ```
 
 `<skill-dir>` is wherever the skill is installed, for example
-`~/.dsh/skills/figure-making-WXL`. The default `--out` is `~/wxl_gallery`, so
+`~/.dsh/skills/figure-making-wxl`. The default `--out` is `~/wxl_gallery`, so
 the flag is optional.
 
 This renders all 20 chart types to `<out>/figs/*.png` (300 dpi) and

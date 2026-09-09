@@ -1,5 +1,5 @@
 ---
-name: figure-making-WXL
+name: figure-making-wxl
 description: >-
   Publication-ready matplotlib figures in the WXL house style for Elsevier,
   IEEE and Springer submissions: every text element is Times New Roman at
@@ -30,7 +30,7 @@ inside the document you opened.
 This skill is self-contained and has no absolute paths. To install it on another
 machine or for another agent:
 
-1. **Copy the whole `figure-making-WXL` directory** into that agent's skills
+1. **Copy the whole `figure-making-wxl` directory** into that agent's skills
    directory. Common locations are `~/.dsh/skills/` (DSH) and
    `~/.claude/skills/` (Claude Code). Keep the directory name.
 2. **Install the Python dependencies**: `pip install -r requirements.txt`
@@ -43,7 +43,7 @@ machine or for another agent:
    metric-compatible Nimbus Roman No9 L / Liberation Serif) and rerun.
 4. **Point your scripts at the skill** with the idiom in Quickstart below. Your
    skill loader already knows the directory; `WXL_SKILL_DIR` overrides the
-   default `~/.dsh/skills/figure-making-WXL`.
+   default `~/.dsh/skills/figure-making-wxl`.
 
 Nothing else needs configuring. See the Portability section for what is
 guaranteed on any conforming machine and what varies with the installed fonts.
@@ -146,7 +146,7 @@ from pathlib import Path
 # Point this at wherever the skill is installed. Your skill loader knows the
 # directory; WXL_SKILL_DIR overrides it, and the default assumes ~/.dsh/skills.
 SKILL = Path(os.environ.get(
-    "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-WXL"))
+    "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-wxl"))
 sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (WXL_PALETTE as P, WXL_FIGSIZE, apply_wxl_style,
@@ -212,7 +212,7 @@ image and the 11 pt match is lost.
 
 The skill is self-contained and has no absolute paths. Scripts resolve the skill
 directory from `__file__`; the docs use `<skill-dir>`. Install it by copying the
-whole `figure-making-WXL` directory into the target agent's skills directory,
+whole `figure-making-wxl` directory into the target agent's skills directory,
 then run `scripts/check_wxl_style.py` to confirm the machine can reproduce the
 style.
 
