@@ -8,6 +8,60 @@ inserted at its original size.
 论文配图样式技能：Times New Roman 统一 10 pt、深蓝主色系、四边全包围、图例带黑框、
 刻度朝内、无网格，图幅按 90 / 140 / 190 mm 印刷宽度校准。
 
+## Install for an agent
+
+The skill is a plain directory: no build step, no absolute paths, no config file.
+Copy it into the skills folder the agent scans and it is live.
+
+### 1. Put it in the agent's skills directory
+
+| Runtime | Skills directory |
+|---|---|
+| DSH | `~/.dsh/skills/figure-making-WXL` |
+| Claude Code | `~/.claude/skills/figure-making-WXL` |
+| Other loaders | wherever the loader scans for `SKILL.md` |
+
+```bash
+git clone https://github.com/OolleyW/figure-making-WXL.git \
+  ~/.dsh/skills/figure-making-WXL
+```
+
+Keep the directory name `figure-making-WXL`: loaders match it against the `name`
+field in `SKILL.md`.
+
+### 2. Install the Python dependencies
+
+```bash
+pip install -r ~/.dsh/skills/figure-making-WXL/requirements.txt
+```
+
+matplotlib ≥ 3.5, numpy, Pillow. `python-docx` is only used by the Word
+assembly module; figures work without it.
+
+### 3. Verify the machine can reproduce the style
+
+```bash
+python ~/.dsh/skills/figure-making-WXL/scripts/check_wxl_style.py
+```
+
+`RESULT: PASS` confirms the audit runs and the fonts resolve. If it reports a
+font problem, install Times New Roman, or the metric-compatible Nimbus Roman
+No9 L / Liberation Serif.
+
+### 4. What the agent must do to stay on-style
+
+1. `apply_wxl_style()` before creating any figure.
+2. Draw only with `WXL_PALETTE` colors, black edges, no custom fonts or sizes.
+3. `prepare_figure(fig)` then `check_wxl_style(fig)`; fix every reported problem.
+4. `finalize_figure(fig, ..., target_width_mm=WXL_WIDTH_MM[preset])`.
+5. Insert the PNG into Word at 100 %, or assemble the document with
+   `assets/wxl_docx.py`.
+
+The audit is the enforcement mechanism. It fails on a non-Times font, a non-10 pt
+size, a hidden spine, a grid line, an outward tick, an unframed legend, an
+off-palette color, or an axis end that is not on a tick value, so an agent that
+runs it cannot silently drift off-style.
+
 ## Style contract
 
 | Item | Value |
@@ -131,16 +185,6 @@ Python 3.9+, `matplotlib` ≥ 3.5, `numpy`, `Pillow` (width measurement) — see
 `requirements.txt`. Times New Roman is mandatory by name; on machines without it
 the stack falls back to the metric-compatible Nimbus Roman No9 L or Liberation
 Serif, which the audit accepts.
-
-## Installing for another agent or machine
-
-Copy the whole `figure-making-WXL` directory into the target agent's skills
-directory. There is nothing else to configure and no absolute path to edit.
-Verify with:
-
-```bash
-python "<skill-dir>/scripts/check_wxl_style.py"     # expects RESULT: PASS
-```
 
 ## Notes
 
