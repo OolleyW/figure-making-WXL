@@ -188,8 +188,9 @@ deliberately short (190 × 66 mm) with the 11 pt text unchanged.
 
 ## Gallery
 
-Every chart type rendered with the WXL style, straight from `preview/`
-(300 dpi, shown at each type's recommended width).
+Every chart type rendered with the WXL style, straight from `preview/`.
+Single-column figures are 90 × 76 mm (the two composite layouts, `multi_panel`
+and `multi_panel_1x3`, keep their full width).
 
 ### Bar
 

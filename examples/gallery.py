@@ -792,17 +792,29 @@ def build(outdir: Path):
     figs_dir = outdir / "figs"
     figs_dir.mkdir(parents=True, exist_ok=True)
     records = []
+    #: charts that keep their full composite layout in the gallery; every other
+    #: chart is shown as a single-column figure, so all the displayed images are
+    #: the same compact size
+    COMPOSITE = {"multi_panel", "multi_panel_1x3"}
     for spec in FIGS:
         apply_wxl_style()
         fig = spec["fn"]()
+        if spec["id"] in COMPOSITE:
+            base = WXL_FIGSIZE[spec["width"]]
+            target = WXL_WIDTH_MM[spec["width"]]
+        else:
+            base = WXL_FIGSIZE["single"]
+            target = WXL_WIDTH_MM["single"]
+        fig.set_size_inches(*base)
         prepare_figure(fig)
         report = check_wxl_style(fig)
         paths = finalize_figure(fig, figs_dir / spec["id"],
                                 formats=["png", "pdf"], dpi=300,
-                                target_width_mm=WXL_WIDTH_MM[spec["width"]])
+                                target_width_mm=target)
         width_mm = measure_width_mm(paths[0], 300)
         report["width_mm"] = round(width_mm, 2)
-        report["target_mm"] = WXL_WIDTH_MM[spec["width"]]
+        report["target_mm"] = target
+        report["preset"] = "double" if spec["id"] in COMPOSITE else "single"
         if abs(width_mm - report["target_mm"]) > 0.6:
             report["problems"].append(
                 f"saved width {width_mm:.2f} mm misses target "
