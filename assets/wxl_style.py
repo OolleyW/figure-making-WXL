@@ -71,6 +71,7 @@ WXL_FIGSIZE = {
     "onehalf": (5.51, 3.90),
     "double": (7.48, 2.60),
     "double_tall": (7.48, 6.80),
+    "double_1x3": (7.48, 1.63),   # 1x3 one-row grid: panels keep the single-column aspect
     "slide": (10.0, 6.00),
 }
 
@@ -80,6 +81,7 @@ WXL_WIDTH_MM = {
     "onehalf": 140.0,
     "double": 190.0,
     "double_tall": 190.0,
+    "double_1x3": 190.0,
     "slide": 254.0,
 }
 

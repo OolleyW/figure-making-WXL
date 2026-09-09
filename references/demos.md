@@ -58,7 +58,7 @@ below gives the figure id, the width preset used, and the core call to copy.
 | `donut` | Donut / pie with framed legend | single | `ax.pie(vals, wedgeprops=dict(width=0.42)); ax.set_axis_off()` |
 | `dual_axis` | Dual y-axis (bars + line) | double | `ax2 = ax.twinx(); ax2.plot(...)` |
 | `multi_panel` | 2 × 2 mixed-type grid | double_tall | `create_subplots(2, 2); panel_tag(axes[0], "(a)", "Grouped bars"); center_grid(fig)` |
-| `multi_panel_1x3` | 1 × 3 mixed-type grid, one row | double | `create_subplots(1, 3); panel_tag(axes[0], "(a)", "Grouped bars"); center_grid(fig)` |
+| `multi_panel_1x3` | 1 × 3 mixed-type grid, one row | double_1x3 | `create_subplots(1, 3); panel_tag(axes[0], "(a)", "Grouped bars"); center_grid(fig)` |
 
 Single-column-only types: `heatmap`, `radar`, `donut`. Double-column-only types:
 `multi_panel`, `multi_panel_1x3` (the column gallery renders each type only in
@@ -66,7 +66,9 @@ the layouts it suits).
 
 Note: the `double` preset is deliberately short — 190 × 66 mm, half the height it
 used to be — while every text element stays 10 pt. `double_tall` (190 × 173 mm)
-is the tall multi-panel preset and is unchanged.
+is the tall 2 × 2 multi-panel preset and is unchanged. `double_1x3`
+(190 × 41 mm) is the 1 × 3 row preset, sized so each panel keeps the
+single-column aspect ratio (50.4 × 38.5 mm, 1.31).
 
 ## Choosing a type
 

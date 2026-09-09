@@ -610,12 +610,12 @@ def fig_multi_panel():
         'panel_tag(axes[0], "(a)", "Grouped bars")\n'
         'center_grid(fig)\n'
         'add_caption_below(fig, r"$\\mathbf{Fig.}$  21  One-row three-panel figure.")',
-        width="double")
+        width="double_1x3")
 def fig_multi_panel_1x3():
-    fig, axes = create_subplots(1, 3, figsize=WXL_FIGSIZE["double"])
+    fig, axes = create_subplots(1, 3, figsize=WXL_FIGSIZE["double_1x3"])
     fig._wxl_no_tight = True      # keep the manual centering
     fig._wxl_center = True        # centre the grid at every layout pass
-    fig.subplots_adjust(wspace=0.42)
+    fig.subplots_adjust(wspace=0.25)
 
     ax = axes[0]
     cats = ["A", "B", "C"]

@@ -84,7 +84,8 @@ def render_variant(spec, preset, outdir: Path, reuse: bool = False):
     if preset == "single":
         base = WXL_FIGSIZE["single"]
     else:
-        base = WXL_FIGSIZE[spec["width"]] if spec["width"] in ("double", "double_tall") \
+        base = WXL_FIGSIZE[spec["width"]] \
+            if spec["width"] in ("double", "double_tall", "double_1x3") \
             else WXL_FIGSIZE["double"]
     fig.set_size_inches(*base)
     prepare_figure(fig)
