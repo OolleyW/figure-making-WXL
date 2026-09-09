@@ -24,10 +24,10 @@ SKILL = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (  # noqa: E402
-    WXL_CMAP, WXL_FIGSIZE, WXL_FONTSIZE, WXL_PALETTE, WXL_WIDTH_MM, add_caption,
-    add_caption_below, annotate_bars, apply_wxl_style, center_grid,
-    check_wxl_style, create_subplots, finalize_figure, framed_legend,
-    measure_width_mm, panel_tag, prepare_figure,
+    WXL_AXES_PANEL_MM, WXL_CMAP, WXL_FIGSIZE, WXL_FONTSIZE, WXL_PALETTE,
+    WXL_WIDTH_MM, add_caption, add_caption_below, annotate_bars, apply_wxl_style,
+    center_grid, check_wxl_style, create_subplots, finalize_figure,
+    framed_legend, measure_width_mm, panel_tag, prepare_figure,
 )
 
 P = WXL_PALETTE
@@ -547,6 +547,8 @@ def fig_multi_panel():
     fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])
     fig._wxl_no_tight = True      # keep the manual centering
     fig._wxl_center = True        # centre the grid at every layout pass
+    # every panel's black frame matches a single-column figure
+    fig._wxl_panel_axes_mm = WXL_AXES_PANEL_MM
     # row/column gap tuned so the top-row panel labels sit ~14 pt above the
     # bottom-row panels, matching the caption gap (add_caption_below, 14 pt)
     fig.subplots_adjust(hspace=0.28, wspace=0.30)

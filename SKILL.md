@@ -72,7 +72,9 @@ These rules supersede any conflicting style text in `references/` or in upstream
    calibration, `finalize_figure` forces each single-column figure's axes onto
    the standard `WXL_AXES_SINGLE_MM = (62.0, 44.0)` mm box (polar axes, pies
    and colorbar axes exempt), so the black frames match across all single-column
-   figures regardless of labels or legends. The trimmed image is then usually
+   figures regardless of labels or legends. Multi-panel figures bring each
+   subplot to the same box (`WXL_AXES_PANEL_MM`), so a panel of a 2 × 2 grid is
+   the same size as a single-column figure. The trimmed image is then usually
    narrower than 90 mm — fitting the column is the rule, not filling it.
 5. **Full box on every Cartesian axes.** All four spines drawn at 0.8 pt.
    Exceptions: polar axes (radar), axes with `axison = False` (pie/donut) and
