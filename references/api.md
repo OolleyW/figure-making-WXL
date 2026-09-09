@@ -1,0 +1,190 @@
+# API Reference (WXL style)
+
+Everything here lives in `assets/wxl_style.py`. Import it after adding the
+skill's `assets/` directory to `sys.path`.
+
+---
+
+## Constants
+
+### WXL_PALETTE
+
+```python
+WXL_PALETTE = {
+    "primary":   "#1F4E79",   # proposed method / main series
+    "secondary": "#4E86C6",   # secondary blue, supporting series
+    "contrast":  "#B64342",   # baseline / competing method
+    "improve":   "#2E8B7A",   # improvement / positive variant
+    "accent":    "#E0A030",   # emphasis, annotations, secondary axis
+    "neutral":   "#7B7B7B",   # reference lines, background categories
+    "light":     "#C9DCF0",   # light fill, uncertainty bands
+}
+```
+
+Only these colors plus black and white are allowed. `check_wxl_style` enforces it.
+
+### WXL_CMAP / WXL_CMAPS
+
+`WXL_CMAP = "RdBu_r"` is the default diverging map. `WXL_CMAPS` also offers
+`"Blues"` (sequential) and `"coolwarm"` (signed) for matrices and fields.
+
+### WXL_SERIES
+
+Ordered color cycle used when a helper is called without explicit colors:
+`primary, contrast, improve, accent, secondary, neutral`.
+
+### WXL_FONTSIZE
+
+```python
+{"caption": 10, "label": 10, "tick": 10, "legend": 10, "annot": 10, "panel": 10}
+```
+
+Uniform 10 pt. This is the W1 contract; the audit fails on any other size.
+
+### WXL_FIGSIZE
+
+```python
+{
+  "single":      (3.54, 2.70),   # 90 mm column
+  "onehalf":     (5.51, 3.90),   # 140 mm
+  "double":      (7.48, 5.20),   # 190 mm
+  "double_tall": (7.48, 6.80),   # 190 mm, tall multi-panel
+  "slide":       (10.0, 6.00),   # slides only, not for submission
+}
+```
+
+---
+
+## WXLStyle
+
+```python
+@dataclass(frozen=True)
+class WXLStyle:
+    font_size: float = 10.0
+    caption_size: float = 10.0
+    tick_size: float = 10.0
+    legend_size: float = 10.0
+    annot_size: float = 10.0
+    axes_linewidth: float = 0.8
+    line_width: float = 1.5
+    marker_size: float = 4.0
+    bar_edge_width: float = 0.8
+    error_linewidth: float = 0.8
+    capsize: float = 2.0
+    figsize: tuple = WXL_FIGSIZE["double"]
+    dpi: int = 600
+    full_box: bool = True
+    legend_framed: bool = True
+    ticks_in: bool = True
+    grid: bool = False
+```
+
+Never set `full_box`, `legend_framed`, `ticks_in` or `grid` to anything but
+their defaults under this skill.
+
+---
+
+## Style and layout
+
+### apply_wxl_style(style=None) -> WXLStyle
+
+Installs the rcParams (fonts, sizes, spines, tick direction, legend frame,
+vector export options, `pdf.fonttype = 42`). Call once before creating figures.
+
+### create_subplots(nrows=1, ncols=1, figsize=None, **kwargs) -> (fig, axes)
+
+`axes` is a flat 1-D numpy array, so `axes[0]` always works.
+
+### framed_legend(ax, **kwargs)
+
+Builds a legend **inside** the axes with an opaque white face and a black
+0.8 pt border. Pass `loc`, `ncol`, `handles`, `labels` as usual.
+
+```python
+framed_legend(ax, loc="upper left", ncol=2, columnspacing=1.0, handlelength=1.6)
+```
+
+### add_caption(fig, text, fontsize=None, y=-0.045, **kwargs)
+
+Places the figure caption centered **below** the whole figure and returns the
+`Text` artist. Never use `fig.suptitle`.
+
+### panel_tag(ax, tag, y=-0.32)
+
+Places `(a)`, `(b)`, ... just below the panel. With an x-label present, use
+`y=-0.42` so the tag clears the label.
+
+### finalize_figure(fig, out_path, formats=None, dpi=None, close=True, pad=0.06, layout=True, target_width_mm=None, tol_mm=0.5)
+
+Saves to one or more formats (`png`, `pdf`, `svg`, `eps`, `tif`), creates parent
+directories, applies `tight_layout(pad=1.0)` unless `layout=False`, and always
+uses `bbox_inches="tight"`. Returns the list of saved paths. Use
+`dpi=600` for submission and `dpi=300` for HTML previews.
+
+`target_width_mm` iteratively calibrates the canvas width (up to six probe
+renders) so the **trimmed** image is exactly that wide while keeping the text at
+10 pt. Pass `WXL_WIDTH_MM[preset]`; without it a `double` figure saves around
+158 mm instead of 190 mm, and stretching it to fill the column drops the text to
+about 8.3 pt.
+
+```python
+finalize_figure(fig, "figures/result", formats=["png", "pdf"], dpi=600,
+                target_width_mm=WXL_WIDTH_MM["double"])
+```
+
+### measure_width_mm(path, dpi=None) -> float
+
+Physical width of a saved raster file in millimetres (`px / dpi × 25.4`). Use it
+to verify that a figure really is 90 / 140 / 190 mm wide before inserting it into
+a manuscript.
+
+### check_wxl_style(fig, style=None, strict_sizes=True) -> dict
+
+Audits a live figure. Returns:
+
+```python
+{
+  "ok": bool,            # True when "problems" is empty
+  "fonts": [...],        # font files actually used
+  "sizes": [...],        # font sizes in pt actually used
+  "n_axes": int,
+  "n_legends": int,
+  "problems": [...],     # hard contract violations
+  "warnings": [...],     # soft notes, e.g. a legend that may cover a bar
+}
+```
+
+Checks performed:
+
+- every text artist resolves to a Times New Roman (or SimSun) font file;
+- every font size equals `font_size` when `strict_sizes=True`;
+- no missing-glyph warnings when the canvas draws;
+- all four spines visible on every Cartesian axes (polar, `axison=False` and
+  colorbar axes are exempt);
+- no visible grid lines;
+- tick direction is `in`;
+- every legend has a visible frame, black border and no transparency;
+- every `Line2D`, `Patch` and `PathCollection` color comes from the palette
+  plus black/white.
+
+Soft warnings currently cover legends whose bounding box overlaps a bar or box
+patch by more than 5 % of the legend area.
+
+---
+
+## Conventions
+
+- Save outputs under a project `figures/` directory with stable basenames.
+- Legend colors and markers must match the series colors exactly.
+- When the comparison target, panel count, color role or data layout is
+  underspecified in a way that changes the figure, ask the user before
+  finalizing.
+- In headless runs, set `matplotlib.use("Agg")` before importing pyplot.
+
+## Related files
+
+- [../SKILL.md](../SKILL.md) — hard rules and when to load
+- [design-theory.md](design-theory.md) — rationale for 10 pt, palette, widths
+- [common-patterns.md](common-patterns.md) — layout patterns
+- [tutorials.md](tutorials.md) — worked examples
+- [demos.md](demos.md) — the 20 chart types

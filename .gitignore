@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# matplotlib probe files written during width calibration
+*.probe.png
+
+# generated figure output
+examples/out/
+figures/
+
+# OS noise
+Thumbs.db
+.DS_Store
+desktop.ini
