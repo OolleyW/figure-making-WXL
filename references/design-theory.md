@@ -64,17 +64,18 @@ Because everything is one size, hierarchy comes from **weight, color and
 position** instead of size: panel tags are bold, emphasis annotations use
 `accent`, reference lines use `neutral` and a dashed style.
 
-### One size for every single-column figure
+### One black frame for every single-column figure
 
-`finalize_figure` saves every single-column figure at the same overall (trimmed)
-size, `WXL_SIZE_SINGLE_MM = (90.0, 76.0)` mm, so a run of single-column figures
-in a manuscript looks like one consistent set. The width calibration fixes the
-90 mm; the axes height is then adjusted (measured from probe saves) until the
-image is 76 mm tall, which only moves the vertical extent and leaves the width
-alone. Colorbar figures and the polar/pie charts are exempt, because a colorbar
-plus its labels cannot fit the column and a circle cannot fill a 90 × 76 box. A
-multi-panel figure instead brings each subplot to `WXL_AXES_PANEL_MM`
-(75 × 55 mm) without changing the spacing.
+`finalize_figure` puts every single-column figure on one fixed black frame,
+`WXL_AXES_SINGLE_MM = (75 × 55 mm)`, centred. The frame is therefore identical
+across figures and does not grow or shrink with the tick labels — a run of
+single-column figures in a manuscript reads as one consistent set. The trade-off
+is that the saved width then follows the labels (about 87–102 mm) instead of
+being pinned to 90 mm; a colorbar adds its bar and labels on the right. The width
+audit consequently does not pin the single-column variant. Polar axes and pies
+have no rectangular frame, and their legend stays in the conventional place
+outside the circle (still inside the figure). A multi-panel figure instead brings
+each subplot to `WXL_AXES_PANEL_MM` (75 × 55 mm) without changing the spacing.
 
 ### Single-column caution
 

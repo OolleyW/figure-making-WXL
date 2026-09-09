@@ -189,8 +189,8 @@ deliberately short (190 × 66 mm) with the 11 pt text unchanged.
 ## Gallery
 
 Every chart type rendered with the WXL style, straight from `preview/`.
-Single-column figures are 90 × 76 mm (the two composite layouts, `multi_panel`
-and `multi_panel_1x3`, keep their full width).
+Single-column figures share one fixed 75 × 55 mm black frame (the two composite
+layouts, `multi_panel` and `multi_panel_1x3`, keep their full width).
 
 ### Bar
 
@@ -263,7 +263,7 @@ never Helvetica, Arial or DejaVu Sans. CJK falls back to SimSun.
 | Legend | inside the axes, opaque white face, black 0.8 pt border |
 | Axis ends | on a tick value (no unlabelled strip) |
 | Export | PNG 600 dpi + vector PDF |
-| Single-column size | 90 × 76 mm |
+| Single-column black frame | one fixed 75 × 55 mm box in every figure |
 
 ### Line styles
 

@@ -68,13 +68,15 @@ These rules supersede any conflicting style text in `references/` or in upstream
    `bbox_inches="tight"` trims the canvas, always pass
    `target_width_mm=WXL_WIDTH_MM[preset]` to `finalize_figure` so the saved
    image is exactly the print width instead of ~17 % narrower.
-4. **Every single-column figure is the same overall size.** `finalize_figure`
-   saves single-column output at `WXL_SIZE_SINGLE_MM = (90.0, 76.0)` mm trimmed:
-   it adjusts the axes height so the image is 76 mm tall while the width stays
-   90 mm, so a set of single-column figures reads as one consistent size.
-   Colorbar figures and polar/pie charts are exempt. A multi-panel figure
-   brings each subplot to `WXL_AXES_PANEL_MM` (75 × 55 mm) without touching the
-   spacing.
+4. **One fixed black frame for every single-column figure.** `finalize_figure`
+   puts single-column output on the shared `WXL_AXES_SINGLE_MM = (75 × 55 mm)`
+   box, centred, so every rectilinear figure's black frame is the same size and
+   never adapts to its tick labels. The saved width therefore follows the labels
+   (roughly 87–102 mm) rather than being pinned to 90 mm; that is intended, and
+   the width audit does not pin the single-column variant. Colorbars are tucked
+   against their host; polar axes and pies have no rectangular frame. A
+   multi-panel figure brings each subplot to `WXL_AXES_PANEL_MM` (75 × 55 mm)
+   without touching the spacing.
 5. **Full box on every Cartesian axes.** All four spines drawn at 0.8 pt.
    Exceptions: polar axes (radar), axes with `axison = False` (pie/donut) and
    colorbar axes.

@@ -224,13 +224,16 @@ caption gap are unchanged, so only the black frames change size. The rows below
 the first are also shifted so the top row's panel titles clear the next row by
 the same 14 pt the caption uses.
 
-Every single-column figure is saved at the same overall (trimmed) size,
-`WXL_SIZE_SINGLE_MM = (90.0, 76.0)`: after the width calibration, the axes
-height is adjusted (measured from probe saves) so the trimmed image is exactly
-76 mm tall, which leaves the width at 90 mm. Figures carrying a colorbar and the
-polar/pie charts are exempt, because a bar plus its labels cannot fit the column
-and a circle cannot fill a 90 × 76 box. Set `fig._wxl_skip_uniform_size = True`
-to opt a figure out.
+Every single-column figure shares one fixed black frame:
+`WXL_AXES_SINGLE_MM = (75 × 55 mm)`. After the width calibration,
+`_standardize_axes_box` puts every rectilinear Cartesian axes on that box,
+centred, so the frame is identical across figures and never grows or shrinks
+with the tick labels. Because the box is fixed, the saved width follows the
+labels (about 87–102 mm) instead of being pinned to 90 mm, and the width audit
+does not pin the single-column variant. Colorbars are tucked against their host
+(host read from the colorbar's mappable, so `contourf` works too); polar axes
+and pies have no rectangular frame and keep their conventional legend outside
+the circle. Set `fig._wxl_skip_uniform_size = True` to opt a figure out.
 
 ```python
 finalize_figure(fig, "figures/result", formats=["png", "pdf"], dpi=600,
