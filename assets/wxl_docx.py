@@ -34,9 +34,9 @@ TNR = "Times New Roman"
 CJK_FONT = "SimSun"
 
 __all__ = [
-    "TNR", "CJK_FONT", "new_document", "add_heading", "add_paragraph",
-    "add_caption", "add_figure", "add_figure_block", "add_three_line_table",
-    "add_page_break",
+    "TNR", "CJK_FONT", "new_document", "add_title", "add_heading",
+    "add_paragraph", "add_caption", "add_figure", "add_figure_block",
+    "add_three_line_table", "add_page_break",
 ]
 
 
@@ -87,6 +87,17 @@ def add_heading(doc, text, size=12.0):
     pf.line_spacing = 2.0
     pf.space_before = Pt(6)
     pf.space_after = Pt(2)
+    return p
+
+
+def add_title(doc, text, size=16.0, font=None, space_after=10.0):
+    """Document title: centered, bold, double spacing, no indent."""
+    p = doc.add_paragraph()
+    _set_run(p.add_run(text), font=font or CJK_FONT, size=size, bold=True)
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    pf = p.paragraph_format
+    pf.line_spacing = 2.0
+    pf.space_after = Pt(space_after)
     return p
 
 

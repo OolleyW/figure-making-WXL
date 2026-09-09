@@ -144,6 +144,7 @@ in `preview/`.
 | `scripts/check_wxl_style.py` | installation self-test |
 | `examples/gallery.py` | render all 20 types + an HTML gallery |
 | `examples/word_report.py` | render figures and assemble a Word report |
+| `examples/column_gallery.py` | all 20 types at 90 mm and 190 mm in one Word document |
 | `requirements.txt` | dependencies (python-docx optional) |
 | `preview/*.png` | 300 dpi previews of the 20 chart types |
 
@@ -158,6 +159,9 @@ python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
 
 # figures assembled into a Word report (needs python-docx)
 python "<skill-dir>/examples/word_report.py" --out ./wxl_report
+
+# every chart type at 90 mm and 190 mm in one Word document
+python "<skill-dir>/examples/column_gallery.py" --out ./wxl_columns
 ```
 
 ## Word assembly

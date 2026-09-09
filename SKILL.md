@@ -220,4 +220,5 @@ axis ends on tick values, the 90 / 140 / 190 mm width calibration, and a
 | `scripts/check_wxl_style.py` | Run `python scripts/check_wxl_style.py` to self-test the install |
 | `examples/gallery.py` | Render all 20 chart types plus an HTML preview gallery |
 | `examples/word_report.py` | Render figures and assemble a Word report end to end |
+| `examples/column_gallery.py` | All 20 chart types at 90 mm and 190 mm in one Word document |
 | `requirements.txt` | Python dependencies (matplotlib, numpy, Pillow; python-docx optional) |
