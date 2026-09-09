@@ -154,18 +154,22 @@ ax.text(x, y, f"{v:.2f}", ha="center", va="bottom")   # 10 pt by rcParams
 ```python
 fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])
 # ... draw each panel ...
-panel_tag(axes[0], "(a)", y=-0.42)
-panel_tag(axes[1], "(b)", y=-0.42)
-panel_tag(axes[2], "(c)", y=-0.42)
-panel_tag(axes[3], "(d)", y=-0.42)
+panel_tag(axes[0], "(a)", "Grouped bars", y=-0.42)
+panel_tag(axes[1], "(b)", "Trend lines", y=-0.42)
+panel_tag(axes[2], "(c)", "Box plots", y=-0.42)
+panel_tag(axes[3], "(d)", "Correlation heatmap", y=-0.42)
 add_caption(fig, "Fig. 4  Multi-panel comparison of the four settings.")
 ```
 
 - One legend per panel, not one shared legend floating outside.
 - Same limits across panels that share a quantity, so the reader can compare
   visually.
-- Panel tags go below their own panel; use `y=-0.42` when the panel has an
-  x-label.
+- Panel labels carry a number **and** a short title, are centered under their own
+  panel, and are **not bold**. Use `y=-0.42` when the panel has an x-label and the
+  same `y` for every panel in the grid so the labels line up.
+- A 2 × 2 grid only works at the full 190 mm width: at 90 mm each panel is about
+  40 mm wide, which cannot hold a 10 pt legend. Render multi-panel figures in
+  double column only.
 - Mixing types in one grid (bar + line + box + heatmap) is fine as long as the
   type scale, spine width and color semantics stay identical.
 

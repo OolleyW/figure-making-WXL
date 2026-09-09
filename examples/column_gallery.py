@@ -38,6 +38,16 @@ from wxl_docx import (  # noqa: E402
 DPI = 600
 VARIANTS = [("single", "单栏", "90 mm"), ("double", "两栏", "190 mm")]
 
+#: chart types that only work at the full 190 mm width, so the single-column
+#: variant is not rendered at all (a 2x2 grid at 90 mm leaves ~40 mm per panel)
+DOUBLE_ONLY = {"multi_panel"}
+
+
+def variants_for(fig_id: str):
+    if fig_id in DOUBLE_ONLY:
+        return [v for v in VARIANTS if v[0] == "double"]
+    return VARIANTS
+
 CATEGORY_CN = {"bar": "柱状 / 条形", "line": "折线 / 面积", "rel": "关系",
                "dist": "分布", "matrix": "矩阵 / 场", "special": "特殊"}
 
@@ -85,7 +95,7 @@ def main():
     records, failures = [], 0
     for i, spec in enumerate(gallery.FIGS, start=1):
         entry = {"idx": i, "spec": spec, "variants": {}}
-        for preset, label, mm_label in VARIANTS:
+        for preset, label, mm_label in variants_for(spec["id"]):
             png, mm, report, ok = render_variant(spec, preset, figs, args.reuse)
             failures += 0 if ok else 1
             entry["variants"][preset] = {"png": png, "mm": mm, "label": label,
@@ -106,7 +116,9 @@ def main():
     add_paragraph(doc, "本文件把 WXL 样式的 20 种图型各出两版，单栏 90 mm 与两栏 "
                        "190 mm，同页上下对比。两版使用相同纵横比与相同字号，差异只"
                        "来自物理宽度，也就是 10 pt 文字在版面上占多大比例。全部图片"
-                       "按 100 % 原始尺寸插入，图内文字与正文 10 pt 字号一致。",
+                       "按 100 % 原始尺寸插入，图内文字与正文 10 pt 字号一致。"
+                       "2x2 多子图只出两栏版，因为单栏下每个面板仅约 40 mm，"
+                       "图例和子图标题都放不下。",
                   spacing=1.5, space_after=8)
     add_paragraph(doc, "选择原则：图内元素少、图例不超过三项时用单栏更省版面。"
                        "分组较多、图例较长，或需要热图、雷达图这类宽幅图形时用两栏。",
@@ -115,11 +127,12 @@ def main():
     add_heading(doc, "图型与版式一览")
     rows = []
     for rec in records:
-        single = rec["variants"]["single"]
+        single = rec["variants"].get("single")
         double = rec["variants"]["double"]
         rows.append([rec["idx"], rec["spec"]["title"],
                      CATEGORY_CN[rec["spec"]["category"]],
-                     f'{single["mm"]:.1f} mm', f'{double["mm"]:.1f} mm',
+                     f'{single["mm"]:.1f} mm' if single else "—",
+                     f'{double["mm"]:.1f} mm',
                      RECOMMEND.get(rec["spec"]["id"], "两者皆可")])
     add_three_line_table(doc, ["序号", "图型", "类别", "单栏", "两栏", "推荐"],
                          rows, col_widths_cm=[1.4, 7.6, 3.0, 2.0, 2.0, 2.6])
@@ -127,24 +140,30 @@ def main():
     for rec in records:
         add_page_break(doc)
         add_heading(doc, f'{rec["idx"]}. {rec["spec"]["title"]}')
-        for preset, _label, _mm in VARIANTS:
+        for preset, _label, _mm in variants_for(rec["spec"]["id"]):
             v = rec["variants"][preset]
             inserted = add_figure(doc, v["png"], dpi=DPI)
             add_caption(doc, f'图 {rec["idx"]}{"a" if preset == "single" else "b"}  '
                              f'{v["label"]}版式（{v["mm_label"]}，实际插入 '
                              f'{inserted:.1f} mm）')
-        warn = (rec["variants"]["single"]["report"]["warnings"]
-                + rec["variants"]["double"]["report"]["warnings"])
-        note = (f'推荐版式：{RECOMMEND.get(rec["spec"]["id"], "两者皆可")}    '
-                f'单栏自检：{"PASS" if rec["variants"]["single"]["ok"] else "FAIL"}    '
-                f'两栏自检：{"PASS" if rec["variants"]["double"]["ok"] else "FAIL"}')
+        warn = []
+        for v in rec["variants"].values():
+            warn += v["report"]["warnings"]
+        ok_all = all(v["ok"] for v in rec["variants"].values())
+        note = f'推荐版式：{RECOMMEND.get(rec["spec"]["id"], "两者皆可")}    '
+        note += "    ".join(
+            f'{v["label"]}自检：{"PASS" if v["ok"] else "FAIL"}'
+            for v in rec["variants"].values())
+        if rec["spec"]["id"] in DOUBLE_ONLY:
+            note += "    说明：该图型单栏放不下，只出两栏版"
         if warn:
             note += "    提示：" + "；".join(sorted(set(warn)))
         add_paragraph(doc, note, size=9, spacing=1.0, indent_chars=0, space_after=0)
 
     out = outdir / "WXL_chart_types_single_and_double_column.docx"
     saved = save_document(doc, out)
-    print(f"\ntypes: {len(records)}  renders: {len(records) * 2}  failures: {failures}")
+    n_renders = sum(len(r["variants"]) for r in records)
+    print(f"\ntypes: {len(records)}  renders: {n_renders}  failures: {failures}")
     print("docx:", saved, f"{saved.stat().st_size / 1024 / 1024:.2f} MB")
     sys.stdout.flush()
     return 1 if failures else 0

@@ -58,7 +58,7 @@ Verify after saving: `measure_width_mm("figures/result.png", 600)` should return
 | Tick label | 10 pt | |
 | Legend text | 10 pt | |
 | Data annotation | 10 pt | |
-| Panel tag `(a)` | 10 pt bold | below its own panel |
+| Panel label `(a) Grouped bars` | 10 pt, not bold | centered below its own panel |
 
 Because everything is one size, hierarchy comes from **weight, color and
 position** instead of size: panel tags are bold, emphasis annotations use

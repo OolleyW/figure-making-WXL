@@ -163,10 +163,16 @@ that had to be thinned.
 Places the figure caption centered **below** the whole figure and returns the
 `Text` artist. Never use `fig.suptitle`.
 
-### panel_tag(ax, tag, y=-0.32)
+### panel_tag(ax, tag, title=None, y=-0.32, bold=False)
 
-Places `(a)`, `(b)`, ... just below the panel. With an x-label present, use
-`y=-0.42` so the tag clears the label.
+Panel label below its own panel, centered on the panel, **not bold** by default.
+Pass a `title` to get `(a) Grouped bars` instead of a bare `(a)`. Use `y=-0.42`
+when the panel has an x-label, and give every panel in a grid the same `y` so the
+labels line up.
+
+```python
+panel_tag(ax, "(a)", "Grouped bars", y=-0.42)
+```
 
 ### finalize_figure(fig, out_path, formats=None, dpi=None, close=True, pad=0.06, layout=True, target_width_mm=None, tol_mm=0.5, lock_ends=True)
 

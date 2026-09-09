@@ -743,10 +743,19 @@ def lock_axis_ends_all(fig, max_ticks: int = 8, min_ticks: int = 4) -> int:
     return n
 
 
-def panel_tag(ax, tag: str, y: float = -0.32):
-    """Panel label such as ``(a)`` placed just BELOW its own panel."""
-    return ax.text(0.0, y, tag, transform=ax.transAxes, ha="left", va="top",
-                   fontsize=WXL_FONTSIZE["panel"], fontweight="bold")
+def panel_tag(ax, tag: str, title: str | None = None, y: float = -0.32,
+              bold: bool = False):
+    """Panel label below its own panel, centered on the panel.
+
+    Pass a ``title`` to get ``(a) Grouped bars`` instead of a bare ``(a)``. The
+    label is centered under the panel and is NOT bold by default, so it reads as
+    a small caption rather than a heading. Use ``y=-0.42`` when the panel has an
+    x-label, and give every panel in a grid the same ``y`` so the labels line up.
+    """
+    text = f"{tag} {title}".strip() if title else tag
+    return ax.text(0.5, y, text, transform=ax.transAxes, ha="center", va="top",
+                   fontsize=WXL_FONTSIZE["panel"],
+                   fontweight="bold" if bold else "normal")
 
 
 def measure_width_mm(path, dpi: int | None = None) -> float:

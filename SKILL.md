@@ -87,8 +87,9 @@ These rules supersede any conflicting style text in `references/` or in upstream
    colorbar axes and pie/donut axes are exempt because their ticks are
    categorical and already span the full extent.
 7. **Caption below the figure**, centered, via `add_caption`. Never
-   `fig.suptitle` and never a title on top of the axes. Panel tags `(a)`, `(b)`
-   go just below their own panel.
+   `fig.suptitle` and never a title on top of the axes. Panel labels go just
+   below their own panel, centered, **not bold**, and carry a number plus a short
+   title (`(a) Grouped bars`), not a bare `(a)`.
 8. **Deep-blue palette only.** Colors come from `WXL_PALETTE`; black, white and
    the palette are the only allowed colors. See `references/design-theory.md`
    for the semantics.

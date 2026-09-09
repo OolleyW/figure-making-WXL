@@ -533,9 +533,9 @@ def fig_dual_axis():
 
 
 @figure("multi_panel", "多子图（2x2 混合排版）", "special",
-        "四种图型拼版，子图标签放在各自面板下方，整图共用一个图题。",
+        "四种图型拼版，每个子图下方居中放编号加标题，整图共用一个图题。",
         'fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])\n'
-        'panel_tag(axes[0], "(a)", y=-0.42)\n'
+        'panel_tag(axes[0], "(a)", "Grouped bars", y=-0.42)\n'
         'add_caption(fig, "Fig. 20  Multi-panel figure.")', width="double_tall")
 def fig_multi_panel():
     fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])
@@ -551,7 +551,7 @@ def fig_multi_panel():
     ax.set_ylabel("Score")
     ax.set_ylim(0, 1.1)
     framed_legend(ax, loc="upper left")
-    panel_tag(ax, "(a)", y=-0.42)
+    panel_tag(ax, "(a)", "Grouped bars", y=-0.42)
 
     ax = axes[1]
     x = np.linspace(0, 10, 11)
@@ -562,7 +562,7 @@ def fig_multi_panel():
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
     framed_legend(ax, loc="upper left")
-    panel_tag(ax, "(b)", y=-0.42)
+    panel_tag(ax, "(b)", "Trend lines", y=-0.42)
 
     ax = axes[2]
     data = [RNG.normal(m, 1.0, 50) for m in (0, 1, 2)]
@@ -575,7 +575,7 @@ def fig_multi_panel():
         patch.set_facecolor(P[key])
     ax.set_xticklabels(["G1", "G2", "G3"])
     ax.set_ylabel("Value")
-    panel_tag(ax, "(c)", y=-0.42)
+    panel_tag(ax, "(c)", "Box plots", y=-0.42)
 
     ax = axes[3]
     m = RNG.uniform(-1, 1, (5, 5))
@@ -587,7 +587,7 @@ def fig_multi_panel():
     cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
     cb.ax.tick_params(direction="in", width=0.8)
     cb.outline.set_linewidth(0.8)
-    panel_tag(ax, "(d)", y=-0.42)
+    panel_tag(ax, "(d)", "Correlation heatmap", y=-0.42)
 
     add_caption(fig, "Fig. 20  Multi-panel figure with four chart types.")
     return fig
