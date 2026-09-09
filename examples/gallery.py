@@ -544,9 +544,9 @@ def fig_multi_panel():
     fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])
     fig._wxl_no_tight = True      # keep the manual centering
     fig._wxl_center = True        # centre the grid at every layout pass
-    # generous row/column gap so the top-row panel labels do not touch the
-    # bottom-row panels (labels sit 5 pt below their x-label)
-    fig.subplots_adjust(hspace=0.55, wspace=0.30)
+    # row/column gap tuned so the top-row panel labels sit ~14 pt above the
+    # bottom-row panels, matching the caption gap (add_caption_below, 14 pt)
+    fig.subplots_adjust(hspace=0.28, wspace=0.30)
 
     ax = axes[0]
     cats = ["A", "B", "C"]
