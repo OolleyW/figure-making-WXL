@@ -22,7 +22,7 @@ Copy it into the skills folder the agent scans and it is live.
 | Other loaders | wherever the loader scans for `SKILL.md` |
 
 ```bash
-git clone https://github.com/OolleyW/figure-making-WXL.git \
+git clone https://github.com/OolleyW/figure-making-wxl.git \
   ~/.dsh/skills/figure-making-wxl
 ```
 
