@@ -632,9 +632,11 @@ def prepare_figure(fig, lock_ends: bool = True, auto_legend: bool = True,
         center = bool(getattr(fig, "_wxl_center", False))
     if center:
         center_grid(fig)
-        caption = getattr(fig, "_wxl_caption", None)
-        if caption is not None:
-            _caption_below(fig, caption[0], caption[1], caption[2])
+    # re-place a caption-below-the-grid at the current canvas size, so it stays
+    # a fixed 14 pt under the grid even after the width calibration resized it
+    caption = getattr(fig, "_wxl_caption", None)
+    if caption is not None:
+        _caption_below(fig, caption[0], caption[1], caption[2])
     return fig
 
 

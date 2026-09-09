@@ -82,7 +82,7 @@ def fig_grouped_bar():
     ax.set_ylabel("Accuracy")
     ax.set_ylim(0, 1.55)
     framed_legend(ax, loc="upper left")
-    add_caption(fig, "Fig. 01  Grouped bars with error bars across four scenarios.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  1  Grouped bars with error bars across four scenarios.")
     return fig
 
 
@@ -108,7 +108,7 @@ def fig_stacked_bar():
     ax.set_ylabel("Mass fraction (%)")
     ax.set_ylim(0, 118)
     framed_legend(ax, loc="upper left", ncol=3, columnspacing=1.0, handlelength=1.4)
-    add_caption(fig, "Fig. 02  Stacked bars of mixture composition by year.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  2  Stacked bars of mixture composition by year.")
     return fig
 
 
@@ -131,7 +131,7 @@ def fig_horizontal_bar():
     ax.set_yticklabels(names)
     ax.set_xlabel("Strength retention (%)")
     ax.set_xlim(0, 100)
-    add_caption(fig, "Fig. 03  Horizontal bars sorted by strength retention.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  3  Horizontal bars sorted by strength retention.")
     return fig
 
 
@@ -155,7 +155,7 @@ def fig_line_trend():
     ax.set_ylabel("Score")
     framed_legend(ax, loc="upper left", ncol=2, columnspacing=1.0,
                   handlelength=1.6, handletextpad=0.5)
-    add_caption(fig, "Fig. 04  Multi-series trend lines with markers.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  4  Multi-series trend lines with markers.")
     return fig
 
 
@@ -177,7 +177,7 @@ def fig_line_band():
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Response (mV)")
     framed_legend(ax, loc="upper left")
-    add_caption(fig, "Fig. 05  Trend lines with uncertainty bands.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  5  Trend lines with uncertainty bands.")
     return fig
 
 
@@ -197,7 +197,7 @@ def fig_stacked_area():
     ax.set_ylabel("Cumulative release (%)")
     ax.set_xlim(0, 10)
     framed_legend(ax, loc="upper left", ncol=2, columnspacing=1.0, handlelength=1.4)
-    add_caption(fig, "Fig. 06  Stacked area chart of cumulative release.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  6  Stacked area chart of cumulative release.")
     return fig
 
 
@@ -223,7 +223,7 @@ def fig_scatter_fit():
     ax.set_xlabel("Measured")
     ax.set_ylabel("Predicted")
     framed_legend(ax, loc="upper left")
-    add_caption(fig, "Fig. 07  Scatter plot with least-squares fits.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  7  Scatter plot with least-squares fits.")
     return fig
 
 
@@ -244,7 +244,7 @@ def fig_bubble():
     ax.set_xlabel("Dosage (mg)")
     ax.set_ylabel("Response")
     framed_legend(ax, loc="upper left")
-    add_caption(fig, "Fig. 08  Bubble chart with size- and colour-encoded groups.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  8  Bubble chart with size- and colour-encoded groups.")
     return fig
 
 
@@ -266,7 +266,7 @@ def fig_errorbar():
     ax.set_xlabel("Strain (%)")
     ax.set_ylabel("Stress (MPa)")
     framed_legend(ax, loc="lower right")
-    add_caption(fig, "Fig. 09  Error bars in both x and y directions.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  9  Error bars in both x and y directions.")
     return fig
 
 
@@ -296,7 +296,7 @@ def fig_boxplot():
     framed_legend(ax, handles=[Patch(facecolor=P[k], edgecolor="black",
                                      linewidth=0.8, label=l)
                                for k, l in zip(keys, labels)], loc="upper left")
-    add_caption(fig, "Fig. 10  Box plots of four groups.", fontsize=WXL_FONTSIZE["caption"])
+    add_caption_below(fig, r"$\mathbf{Fig.}$  10  Box plots of four groups.")
     return fig
 
 
@@ -324,7 +324,7 @@ def fig_violin():
     framed_legend(ax, handles=[Patch(facecolor=P[k], edgecolor="black",
                                      linewidth=0.8, label=l)
                                for k, l in zip(keys, labels)], loc="upper left")
-    add_caption(fig, "Fig. 11  Violin plots with mean markers.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  11  Violin plots with mean markers.")
     return fig
 
 
@@ -345,7 +345,7 @@ def fig_hist_kde():
     ax.set_xlabel("Residual (mm)")
     ax.set_ylabel("Density")
     framed_legend(ax, loc="upper right")
-    add_caption(fig, "Fig. 12  Histogram with kernel density estimate.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  12  Histogram with kernel density estimate.")
     return fig
 
 
@@ -365,7 +365,7 @@ def fig_ecdf():
     ax.set_ylabel("Cumulative probability")
     ax.set_ylim(0, 1.02)
     framed_legend(ax, loc="upper left")
-    add_caption(fig, "Fig. 13  Empirical cumulative distribution functions.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  13  Empirical cumulative distribution functions.")
     return fig
 
 
@@ -391,7 +391,7 @@ def fig_strip_mean():
     ax.set_xticklabels(labels)
     ax.set_ylabel("Measured value")
     framed_legend(ax, loc="upper left", ncol=2, columnspacing=1.0, handlelength=1.4)
-    add_caption(fig, "Fig. 14  Strip plot with mean and standard deviation.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  14  Strip plot with mean and standard deviation.")
     return fig
 
 
@@ -420,7 +420,7 @@ def fig_heatmap():
     cb.set_label("Correlation")
     cb.ax.tick_params(direction="in", width=0.8)
     cb.outline.set_linewidth(0.8)
-    add_caption(fig, "Fig. 15  Correlation heatmap with annotated values.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  15  Correlation heatmap with annotated values.")
     return fig
 
 
@@ -441,7 +441,7 @@ def fig_contour():
     cb.set_label("Normalised intensity")
     cb.ax.tick_params(direction="in", width=0.8)
     cb.outline.set_linewidth(0.8)
-    add_caption(fig, "Fig. 16  Filled contour map of a two-dimensional field.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  16  Filled contour map of a two-dimensional field.")
     return fig
 
 
@@ -473,7 +473,7 @@ def fig_radar():
     ax.grid(True, color=P["neutral"], alpha=0.35, linewidth=0.6)
     ax.tick_params(direction="in")
     framed_legend(ax, loc="lower right", bbox_to_anchor=(1.16, -0.08))
-    add_caption(fig, "Fig. 17  Radar chart of five performance indices.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  17  Radar chart of five performance indices.")
     return fig
 
 
@@ -495,7 +495,7 @@ def fig_donut():
                                      linewidth=0.8, label=f"{l} ({v}%)")
                                for k, l, v in zip(keys, labels, vals)],
                   loc="center left", bbox_to_anchor=(0.92, 0.5))
-    add_caption(fig, "Fig. 18  Donut chart of mixture proportions.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  18  Donut chart of mixture proportions.")
     return fig
 
 
@@ -529,7 +529,7 @@ def fig_dual_axis():
     h1, l1 = ax.get_legend_handles_labels()
     h2, l2 = ax2.get_legend_handles_labels()
     framed_legend(ax, handles=h1 + h2, labels=l1 + l2, loc="upper left")
-    add_caption(fig, "Fig. 19  Dual-axis chart with bars and a line series.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  19  Dual-axis chart with bars and a line series.")
     return fig
 
 
@@ -539,7 +539,7 @@ def fig_dual_axis():
         'fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])\n'
         'panel_tag(axes[0], "(a)", "Grouped bars")\n'
         'center_grid(fig)          # centre the grid horizontally and vertically\n'
-        'add_caption(fig, "Fig. 20  Multi-panel figure.")', width="double_tall")
+        'add_caption_below(fig, r"$\mathbf{Fig.}$  20  Multi-panel figure.")', width="double_tall")
 def fig_multi_panel():
     fig, axes = create_subplots(2, 2, figsize=WXL_FIGSIZE["double_tall"])
     fig._wxl_no_tight = True      # keep the manual centering
@@ -596,7 +596,7 @@ def fig_multi_panel():
     framed_legend(ax, loc="upper left")
     panel_tag(ax, "(d)", "Scatter")
 
-    add_caption_below(fig, "Fig. 20  Multi-panel figure with four chart types.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  20  Multi-panel figure with four chart types.")
     return fig
 
 
