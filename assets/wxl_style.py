@@ -982,20 +982,25 @@ WXL_SIZE_SINGLE_MM = (90.0, 76.0)
 
 def _fit_trimmed_height(fig, h_mm: float, probe, dpi: int,
                         pad: float = 0.06, tol_mm: float = 0.25,
-                        rounds: int = 8, caption_max_mm: float | None = None) -> bool:
+                        rounds: int = 12, caption_max_mm: float | None = None) -> bool:
     """Grow or shrink the axes until the saved (tight) image is ``h_mm`` tall.
 
     Only the height moves: the width calibration has already fixed the width and
     changing the axes height does not move the left/right labels. The height is
     measured from a real probe save, because ``get_tightbbox`` disagrees with
-    ``bbox_inches="tight"`` by up to about 1 mm. Legends, annotations and the
-    caption are re-placed at each step; ``caption_max_mm`` must be passed so the
-    caption keeps wrapping to the column width instead of falling back to one
-    over-wide line. Returns True when it converged.
+    ``bbox_inches="tight"`` by up to about 1 mm. Each step is damped to 0.5 of
+    the error, because a twin-axis figure (dual_axis) answers an adjustment with
+    roughly twice the change and would otherwise oscillate forever. Legends,
+    annotations and the caption are re-placed at each step; ``caption_max_mm``
+    must be passed so the caption keeps wrapping to the column width. Returns
+    True when it converged.
     """
     H_canvas = float(fig.get_size_inches()[1]) * 25.4
     if H_canvas <= 0:
         return False
+    # lock the layout before measuring: a later tight_layout would move the axes
+    # (and every re-measured height with them) out from under this loop
+    fig._wxl_no_tight = True
     ok = False
     for _ in range(rounds):
         fig.savefig(probe, dpi=dpi, bbox_inches="tight", pad_inches=pad)
@@ -1004,11 +1009,10 @@ def _fit_trimmed_height(fig, h_mm: float, probe, dpi: int,
         if abs(err) <= tol_mm:
             ok = True
             break
-        dh = err / H_canvas
+        dh = 0.5 * err / H_canvas
         for a in fig.get_axes():
             p = a.get_position()
             a.set_position([p.x0, p.y0, p.width, p.height + dh])
-        fig._wxl_no_tight = True
         prepare_figure(fig, caption_max_mm=caption_max_mm)
     return ok
 
@@ -1151,6 +1155,12 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                     fig.tight_layout(pad=1.0)
             except Exception:
                 pass
+            # tight_layout moves the axes, so the caption has to be re-placed to
+            # keep its fixed gap (a colorbar makes the shift large)
+            _cap = getattr(fig, "_wxl_caption", None)
+            if _cap is not None:
+                _caption_below(fig, _cap[0], _cap[1], _cap[2],
+                               max_mm=target_width_mm if target_width_mm else _cap[3])
 
     def _prepare():
         # Axis-end locking, legend placement, annotation nudging and grid
@@ -1227,6 +1237,14 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                                caption_max_mm=target_width_mm):
             _relayout()
         probe_h.unlink(missing_ok=True)
+
+    # The caption must keep its 14 pt gap after the last layout pass: the
+    # tight_layout in _relayout() (and any later axes move) shifts the grid
+    # without moving the caption, which a colorbar makes visibly worse.
+    _cap = getattr(fig, "_wxl_caption", None)
+    if _cap is not None:
+        _caption_below(fig, _cap[0], _cap[1], _cap[2],
+                       max_mm=target_width_mm if target_width_mm else _cap[3])
 
     saved = []
     for ext in formats:
