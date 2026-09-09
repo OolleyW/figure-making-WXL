@@ -87,8 +87,13 @@ the colours — the skill never decides these for them. See `references/preferen
 saves around 158 mm. Stretching that image to fill a 190 mm column scales every
 glyph by 0.83 and silently turns 11 pt into 8.3 pt. `finalize_figure` therefore
 takes `target_width_mm` and calibrates the canvas until the trimmed image is
-exactly the print width. All 20 preview figures land within 0.5 mm of their
-target.
+exactly the print width. All preview figures land within 0.5 mm of their target.
+
+All single-column figures additionally share one fixed black frame: their axes
+are resized onto a standard 62 × 44 mm box, so a group of single-column figures
+reads as one consistent set even when legends and labels differ. With the box
+fixed, the trimmed figure is usually narrower than 90 mm — fitting the column
+is the requirement, not filling it.
 
 ## How to call the skill
 

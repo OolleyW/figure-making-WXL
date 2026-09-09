@@ -21,9 +21,19 @@ Placement is automatic. Write `framed_legend(ax)` with no `loc`, and
 4. `check_wxl_style` reports a soft warning naming the measured percentage when
    a legend still covers more than 2 % of the data.
 
-Measured result across all 20 chart types at both 90 mm and 190 mm: overlap
-score 0.0000 for every legend (the radar chart's hand-placed legend, which is
-exempt, sits at 0.009).
+Measured result across all 20 chart types at both widths: overlap score 0.0000
+for every legend in the 140 mm and 190 mm presets (the radar chart's hand-placed
+legend, which is exempt, sits at 0.009). Single-column figures share one fixed
+62 × 44 mm box and keep their legend in-axes; dense charts such as a stacked
+area or a violin can then keep only a small residual overlap (best measured
+scores ~0.01–0.03), because a right-hand panel would overflow the 90 mm column.
+Move those chart types to 140 mm if you need a fully clear legend.
+
+Note: when a legend simply cannot fit inside the axes and the figure has room
+to the right (140 / 190 mm presets), `place_all_legends` moves it into a
+dedicated panel axes on the right. Single-column figures skip that fallback:
+with the fixed standard box there is no spare width for a panel, so the legend
+stays in-axes at its best-scoring position instead.
 
 Things you still do by hand:
 

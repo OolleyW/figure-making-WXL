@@ -39,7 +39,7 @@ text silently becomes 8.3 pt.
 Two ways to stay safe:
 
 1. Pass `target_width_mm=WXL_WIDTH_MM[preset]` to `finalize_figure`. It
-   calibrates the canvas with up to six probe renders so the trimmed image is
+   calibrates the canvas with up to eight probe renders so the trimmed image is
    exactly 90 / 140 / 190 mm wide, and the aspect ratio is preserved. This is
    the default workflow in `examples/gallery.py`.
 2. If you skip the calibration, insert the image at its **measured** width
@@ -48,6 +48,23 @@ Two ways to stay safe:
 
 Verify after saving: `measure_width_mm("figures/result.png", 600)` should return
 90 / 140 / 190 mm within about 0.5 mm.
+
+### The standard single-column box
+
+All single-column figures share the same black frame: after the width
+calibration, `finalize_figure` resizes every rectilinear Cartesian axes onto
+`WXL_AXES_SINGLE_MM = (62.0, 44.0)` mm, centred horizontally (polar axes, pies
+and colorbar axes are exempt). That is why a group of single-column figures in a
+manuscript reads as one consistent set even when their legends, labels and
+colorbars differ. Consequences to design around:
+
+- The trimmed figure is normally **narrower than 90 mm** (labels plus a fixed
+  62 mm box rarely reach the full column). Fit is the constraint, not filling.
+- A 62 × 44 mm box is small: an 11 pt legend of more than two or three entries
+  cannot sit inside without covering data, and a right-hand legend panel would
+  overflow the column, so at this size legends are kept in-axes at their
+  best-scoring position instead. If a chart really needs a long legend, use the
+  140 mm (`onehalf`) or 190 mm (`double`) presets, which are not box-constrained.
 
 ### Type scale
 
