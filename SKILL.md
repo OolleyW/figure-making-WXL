@@ -6,7 +6,9 @@ description: >-
   uniform 10 pt (so figure text matches Word 10 pt body text when the figure is
   inserted at its original size), a deep-blue semantic palette, full-box axes,
   framed in-plot legends, inward ticks, no grid, captions below the figure, and
-  figure widths fixed to the final print width (90 / 140 / 190 mm). Covers 20
+  figure widths fixed to the final print width (90 / 140 / 190 mm). Before
+  plotting it always asks the user for the chart type, the x/y axis labels (and
+  whether each symbol is italic), the line style and the colours. Covers 20
   chart types (grouped/stacked/horizontal bars, trend lines, uncertainty bands,
   stacked areas, scatter, bubble, error bars, box, violin, histogram + KDE,
   ECDF, strip+mean, heatmap, filled contour, radar, donut, dual axis, multi
@@ -104,6 +106,28 @@ These rules supersede any conflicting style text in `references/` or in upstream
     step, and drops bar labels that are wider than their own bar at the final
     canvas size. `check_wxl_style` reports any remaining collision. When a label
     cannot be placed legibly, drop it rather than printing overlapping numbers.
+
+12. **Ask before you plot; do not decide for the user.** Before drawing, confirm
+    four things in a single question set: the **chart type** and how many panels,
+    the **x and y axis labels** (text, units, and whether each symbol is
+    italic), the **line style** (markers, width, dash pattern), and the
+    **colours** (per-series mapping and, for matrices, the colormap). Offer a
+    recommended default but do not apply anything until the user picks. Do not
+    silently reuse a previous figure's choices without asking. See
+    `references/preferences.md` for the exact questions and how to map the
+    answers to code.
+
+## Ask before you plot (short version)
+
+| Decision | What to ask | Default to offer |
+|---|---|---|
+| Chart type | which chart, how many panels | grouped bar / trend / ... |
+| Axis labels | x and y text, units, italic or not | italic symbol, upright unit |
+| Line style | markers, width, dash pattern | open markers, 1.5 pt, solid |
+| Colours | per-series colours; colormap for matrices | deep-blue `WXL_PALETTE` |
+
+For a variable, italicise the symbol and keep the unit upright, e.g.
+`r"Slip $s$ (mm)"` and `r"Bond stress $\tau$ (MPa)"`.
 
 ## Quickstart
 
@@ -218,6 +242,7 @@ axis ends on tick values, the 90 / 140 / 190 mm width calibration, and a
 
 | File | Open when |
 |------|-----------|
+| [references/preferences.md](references/preferences.md) | The four questions to ask before plotting, and how to map the answers |
 | [references/api.md](references/api.md) | Function signatures, `WXL_PALETTE`, `WXLStyle`, validation rules |
 | [references/design-theory.md](references/design-theory.md) | Why 10 pt, Word insertion, palette semantics, print widths, exceptions |
 | [references/common-patterns.md](references/common-patterns.md) | Legend placement, panel tags, multi-panel, print-safe encoding |

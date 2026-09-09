@@ -333,6 +333,10 @@ patch by more than 5 % of the legend area.
 
 ## Conventions
 
+- **Ask before you plot.** Before drawing, confirm the chart type and panel
+  count, the x and y axis labels (text, units, italic or not), the line style,
+  and the colours. Offer a default but apply nothing until the user picks. See
+  `preferences.md`. The user, not the skill, decides these.
 - Save outputs under a project `figures/` directory with stable basenames.
 - Legend colors and markers must match the series colors exactly.
 - When the comparison target, panel count, color role or data layout is

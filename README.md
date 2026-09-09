@@ -64,6 +64,10 @@ runs it cannot silently drift off-style.
 
 ## Style contract
 
+Before drawing **any** figure, confirm with the user the chart type, the x and y
+axis labels (text, units, and whether each symbol is italic), the line style, and
+the colours — the skill never decides these for them. See `references/preferences.md`.
+
 | Item | Value |
 |---|---|
 | Target | Elsevier / IEEE / Springer |
@@ -134,6 +138,7 @@ in `preview/`.
 | Path | Purpose |
 |---|---|
 | `SKILL.md` | hard rules and when to load the skill |
+| `references/preferences.md` | what to ask the user before plotting (labels, italic, type, style, colours) |
 | `references/api.md` | constants, `WXLStyle`, signatures, audit contract |
 | `references/design-theory.md` | why 10 pt, the tight-crop trap, palette semantics, exceptions |
 | `references/common-patterns.md` | legend placement, multi-panel, dual axes, print-safe encoding |
