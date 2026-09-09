@@ -43,7 +43,7 @@ Things you still do by hand:
 
 Sometimes the geometry is impossible, not the algorithm. Measured example: a
 2 × 2 multi-panel at 90 mm gives each panel an 83 × 52 pt axes, while a two-entry
-10 pt legend box is 68 × 31 pt. The legend alone takes 81 % of the panel width,
+11 pt legend box is 68 × 31 pt. The legend alone takes 81 % of the panel width,
 so it must cover data. `check_wxl_style` reports exactly this:
 
 ```
@@ -65,7 +65,7 @@ The fix is a layout decision, not a style tweak, in this order:
 3. Give the legend its own subplot inside the same figure.
 4. Drop a series so the legend shrinks.
 
-Do not shrink the legend font: the uniform 10 pt rule is non-negotiable, and
+Do not shrink the legend font: the uniform 11 pt rule is non-negotiable, and
 `check_wxl_style` rejects any other size.
 
 ```python
@@ -83,7 +83,7 @@ handles four cases automatically in `prepare_figure`:
 |---|---|
 | Annotation touches a line, bar or another text | `place_annotations` tries eight offsets and keeps the one with no collision; if none works it grows the y-range (capped at 35 % of the data span) and retries |
 | Two adjacent tick labels touch | `fix_tick_label_overlap` increases the tick step until they separate (8 → 6 → 5 → 4 ticks) |
-| A bar label is wider than its bar | the label is dropped, because a 10 pt number is about 10 mm wide and a grouped bar at 90 mm is about 4 mm wide |
+| A bar label is wider than its bar | the label is dropped, because a 11 pt number is about 10 mm wide and a grouped bar at 90 mm is about 4 mm wide |
 | A label sticks out of the axes | the y-range grows, capped, then the axis ends are re-locked |
 
 Create bar labels with the helper, never by hand, so the fit check runs at the
@@ -107,7 +107,7 @@ What you still decide by hand:
   overlapping labels.
 - **Rotate long category labels** rather than letting them collide, and shorten
   the axis label instead of shrinking the type.
-- **Never shrink the text.** 10 pt is fixed; drop or move the label instead.
+- **Never shrink the text.** 11 pt is fixed; drop or move the label instead.
 
 `check_wxl_style` reports any remaining collision with the offending text, so a
 silent regression is impossible.
@@ -142,7 +142,7 @@ series and `neutral` for the comparison series so the two bands stay separable.
 ## 5) Value annotations
 
 ```python
-ax.text(x, y, f"{v:.2f}", ha="center", va="bottom")   # 10 pt by rcParams
+ax.text(x, y, f"{v:.2f}", ha="center", va="bottom")   # 11 pt by rcParams
 ```
 
 - Keep annotations inside the limits; raise `ylim` instead of clipping.
@@ -175,7 +175,7 @@ add_caption(fig, "Fig. 4  Multi-panel comparison of the four settings.")
   (`fig._wxl_center = True`). Measured margins on the demo: 0.0826 left/right and
   0.0770 top/bottom of the canvas.
 - A 2 × 2 grid only works at the full 190 mm width: at 90 mm each panel is about
-  40 mm wide, which cannot hold a 10 pt legend. Render multi-panel figures in
+  40 mm wide, which cannot hold a 11 pt legend. Render multi-panel figures in
   double column only.
 - Keep a heatmap out of the grid. A colorbar adds a fifth axes, its aspect is
   fixed, and the shared `RdBu_r` scale competes with the other panels. Show it as

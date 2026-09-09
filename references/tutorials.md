@@ -65,11 +65,11 @@ Points worth noticing:
 
 - `target_width_mm` keeps the saved image at exactly 190 mm despite tight
   cropping, so inserting it in Word at 100 % fills the column **and** keeps the
-  text at 10 pt. Without it the image saves near 158 mm.
+  text at 11 pt. Without it the image saves near 158 mm.
 
 - `ylim` is raised to 1.55 although the tallest bar plus error reaches 0.96.
   That strip is what keeps the legend off the data.
-- Every text artist inherits 10 pt from rcParams; nothing is passed a size.
+- Every text artist inherits 11 pt from rcParams; nothing is passed a size.
 - The error bar color is set to the series color, not black, so the audit and
   the reader both see the series identity.
 
@@ -139,7 +139,7 @@ Points worth noticing:
 
 - `vmin`/`vmax` are pinned to ±1 so the colors mean the same thing in every
   panel of a paper.
-- Cell annotations stay at 10 pt; stop annotating beyond 8 × 8.
+- Cell annotations stay at 11 pt; stop annotating beyond 8 × 8.
 - The colorbar axes is exempt from the full-box rule but keeps inward ticks and
   a 0.8 pt outline.
 

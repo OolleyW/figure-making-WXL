@@ -65,7 +65,7 @@ Single-column-only types: `heatmap`, `radar`, `donut`. Double-column-only types:
 the layouts it suits).
 
 Note: the `double` preset is deliberately short — 190 × 66 mm, half the height it
-used to be — while every text element stays 10 pt. `double_tall` (190 × 173 mm)
+used to be — while every text element stays 11 pt. `double_tall` (190 × 173 mm)
 is the tall 2 × 2 multi-panel preset and is unchanged. `double_1x3`
 (190 × 41 mm) is the 1 × 3 row preset, sized so each panel keeps the
 single-column aspect ratio (50.4 × 38.5 mm, 1.31).

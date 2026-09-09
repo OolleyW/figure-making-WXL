@@ -1,6 +1,6 @@
 # Ask before you plot (per-figure preferences)
 
-The house style (10 pt Times, deep-blue palette, full box, framed legends,
+The house style (11 pt Times, deep-blue palette, full box, framed legends,
 inward ticks, axis ends on ticks) is the default, but four decisions belong to
 the user and must be confirmed **before** drawing each figure. Never pick them
 yourself, and never silently reuse a previous figure's choices.

@@ -36,10 +36,10 @@ Ordered color cycle used when a helper is called without explicit colors:
 ### WXL_FONTSIZE
 
 ```python
-{"caption": 10, "label": 10, "tick": 10, "legend": 10, "annot": 10, "panel": 10}
+{"caption": 11, "label": 11, "tick": 11, "legend": 11, "annot": 11, "panel": 11}
 ```
 
-Uniform 10 pt. This is the W1 contract; the audit fails on any other size.
+Uniform 11 pt. This is the W1 contract; the audit fails on any other size.
 
 ### WXL_FIGSIZE
 
@@ -144,7 +144,7 @@ Labels bars above their top edge and returns `(kept, skipped)`. With
 `skip_if_wider=True` any label wider than its own bar is dropped, and every label
 is tagged so `prepare_figure` re-checks it at the final canvas size. This is what
 makes the same figure code produce labelled bars at 190 mm and clean bars at
-90 mm, where a 10 pt label is wider than the bar underneath.
+90 mm, where a 11 pt label is wider than the bar underneath.
 
 ### place_annotations(fig, rounds=2)
 
@@ -156,7 +156,7 @@ span) and retries. Returns the annotations that still collide.
 
 ### fix_tick_label_overlap(fig, tries=(8, 6, 5, 4))
 
-Thins out major ticks until no two adjacent tick labels touch. The 10 pt size is
+Thins out major ticks until no two adjacent tick labels touch. The 11 pt size is
 fixed, so tick density is the only lever. Returns `[(axes, ticks)]` for the axes
 that had to be thinned.
 
@@ -212,7 +212,7 @@ whose axes must keep hand-set limits.
 
 `target_width_mm` iteratively calibrates the canvas width (up to six probe
 renders) so the **trimmed** image is exactly that wide while keeping the text at
-10 pt. Pass `WXL_WIDTH_MM[preset]`; without it a `double` figure saves around
+11 pt. Pass `WXL_WIDTH_MM[preset]`; without it a `double` figure saves around
 158 mm instead of 190 mm, and stretching it to fill the column drops the text to
 about 8.3 pt.
 
@@ -254,7 +254,7 @@ It needs `python-docx`. Import it the same way as `wxl_style`.
 ### new_document(side_mm=10, top_mm=20, bottom_mm=20, base_size=10) -> Document
 
 A4 document whose usable text width is `210 − 2 × side_mm` millimetres, 190 mm by
-default. Body style is Times New Roman 10 pt with a CJK fallback.
+default. Body style is Times New Roman 11 pt with a CJK fallback.
 
 ### add_heading(doc, text, size=12)
 
@@ -262,7 +262,7 @@ Section heading in black CJK serif bold, double line spacing, no indent.
 
 ### add_paragraph(doc, text, size=10, bold=False, align=None, font=TNR, spacing=2.0, indent_chars=2, space_after=0)
 
-Body paragraph with the paper contract defaults: 10 pt Times, double spacing,
+Body paragraph with the paper contract defaults: 11 pt Times, double spacing,
 two-character first-line indent.
 
 ### add_caption(doc, text, size=10, spacing=1.5, space_after=6)
@@ -274,7 +274,7 @@ Centered caption. Use it **below** a figure and **above** a table.
 Inserts the image centered at 100 % of its measured physical width and returns
 that width in millimetres. The PNG must come from
 `finalize_figure(..., target_width_mm=...)`, otherwise the inserted size is wrong
-and the 10 pt match is lost.
+and the 11 pt match is lost.
 
 ### add_figure_block(doc, png, caption, dpi=600) -> float
 
@@ -349,7 +349,7 @@ patch by more than 5 % of the legend area.
 ## Related files
 
 - [../SKILL.md](../SKILL.md) — hard rules and when to load
-- [design-theory.md](design-theory.md) — rationale for 10 pt, palette, widths
+- [design-theory.md](design-theory.md) — rationale for 11 pt, palette, widths
 - [common-patterns.md](common-patterns.md) — layout patterns
 - [tutorials.md](tutorials.md) — worked examples
 - [demos.md](demos.md) — the 20 chart types

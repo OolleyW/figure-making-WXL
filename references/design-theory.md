@@ -2,18 +2,18 @@
 
 Why the WXL style looks the way it does. Everything here is derived from the
 locked decisions: Elsevier / IEEE / Springer target, Times New Roman, uniform
-10 pt, deep-blue palette, full box, framed legend, inward ticks, no grid.
+11 pt, deep-blue palette, full box, framed legend, inward ticks, no grid.
 
 ---
 
-## 1) The 10 pt contract and Word insertion
+## 1) The 11 pt contract and Word insertion
 
-The requirement is that figure text matches **Word 10 pt body text**. Points are
+The requirement is that figure text matches **Word 11 pt body text**. Points are
 absolute physical units, so this only holds when the image is placed in Word at
 **100 % of its original size**:
 
-- A figure authored at 190 mm wide and inserted at 190 mm shows 10 pt text as
-  10 pt.
+- A figure authored at 190 mm wide and inserted at 190 mm shows 11 pt text as
+  11 pt.
 - If the same figure is dragged to 140 mm, every glyph shrinks to 10 × 140/190
   = 7.4 pt, and the match is lost.
 
@@ -24,16 +24,16 @@ Therefore the workflow is:
 3. In Word, insert with **Original Size** and never resize by dragging.
 
 `check_wxl_style` cannot see Word, so it verifies the other half of the
-contract: every text artist is exactly 10 pt.
+contract: every text artist is exactly 11 pt.
 
 ### The tight-crop trap (important)
 
 `bbox_inches="tight"` is mandatory so the below-figure caption survives, but it
 also **trims the canvas margins**. A figure authored with
 `figsize=(7.48, 5.20)` (190 mm) therefore usually saves around **158 mm** wide.
-The text inside is still physically 10 pt, so inserting that image at its natural
+The text inside is still physically 11 pt, so inserting that image at its natural
 158 mm keeps the match. The trap is the next step: to fill a 190 mm column you
-stretch the image to 190 mm, every glyph scales by 158/190 = 0.83, and the 10 pt
+stretch the image to 190 mm, every glyph scales by 158/190 = 0.83, and the 11 pt
 text silently becomes 8.3 pt.
 
 Two ways to stay safe:
@@ -53,12 +53,12 @@ Verify after saving: `measure_width_mm("figures/result.png", 600)` should return
 
 | Element | Size | Note |
 |---|---|---|
-| Figure caption | 10 pt | below the figure, centered |
-| Axis label | 10 pt | |
-| Tick label | 10 pt | |
-| Legend text | 10 pt | |
-| Data annotation | 10 pt | |
-| Panel label `(a) Grouped bars` | 10 pt, not bold | centered below its own panel |
+| Figure caption | 11 pt | below the figure, centered |
+| Axis label | 11 pt | |
+| Tick label | 11 pt | |
+| Legend text | 11 pt | |
+| Data annotation | 11 pt | |
+| Panel label `(a) Grouped bars` | 11 pt, not bold | centered below its own panel |
 
 Because everything is one size, hierarchy comes from **weight, color and
 position** instead of size: panel tags are bold, emphasis annotations use
@@ -66,7 +66,7 @@ position** instead of size: panel tags are bold, emphasis annotations use
 
 ### Single-column caution
 
-At 90 mm width, 10 pt text consumes a much larger share of the canvas. A
+At 90 mm width, 11 pt text consumes a much larger share of the canvas. A
 single-column figure therefore needs fewer tick labels, shorter axis labels and
 at most a two-entry legend. If a panel feels crowded at 90 mm, move it to
 140 mm rather than shrinking the type.
@@ -130,7 +130,7 @@ and more contrast is needed.
 ## 4) Layout
 
 - **Aspect ratios**: `double` figures are deliberately short — 7.48 × 2.60 in
-  (190 × 66 mm, half the old 190 × 132 mm height). The 10 pt text is unchanged,
+  (190 × 66 mm, half the old 190 × 132 mm height). The 11 pt text is unchanged,
   so it reads larger relative to the shorter plot. This suits a wide, flat
   comparison figure. The 2 × 2 multi-panel grid stays tall via `double_tall`
   (190 × 173 mm).
@@ -162,7 +162,7 @@ fixed bounding box would clip it.
 | Pie / donut | `ax.set_axis_off()` | there are no axes to frame |
 | Categorical axes | not end-locked | category labels sit at bar / box centers, and locking the ends would clip half of the first and last category |
 | Colorbar | spines not checked | the colorbar draws its own 0.8 pt outline |
-| Slide export | `WXL_FIGSIZE["slide"]` | slides are viewed, not printed, so the 10 pt/print-width contract does not apply |
+| Slide export | `WXL_FIGSIZE["slide"]` | slides are viewed, not printed, so the 11 pt/print-width contract does not apply |
 
 ## 7) Reproduction checklist
 

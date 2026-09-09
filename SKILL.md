@@ -3,7 +3,7 @@ name: figure-making-WXL
 description: >-
   Publication-ready matplotlib figures in the WXL house style for Elsevier,
   IEEE and Springer submissions: every text element is Times New Roman at a
-  uniform 10 pt (so figure text matches Word 10 pt body text when the figure is
+  uniform 11 pt (so figure text matches Word 11 pt body text when the figure is
   inserted at its original size), a deep-blue semantic palette, full-box axes,
   framed in-plot legends, inward ticks, no grid, captions below the figure, and
   figure widths fixed to the final print width (90 / 140 / 190 mm). Before
@@ -14,7 +14,7 @@ description: >-
   ECDF, strip+mean, heatmap, filled contour, radar, donut, dual axis, multi
   panel) with a machine-checked style audit. Use when the user asks for
   publication figures, 论文配图, 科研绘图, 画图/作图 with matplotlib, or wants
-  figures in "WXL 风格" / "我的绘图风格" / matching Word 10 pt text. Do not use
+  figures in "WXL 风格" / "我的绘图风格" / matching Word 11 pt text. Do not use
   for interactive dashboards or web viz (Plotly, Altair, Bokeh), exploratory
   plots with no publication target, Origin/OriginPro automation (use the
   editaplot skill), or Illustrator/Figma-first infographics.
@@ -59,11 +59,11 @@ These rules supersede any conflicting style text in `references/` or in upstream
    `axes.unicode_minus = False` because Times New Roman lacks U+2212. Bold and
    italic Times faces are allowed; never Helvetica, Arial or DejaVu Sans. CJK
    text falls back to SimSun.
-2. **Uniform 10 pt.** Caption, axis label, tick, legend and annotation are all
-   10 pt. The contract is checked; do not hand-tune individual sizes.
+2. **Uniform 11 pt.** Caption, axis label, tick, legend and annotation are all
+   11 pt. The contract is checked; do not hand-tune individual sizes.
 3. **Figure width = final print width.** `single` = 90 mm (3.54 in),
-   `onehalf` = 140 mm (5.51 in), `double` = 190 mm (7.48 in). 10 pt in the
-   figure equals Word 10 pt only when the image is inserted at its original
+   `onehalf` = 140 mm (5.51 in), `double` = 190 mm (7.48 in). 11 pt in the
+   figure equals Word 11 pt only when the image is inserted at its original
    size, so never design a wide figure and let Word shrink it. Because
    `bbox_inches="tight"` trims the canvas, always pass
    `target_width_mm=WXL_WIDTH_MM[preset]` to `finalize_figure` so the saved
@@ -172,7 +172,7 @@ The 20 chart types the style covers, each with its core call, are listed in
 A4 with 10 mm side margins so the usable width is exactly 190 mm, figures
 inserted at 100 % of their measured physical width, captions below figures,
 table captions above three-line tables, section headings in black CJK serif bold
-with double spacing, body text in Times New Roman 10 pt with a two-character
+with double spacing, body text in Times New Roman 11 pt with a two-character
 first-line indent.
 
 ```python
@@ -199,7 +199,7 @@ python "<skill-dir>/examples/word_report.py" --out ./wxl_report
 
 Figures must come from `finalize_figure(..., target_width_mm=...)` so their
 physical width is the print width; otherwise `add_figure` inserts a wrongly sized
-image and the 10 pt match is lost.
+image and the 11 pt match is lost.
 
 ## Portability (another machine or another agent)
 
@@ -218,7 +218,7 @@ style.
 | `legend.set_ncols` | Used for the flatten fallback when available (matplotlib ≥ 3.6); skipped silently otherwise. |
 | `python-docx` | Only imported by `assets/wxl_docx.py`; the core style module never imports it. Figures work without it. |
 
-What is guaranteed on any conforming machine: 10 pt Times text, the deep-blue
+What is guaranteed on any conforming machine: 11 pt Times text, the deep-blue
 palette, full-box axes, framed legends placed by measured overlap, inward ticks,
 axis ends on tick values, the 90 / 140 / 190 mm width calibration, and a
 `check_wxl_style` audit that fails on any deviation.
@@ -226,9 +226,9 @@ axis ends on tick values, the 90 / 140 / 190 mm width calibration, and a
 ## When to load this skill
 
 - Matplotlib figures for **Elsevier / IEEE / Springer** manuscripts, theses or
-  reports that must match the WXL look (10 pt Times, deep blue, full box).
+  reports that must match the WXL look (11 pt Times, deep blue, full box).
 - Requests for **论文配图 / 科研绘图 / 画图** where the figure will be pasted
-  into Word and should match 10 pt body text.
+  into Word and should match 11 pt body text.
 - Any of the 20 chart types in `references/demos.md`, or multi-panel layouts.
 
 ## When not to load
@@ -244,7 +244,7 @@ axis ends on tick values, the 90 / 140 / 190 mm width calibration, and a
 |------|-----------|
 | [references/preferences.md](references/preferences.md) | The four questions to ask before plotting, and how to map the answers |
 | [references/api.md](references/api.md) | Function signatures, `WXL_PALETTE`, `WXLStyle`, validation rules |
-| [references/design-theory.md](references/design-theory.md) | Why 10 pt, Word insertion, palette semantics, print widths, exceptions |
+| [references/design-theory.md](references/design-theory.md) | Why 11 pt, Word insertion, palette semantics, print widths, exceptions |
 | [references/common-patterns.md](references/common-patterns.md) | Legend placement, panel tags, multi-panel, print-safe encoding |
 | [references/tutorials.md](references/tutorials.md) | End-to-end walkthroughs (bar, trend + band, heatmap) |
 | [references/demos.md](references/demos.md) | The 20 chart types and where the runnable code lives |

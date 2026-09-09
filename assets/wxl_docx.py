@@ -5,11 +5,11 @@ contract the figures follow:
 
   * A4, 10 mm side margins, so the usable text width is exactly 190 mm
   * figures inserted at 100 % of their measured physical width, which keeps the
-    10 pt figure text equal to 10 pt Word body text
+    11 pt figure text kept at its authored size in Word
   * figure captions BELOW the figure
   * table captions ABOVE the table, three-line tables (top / header / bottom)
   * section headings in black CJK serif bold with double line spacing
-  * body text in Times New Roman 10 pt, double spacing, 2-character indent
+  * body text in Times New Roman 11 pt, double spacing, 2-character indent
 
 Requires ``python-docx`` (``pip install python-docx``). Import it after adding
 the skill's ``assets`` directory to ``sys.path``.
@@ -67,7 +67,7 @@ def new_document(side_mm: float = 10.0, top_mm: float = 20.0,
 
 def add_paragraph(doc, text, size=10.0, bold=False, align=None, font=TNR,
                   spacing=2.0, indent_chars=2, space_after=0.0):
-    """Body paragraph: Times New Roman 10 pt, double spacing, 2-char indent."""
+    """Body paragraph: Times New Roman 11 pt, double spacing, 2-char indent."""
     p = doc.add_paragraph()
     _set_run(p.add_run(text), font=font, size=size, bold=bold)
     if align is not None:

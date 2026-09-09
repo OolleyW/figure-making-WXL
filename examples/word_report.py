@@ -74,7 +74,7 @@ def main():
     doc = new_document()
     add_paragraph(doc, "This report was assembled from WXL-style figures. Every "
                        "figure is inserted at 100 % of its physical width, so the "
-                       "10 pt figure text matches the 10 pt body text below.",
+                       "11 pt figure text matches the 11 pt body text below.",
                   spacing=1.5, space_after=8)
 
     add_heading(doc, "1  Figures")

@@ -719,14 +719,14 @@ HTML_HEAD = """<!doctype html>
 <body>
 <header>
   <h1>figure-making-WXL · 全部图型预览</h1>
-  <p class="sub">W1 统一 10 pt · Times New Roman · 深蓝主色系 · 四边全包围 · 图例带黑框 · 刻度朝内 · 无网格</p>
+  <p class="sub">统一 11 pt · Times New Roman · 深蓝主色系 · 四边全包围 · 图例带黑框 · 刻度朝内 · 无网格</p>
 </header>
 <main>
 <section>
   <h2>样式契约</h2>
   <div class="contract">
-    <div class="cbox"><b>字号</b>统一 10 pt（图题 / 轴标题 / 刻度 / 图例 / 标注）</div>
-    <div class="cbox"><b>与 Word 对齐</b>图幅 = 最终印刷宽度，按原始大小插入即等于正文 10 pt</div>
+    <div class="cbox"><b>字号</b>统一 11 pt（图题 / 轴标题 / 刻度 / 图例 / 标注）</div>
+    <div class="cbox"><b>与 Word 对齐</b>图幅 = 最终印刷宽度，按原始大小插入即等于正文 11 pt</div>
     <div class="cbox"><b>字体</b>Times New Roman + STIX 数学，中文宋体回退</div>
     <div class="cbox"><b>图幅</b>单栏 90 mm / 1.5 栏 140 mm / 双栏 190 mm</div>
     <div class="cbox"><b>轴与图例</b>四边全包围，线宽 0.8；图例框内、白底、黑边 0.8</div>

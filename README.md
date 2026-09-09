@@ -2,10 +2,10 @@
 
 Publication-ready matplotlib figures in the **WXL house style** for Elsevier,
 IEEE and Springer submissions. Every text element is Times New Roman at a
-uniform **10 pt**, so figure text matches Word 10 pt body text when the image is
+uniform **11 pt**, so figure text matches Word 11 pt body text when the image is
 inserted at its original size.
 
-论文配图样式技能：Times New Roman 统一 10 pt、深蓝主色系、四边全包围、图例带黑框、
+论文配图样式技能：Times New Roman 统一 11 pt、深蓝主色系、四边全包围、图例带黑框、
 刻度朝内、无网格，图幅按 90 / 140 / 190 mm 印刷宽度校准。
 
 ## Install for an agent
@@ -57,7 +57,7 @@ No9 L / Liberation Serif.
 5. Insert the PNG into Word at 100 %, or assemble the document with
    `assets/wxl_docx.py`.
 
-The audit is the enforcement mechanism. It fails on a non-Times font, a non-10 pt
+The audit is the enforcement mechanism. It fails on a non-Times font, a non-11 pt
 size, a hidden spine, a grid line, an outward tick, an unframed legend, an
 off-palette color, or an axis end that is not on a tick value, so an agent that
 runs it cannot silently drift off-style.
@@ -72,7 +72,7 @@ the colours — the skill never decides these for them. See `references/preferen
 |---|---|
 | Target | Elsevier / IEEE / Springer |
 | Font | Times New Roman + STIX math, SimSun for CJK |
-| Type scale | uniform 10 pt (caption / label / tick / legend / annotation) |
+| Type scale | uniform 11 pt (caption / label / tick / legend / annotation) |
 | Palette | deep blue `#1F4E79` primary, `#B64342` contrast, `#2E8B7A` improve, `#E0A030` accent, `#7B7B7B` neutral, `#C9DCF0` light |
 | Axes | full box, 0.8 pt spines |
 | Legend | inside the axes, white face, black 0.8 pt border |
@@ -85,7 +85,7 @@ the colours — the skill never decides these for them. See `references/preferen
 
 `bbox_inches="tight"` trims the canvas, so a figure authored at 190 mm usually
 saves around 158 mm. Stretching that image to fill a 190 mm column scales every
-glyph by 0.83 and silently turns 10 pt into 8.3 pt. `finalize_figure` therefore
+glyph by 0.83 and silently turns 11 pt into 8.3 pt. `finalize_figure` therefore
 takes `target_width_mm` and calibrates the canvas until the trimmed image is
 exactly the print width. All 20 preview figures land within 0.5 mm of their
 target.
@@ -103,7 +103,7 @@ publication figure / 科研绘图 / 论文配图, then follows `SKILL.md`:
    (text, units, and whether each symbol is italic), the line style, and the
    colours. Do not decide these for them — see `references/preferences.md`.
 2. `apply_wxl_style()`.
-3. Draw with `WXL_PALETTE` colours and black edges; every label at 10 pt.
+3. Draw with `WXL_PALETTE` colours and black edges; every label at 11 pt.
 4. `prepare_figure(fig)` then `check_wxl_style(fig)`; fix every reported problem.
 5. `finalize_figure(fig, ..., target_width_mm=WXL_WIDTH_MM[preset])`.
 6. Insert the PNG into Word at 100 %, or assemble the document with
@@ -175,7 +175,7 @@ Special: radar, donut, dual axis, 2 × 2 multi-panel, 1 × 3 one-row multi-panel
 Runnable code for all of them is in `examples/gallery.py`; rendered previews are
 in `preview/`. `heatmap`, `radar` and `donut` are rendered in single column only;
 `multi_panel` and `multi_panel_1x3` in double column only. The `double` preset is
-deliberately short (190 × 66 mm) with the 10 pt text unchanged.
+deliberately short (190 × 66 mm) with the 11 pt text unchanged.
 
 ## Files
 
@@ -184,7 +184,7 @@ deliberately short (190 × 66 mm) with the 10 pt text unchanged.
 | `SKILL.md` | hard rules and when to load the skill |
 | `references/preferences.md` | what to ask the user before plotting (labels, italic, type, style, colours) |
 | `references/api.md` | constants, `WXLStyle`, signatures, audit contract |
-| `references/design-theory.md` | why 10 pt, the tight-crop trap, palette semantics, exceptions |
+| `references/design-theory.md` | why 11 pt, the tight-crop trap, palette semantics, exceptions |
 | `references/common-patterns.md` | legend placement, multi-panel, dual axes, print-safe encoding |
 | `references/tutorials.md` | three end-to-end walkthroughs |
 | `references/demos.md` | the 20 chart types with core calls |
@@ -219,7 +219,7 @@ python "<skill-dir>/examples/column_gallery.py" --out ./wxl_columns
 document: A4 with 10 mm side margins so the usable width is 190 mm, figures
 inserted at 100 % of their measured physical width, captions below figures,
 table captions above three-line tables, headings in black CJK serif bold with
-double spacing, body text in Times New Roman 10 pt with a two-character indent.
+double spacing, body text in Times New Roman 11 pt with a two-character indent.
 
 ```python
 from wxl_docx import new_document, add_heading, add_figure_block, add_three_line_table
@@ -242,9 +242,9 @@ Serif, which the audit accepts.
 ## Notes
 
 - The style is enforced, not suggested: `check_wxl_style` fails on a non-Times
-  font, a non-10 pt size, a hidden spine, a grid line, an outward tick, an
+  font, a non-11 pt size, a hidden spine, a grid line, an outward tick, an
   unframed legend or an off-palette color.
 - Documented exceptions: polar axes (radar) keep a light grid, pie/donut axes
   are turned off, colorbar axes are exempt from the four-spine rule.
-- Slide export uses the `slide` preset; the 10 pt / print-width contract does
+- Slide export uses the `slide` preset; the 11 pt / print-width contract does
   not apply to slides.

@@ -1,12 +1,12 @@
 """WXL publication figure style (v1.0).
 
 House style for matplotlib figures meant for Elsevier / IEEE / Springer
-submissions, tuned so that figure text matches Word 10 pt body text when the
+submissions, tuned so that figure text keeps a fixed 11 pt size when the
 figure is inserted at its original physical size.
 
 Hard rules (see SKILL.md):
   * Times New Roman everywhere, STIX math glyphs, no sans-serif faces.
-  * Uniform 10 pt text (caption / axis label / tick / legend / annotation).
+  * Uniform 11 pt text (caption / axis label / tick / legend / annotation).
   * Deep-blue palette only.
   * Full box on every Cartesian axes (all four spines).
   * Legend inside the axes, opaque white face, black 0.8 pt border.
@@ -56,16 +56,16 @@ WXL_SERIES = [
     WXL_PALETTE["accent"], WXL_PALETTE["secondary"], WXL_PALETTE["neutral"],
 ]
 
-#: Uniform 10 pt type scale (matches Word 10 pt at 100 % insertion).
+#: Uniform 11 pt type scale (10 pt increased by one step).
 WXL_FONTSIZE = {
-    "caption": 10, "label": 10, "tick": 10,
-    "legend": 10, "annot": 10, "panel": 10,
+    "caption": 11, "label": 11, "tick": 11,
+    "legend": 11, "annot": 11, "panel": 11,
 }
 
-#: Figure width = final print width, so 10 pt stays 10 pt after insertion.
+#: Figure width = final print width, so 11 pt stays 11 pt after insertion.
 #: single = 90 mm, onehalf = 140 mm, double = 190 mm.
 #: double is deliberately short (half the old height) so the wide column holds a
-#: flat figure whose 10 pt text reads larger relative to the plot.
+#: flat figure whose 11 pt text reads larger relative to the plot.
 WXL_FIGSIZE = {
     "single": (3.54, 2.70),
     "onehalf": (5.51, 3.90),
@@ -116,11 +116,11 @@ def _font_is_allowed(filename: str) -> bool:
 class WXLStyle:
     """Quantitative style contract. Every field is checked by check_wxl_style."""
 
-    font_size: float = 10.0        # base text size (pt)
-    caption_size: float = 10.0
-    tick_size: float = 10.0
-    legend_size: float = 10.0
-    annot_size: float = 10.0
+    font_size: float = 11.0        # base text size (pt)
+    caption_size: float = 11.0
+    tick_size: float = 11.0
+    legend_size: float = 11.0
+    annot_size: float = 11.0
     axes_linewidth: float = 0.8
     line_width: float = 1.5
     marker_size: float = 4.0
@@ -449,7 +449,7 @@ def _tick_labels_overlap(ax) -> bool:
 def fix_tick_label_overlap(fig, tries=(8, 6, 5, 4)):
     """Thin out ticks until no two adjacent tick labels touch.
 
-    The 10 pt size is fixed, so the only lever is tick density. Returns a list of
+    The 11 pt size is fixed, so the only lever is tick density. Returns a list of
     ``(axes, ticks_per_axis)`` for the axes that had to be thinned.
     """
     changed = []
@@ -553,7 +553,7 @@ def annotate_bars(ax, bars, fmt: str = "{:.2f}", fontsize: float | None = None,
                   y_offset_frac: float = 0.02, skip_if_wider: bool = True):
     """Label bars above their top edge, skipping labels that do not fit.
 
-    A 10 pt value label is about 10 mm wide, so in a 90 mm panel with narrow
+    A 11 pt value label is about 10 mm wide, so in a 90 mm panel with narrow
     grouped bars the labels would cover each other and the neighbouring bars.
     With ``skip_if_wider=True`` (the default) any label wider than its own bar is
     dropped, which makes the same figure code produce labelled bars at 190 mm and
@@ -590,7 +590,7 @@ def _enforce_label_fit(fig) -> int:
     """Drop tagged bar labels that no longer fit their bar at the current size.
 
     :func:`annotate_bars` tags every label it creates. A figure is often authored
-    at 190 mm and later resized to 90 mm, where a 10 pt label is wider than the
+    at 190 mm and later resized to 90 mm, where a 11 pt label is wider than the
     bar underneath; this pass removes those labels so they cannot cover the
     neighbouring bars. Returns the number of labels removed.
     """
@@ -615,7 +615,7 @@ def _enforce_label_fit(fig) -> int:
 
 
 def prepare_figure(fig, lock_ends: bool = True, auto_legend: bool = True,
-                   auto_text: bool = True, center=None):
+                   auto_text: bool = True, center=None, caption_max_mm=None):
     """Bring a figure to contract state.
 
     Locks axis ends, deconflicts legends, thins crowded tick labels and nudges
@@ -640,7 +640,8 @@ def prepare_figure(fig, lock_ends: bool = True, auto_legend: bool = True,
     # a fixed 14 pt under the grid even after the width calibration resized it
     caption = getattr(fig, "_wxl_caption", None)
     if caption is not None:
-        _caption_below(fig, caption[0], caption[1], caption[2])
+        _caption_below(fig, caption[0], caption[1], caption[2],
+                       max_mm=caption_max_mm if caption_max_mm else caption[3])
     return fig
 
 
@@ -656,8 +657,33 @@ def add_caption(fig, text: str, fontsize: float | None = None, y: float = -0.045
 WXL_CAPTION_PAD_PT = 14.0
 
 
+def _wrap_caption(fig, text, max_mm, fontsize):
+    """Wrap the caption so no line is wider than ``max_mm`` millimetres."""
+    if not max_mm:
+        return text
+    probe = fig.text(0.5, -1000, text, ha="center", va="top", fontsize=fontsize)
+    fig.canvas.draw()
+    full_mm = probe.get_window_extent().width / fig.dpi * 25.4
+    probe.remove()
+    if full_mm <= max_mm:
+        return text
+    import textwrap
+    n_chars = max(8, int(len(text) * max_mm / full_mm))
+    wrapped = text
+    for _ in range(4):
+        wrapped = "\n".join(textwrap.wrap(text, width=n_chars))
+        probe = fig.text(0.5, -1000, wrapped, ha="center", va="top", fontsize=fontsize)
+        fig.canvas.draw()
+        w_mm = probe.get_window_extent().width / fig.dpi * 25.4
+        probe.remove()
+        if w_mm <= max_mm:
+            break
+        n_chars = max(8, int(n_chars * max_mm / max(w_mm, 1e-9)) - 1)
+    return wrapped
+
+
 def _caption_below(fig, text, pad_pt: float = WXL_CAPTION_PAD_PT,
-                   fontsize: float | None = None):
+                   fontsize: float | None = None, max_mm: float | None = None):
     """Place the caption ``pad_pt`` points below the grid's lowest label."""
     old = getattr(fig, "_wxl_caption_artist", None)
     if old is not None:
@@ -665,33 +691,34 @@ def _caption_below(fig, text, pad_pt: float = WXL_CAPTION_PAD_PT,
             old.remove()
         except Exception:                                 # pragma: no cover
             pass
+    fs = fontsize or WXL_FONTSIZE["caption"]
+    text = _wrap_caption(fig, text, max_mm, fs)
     fig.canvas.draw()
     boxes = [ax.get_tightbbox() for ax in fig.get_axes()
              if ax.get_visible() and ax.get_tightbbox() is not None]
     if not boxes:
-        artist = fig.text(0.5, 0.01, text, ha="center", va="top",
-                          fontsize=fontsize or WXL_FONTSIZE["caption"])
+        artist = fig.text(0.5, 0.01, text, ha="center", va="top", fontsize=fs)
     else:
         Hpx = fig.get_size_inches()[1] * fig.dpi
         y_bottom = min(b.y0 for b in boxes) / Hpx
         y = y_bottom - pad_pt * fig.dpi / 72.0 / Hpx
-        artist = fig.text(0.5, y, text, ha="center", va="top",
-                          fontsize=fontsize or WXL_FONTSIZE["caption"])
+        artist = fig.text(0.5, y, text, ha="center", va="top", fontsize=fs)
     fig._wxl_caption_artist = artist
     return artist
 
 
 def add_caption_below(fig, text: str, pad_pt: float = WXL_CAPTION_PAD_PT,
-                      fontsize: float | None = None):
+                      fontsize: float | None = None, max_mm: float | None = None):
     """Caption close below the grid, re-applied after grid centering.
 
     Records the caption on the figure so :func:`prepare_figure` re-places it
     after :func:`center_grid` moves the axes. Use this for a centered multi-panel
     figure where the default ``add_caption`` (placed below the canvas) would end
-    up far from the grid.
+    up far from the grid. ``max_mm`` wraps the caption so no line exceeds the
+    print width; ``finalize_figure`` passes its ``target_width_mm`` for this.
     """
-    fig._wxl_caption = (text, pad_pt, fontsize)
-    return _caption_below(fig, text, pad_pt, fontsize)
+    fig._wxl_caption = (text, pad_pt, fontsize, max_mm)
+    return _caption_below(fig, text, pad_pt, fontsize, max_mm)
 
 
 def _nice_axis(lo: float, hi: float, min_ticks: int = 4, max_ticks: int = 8):
@@ -900,7 +927,7 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
     ``target_width_mm`` closes the trap that tight cropping opens: the tight
     bounding box trims the canvas margins, so a figure authored with
     ``figsize=(7.48, 5.20)`` (190 mm) often saves as ~158 mm wide. Inserting that
-    image at its natural size keeps the text at 10 pt, but stretching it to fill
+    image at its natural size keeps the text at 11 pt, but stretching it to fill
     a 190 mm column shrinks the text to ~8.3 pt. When ``target_width_mm`` is
     given, the canvas width is calibrated (two probe renders) so the trimmed
     image is exactly that wide, and the aspect ratio is preserved.
@@ -926,10 +953,10 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
     def _prepare():
         # Axis-end locking, legend placement, annotation nudging and grid
         # centering must run AFTER any canvas resize: resizing changes how much
-        # of the axes a fixed 10 pt text box occupies.
+        # of the axes a fixed 12 pt text box occupies.
         if lock_ends or auto_legend or auto_text or getattr(fig, "_wxl_center", False):
             prepare_figure(fig, lock_ends=lock_ends, auto_legend=auto_legend,
-                           auto_text=auto_text)
+                           auto_text=auto_text, caption_max_mm=target_width_mm)
 
     w0, h0 = (float(v) for v in fig.get_size_inches())
     aspect = h0 / w0 if w0 else 1.0
@@ -937,20 +964,30 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
     if target_width_mm:
         # Alternate calibration and layout until both the trimmed width and the
         # legend placement are stable, because moving a legend changes the tight
-        # bounding box.
+        # bounding box. Text does not scale with the canvas, so a very large type
+        # scale can make the width jump between iterations; keep the canvas size
+        # whose measured width was closest to the target and restore it at the end.
         probe = stem.with_suffix(".probe.png")
+        best = None
         for _ in range(8):
             _prepare()
             _relayout()
             fig.savefig(probe, dpi=dpi, bbox_inches="tight", pad_inches=pad)
             m = measure_width_mm(probe, dpi)
-            if abs(m - target_width_mm) <= tol_mm:
+            w, h = (float(v) for v in fig.get_size_inches())
+            err = abs(m - target_width_mm)
+            if best is None or err < best[0] - 1e-9:
+                best = (err, w, h)
+            if err <= tol_mm:
                 break
-            w = float(fig.get_size_inches()[0]) * target_width_mm / m
-            fig.set_size_inches(w, w * aspect)
-        else:
-            _prepare()
-            _relayout()
+            new_w = w * target_width_mm / m
+            fig.set_size_inches(new_w, new_w * aspect)
+        if best is not None:
+            cur_w = float(fig.get_size_inches()[0])
+            if abs(cur_w - best[1]) > 1e-9:
+                fig.set_size_inches(best[1], best[2])
+                _prepare()
+                _relayout()
         probe.unlink(missing_ok=True)
     else:
         _prepare()
