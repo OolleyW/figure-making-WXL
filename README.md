@@ -170,10 +170,12 @@ Line: multi-series trend, trend + uncertainty band, stacked area.
 Relationship: scatter + fit, bubble, bidirectional error bars.
 Distribution: box, violin, histogram + KDE, ECDF, strip + mean.
 Matrix: annotated heatmap, filled contour.
-Special: radar, donut, dual axis, 2 × 2 multi-panel.
+Special: radar, donut, dual axis, 2 × 2 multi-panel, 1 × 3 one-row multi-panel.
 
 Runnable code for all of them is in `examples/gallery.py`; rendered previews are
-in `preview/`.
+in `preview/`. `heatmap`, `radar` and `donut` are rendered in single column only;
+`multi_panel` and `multi_panel_1x3` in double column only. The `double` preset is
+deliberately short (190 × 66 mm) with the 10 pt text unchanged.
 
 ## Files
 

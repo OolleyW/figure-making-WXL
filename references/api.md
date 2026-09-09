@@ -47,7 +47,7 @@ Uniform 10 pt. This is the W1 contract; the audit fails on any other size.
 {
   "single":      (3.54, 2.70),   # 90 mm column
   "onehalf":     (5.51, 3.90),   # 140 mm
-  "double":      (7.48, 5.20),   # 190 mm
+  "double":      (7.48, 2.60),   # 190 mm, deliberately short (half the old height)
   "double_tall": (7.48, 6.80),   # 190 mm, tall multi-panel
   "slide":       (10.0, 6.00),   # slides only, not for submission
 }

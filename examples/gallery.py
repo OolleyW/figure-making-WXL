@@ -399,10 +399,10 @@ def fig_strip_mean():
 # matrix family
 # --------------------------------------------------------------------------
 @figure("heatmap", "热图（带色条与数值）", "matrix",
-        "相关系数矩阵，RdBu_r 发散色图，单元格标数值。",
+        "相关系数矩阵，RdBu_r 发散色图，单元格标数值。只出单栏版。",
         'im = ax.imshow(m, cmap="RdBu_r", vmin=-1, vmax=1)\n'
         'cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)\n'
-        'cb.outline.set_linewidth(0.8)')
+        'cb.outline.set_linewidth(0.8)', width="single")
 def fig_heatmap():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     m = RNG.uniform(-1, 1, (6, 6))
@@ -449,9 +449,10 @@ def fig_contour():
 # special family
 # --------------------------------------------------------------------------
 @figure("radar", "雷达图（极坐标）", "special",
-        "多指标综合对比，极坐标例外地保留浅灰网格以便读数。",
+        "多指标综合对比，极坐标例外地保留浅灰网格以便读数。只出单栏版。",
         'ax = fig.add_subplot(projection="polar")\n'
-        'ax.plot(theta, values, "-o", color=PALETTE[key], lw=1.5, ms=3.5)')
+        'ax.plot(theta, values, "-o", color=PALETTE[key], lw=1.5, ms=3.5)',
+        width="single")
 def fig_radar():
     fig = plt.figure(figsize=WXL_FIGSIZE["double"])
     ax = fig.add_subplot(projection="polar")
@@ -600,6 +601,63 @@ def fig_multi_panel():
     panel_tag(ax, "(d)", "Scatter")
 
     add_caption_below(fig, r"$\mathbf{Fig.}$  20  Multi-panel figure with four chart types.")
+    return fig
+
+
+@figure("multi_panel_1x3", "多子图（1x3 一行三图）", "special",
+        "三种图型并排一行，网格居中，每个子图下方居中放编号加标题；只出两栏版。",
+        'fig, axes = create_subplots(1, 3, figsize=WXL_FIGSIZE["double"])\n'
+        'panel_tag(axes[0], "(a)", "Grouped bars")\n'
+        'center_grid(fig)\n'
+        'add_caption_below(fig, r"$\\mathbf{Fig.}$  21  One-row three-panel figure.")',
+        width="double")
+def fig_multi_panel_1x3():
+    fig, axes = create_subplots(1, 3, figsize=WXL_FIGSIZE["double"])
+    fig._wxl_no_tight = True      # keep the manual centering
+    fig._wxl_center = True        # centre the grid at every layout pass
+    fig.subplots_adjust(wspace=0.42)
+
+    ax = axes[0]
+    cats = ["A", "B", "C"]
+    for i, (name, key, vals) in enumerate([("S1", "primary", [0.7, 0.8, 0.9]),
+                                           ("S2", "contrast", [0.5, 0.6, 0.7])]):
+        ax.bar(np.arange(3) + (i - 0.5) * 0.3, vals, 0.3, label=name,
+               color=P[key], edgecolor="black", linewidth=0.8)
+    ax.set_xticks(np.arange(3))
+    ax.set_xticklabels(cats)
+    ax.set_xlabel("Scenario")
+    ax.set_ylabel("Score")
+    ax.set_ylim(0, 1.35)
+    framed_legend(ax, loc="upper left", ncol=2, columnspacing=0.8, handlelength=1.2)
+    panel_tag(ax, "(a)", "Grouped bars")
+
+    ax = axes[1]
+    x = np.linspace(0, 10, 11)
+    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=1.5, ms=3.2,
+            mfc="white", mew=0.9, label="Curve 1")
+    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=1.5, ms=3.2,
+            mfc="white", mew=0.9, label="Curve 2")
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Amplitude")
+    ax.set_ylim(0.35, 0.95)
+    framed_legend(ax, loc="upper left", ncol=2, columnspacing=0.8, handlelength=1.2)
+    panel_tag(ax, "(b)", "Trend lines")
+
+    ax = axes[2]
+    data = [RNG.normal(m, 1.0, 50) for m in (0, 1, 2)]
+    bp = ax.boxplot(data, patch_artist=True, widths=0.55,
+                    medianprops=dict(color="black", linewidth=1.2),
+                    whiskerprops=dict(color="black", linewidth=0.8),
+                    capprops=dict(color="black", linewidth=0.8),
+                    boxprops=dict(edgecolor="black", linewidth=0.8))
+    for patch, key in zip(bp["boxes"], ["primary", "contrast", "improve"]):
+        patch.set_facecolor(P[key])
+    ax.set_xticklabels(["G1", "G2", "G3"])
+    ax.set_xlabel("Group")
+    ax.set_ylabel("Value")
+    panel_tag(ax, "(c)", "Box plots")
+
+    add_caption_below(fig, r"$\mathbf{Fig.}$  21  One-row three-panel figure.")
     return fig
 
 

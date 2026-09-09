@@ -129,8 +129,10 @@ and more contrast is needed.
 
 ## 4) Layout
 
-- **Aspect ratios**: `double` figures use 7.48 × 5.20 in (190 × 132 mm), which
-  fits a full-width single-row figure. Multi-panel grids use `double_tall`
+- **Aspect ratios**: `double` figures are deliberately short — 7.48 × 2.60 in
+  (190 × 66 mm, half the old 190 × 132 mm height). The 10 pt text is unchanged,
+  so it reads larger relative to the shorter plot. This suits a wide, flat
+  comparison figure. The 2 × 2 multi-panel grid stays tall via `double_tall`
   (190 × 173 mm).
 - **Legends**: inside the axes, `loc="best"` first, then the emptiest corner,
   then two columns. `ylim` is deliberately loosened (for example to 1.55 for

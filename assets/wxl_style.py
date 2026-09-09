@@ -64,10 +64,12 @@ WXL_FONTSIZE = {
 
 #: Figure width = final print width, so 10 pt stays 10 pt after insertion.
 #: single = 90 mm, onehalf = 140 mm, double = 190 mm.
+#: double is deliberately short (half the old height) so the wide column holds a
+#: flat figure whose 10 pt text reads larger relative to the plot.
 WXL_FIGSIZE = {
     "single": (3.54, 2.70),
     "onehalf": (5.51, 3.90),
-    "double": (7.48, 5.20),
+    "double": (7.48, 2.60),
     "double_tall": (7.48, 6.80),
     "slide": (10.0, 6.00),
 }
@@ -910,7 +912,12 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
     def _relayout():
         if layout and not getattr(fig, "_wxl_no_tight", False):
             try:
-                fig.tight_layout(pad=1.0)
+                with warnings.catch_warnings():
+                    # a very short figure (the half-height double preset) can be
+                    # too small for tight_layout; bbox_inches="tight" still keeps
+                    # every decoration in the saved image
+                    warnings.simplefilter("ignore", UserWarning)
+                    fig.tight_layout(pad=1.0)
             except Exception:
                 pass
 
@@ -930,7 +937,7 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
         # legend placement are stable, because moving a legend changes the tight
         # bounding box.
         probe = stem.with_suffix(".probe.png")
-        for _ in range(5):
+        for _ in range(8):
             _prepare()
             _relayout()
             fig.savefig(probe, dpi=dpi, bbox_inches="tight", pad_inches=pad)

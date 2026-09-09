@@ -40,12 +40,17 @@ VARIANTS = [("single", "单栏", "90 mm"), ("double", "两栏", "190 mm")]
 
 #: chart types that only work at the full 190 mm width, so the single-column
 #: variant is not rendered at all (a 2x2 grid at 90 mm leaves ~40 mm per panel)
-DOUBLE_ONLY = {"multi_panel"}
+DOUBLE_ONLY = {"multi_panel", "multi_panel_1x3"}
+
+#: chart types the user wants in single column only
+SINGLE_ONLY = {"heatmap", "radar", "donut"}
 
 
 def variants_for(fig_id: str):
     if fig_id in DOUBLE_ONLY:
         return [v for v in VARIANTS if v[0] == "double"]
+    if fig_id in SINGLE_ONLY:
+        return [v for v in VARIANTS if v[0] == "single"]
     return VARIANTS
 
 CATEGORY_CN = {"bar": "柱状 / 条形", "line": "折线 / 面积", "rel": "关系",
@@ -57,8 +62,9 @@ RECOMMEND = {
     "line_trend": "两者皆可", "line_band": "单栏", "stacked_area": "两栏",
     "scatter_fit": "两者皆可", "bubble": "两者皆可", "errorbar": "两者皆可",
     "boxplot": "两者皆可", "violin": "两者皆可", "hist_kde": "两者皆可",
-    "ecdf": "单栏", "strip_mean": "两栏", "heatmap": "两栏", "contour": "两栏",
-    "radar": "两栏", "donut": "单栏", "dual_axis": "两栏", "multi_panel": "两栏",
+    "ecdf": "单栏", "strip_mean": "两栏", "heatmap": "单栏", "contour": "两栏",
+    "radar": "单栏", "donut": "单栏", "dual_axis": "两栏",
+    "multi_panel": "两栏", "multi_panel_1x3": "两栏",
 }
 
 
@@ -137,11 +143,11 @@ def main():
     rows = []
     for rec in records:
         single = rec["variants"].get("single")
-        double = rec["variants"]["double"]
+        double = rec["variants"].get("double")
         rows.append([rec["idx"], rec["spec"]["title"],
                      CATEGORY_CN[rec["spec"]["category"]],
                      f'{single["mm"]:.1f} mm' if single else "—",
-                     f'{double["mm"]:.1f} mm',
+                     f'{double["mm"]:.1f} mm' if double else "—",
                      RECOMMEND.get(rec["spec"]["id"], "两者皆可")])
     add_three_line_table(doc, ["序号", "图型", "类别", "单栏", "两栏", "推荐"],
                          rows, col_widths_cm=[1.4, 7.6, 3.0, 2.0, 2.0, 2.6])
@@ -165,6 +171,8 @@ def main():
             for v in rec["variants"].values())
         if rec["spec"]["id"] in DOUBLE_ONLY:
             note += "    说明：该图型单栏放不下，只出两栏版"
+        if rec["spec"]["id"] in SINGLE_ONLY:
+            note += "    说明：该图型只出单栏版"
         if warn:
             note += "    提示：" + "；".join(sorted(set(warn)))
         add_paragraph(doc, note, size=9, spacing=1.0, indent_chars=0, space_after=0)
