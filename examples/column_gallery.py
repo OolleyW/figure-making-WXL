@@ -3,7 +3,7 @@
     pip install python-docx
     python column_gallery.py --out ./wxl_columns
 
-Renders all 20 chart types twice (single column 90 mm, double column 190 mm),
+Renders all 21 chart types twice (single column 90 mm, double column 190 mm),
 audits each render, then assembles a Word document with the paper layout
 contract applied through ``assets/wxl_docx.py``: one page per chart type showing
 both variants stacked, a cover page with a three-line summary table, figure
@@ -129,11 +129,11 @@ def main():
     # ---- document -----------------------------------------------------
     doc = new_document()
     add_title(doc, "figure-making-WXL · 全部图型 · 单栏与两栏")
-    add_paragraph(doc, "本文件把 WXL 样式的 20 种图型各出两版，单栏 90 mm 与两栏 "
+    add_paragraph(doc, "本文件把 WXL 样式的 21 种图型各出两版，单栏 90 mm 与两栏 "
                        "190 mm，同页上下对比。两版使用相同纵横比与相同字号，差异只"
                        "来自物理宽度，也就是 11 pt 文字在版面上占多大比例。全部图片"
                        "按 100 % 原始尺寸插入，图内文字与正文 11 pt 字号一致。"
-                       "2x2 多子图只出两栏版，因为单栏下每个面板仅约 40 mm，"
+                       "两种多子图（2x2 与 1x3）只出两栏版，因为单栏下每个面板都太窄，"
                        "图例和子图标题都放不下。",
                   spacing=1.5, space_after=8)
     add_paragraph(doc, "选择原则：图内元素少、图例不超过三项时用单栏更省版面。"

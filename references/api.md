@@ -368,4 +368,4 @@ patch by more than 5 % of the legend area.
 - [design-theory.md](design-theory.md) — rationale for 11 pt, palette, widths
 - [common-patterns.md](common-patterns.md) — layout patterns
 - [tutorials.md](tutorials.md) — worked examples
-- [demos.md](demos.md) — the 20 chart types
+- [demos.md](demos.md) — the 21 chart types

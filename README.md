@@ -96,7 +96,7 @@ the colours — the skill never decides these for them. See `references/preferen
 saves around 158 mm. Stretching that image to fill a 190 mm column scales every
 glyph by 0.83 and silently turns 11 pt into 8.3 pt. `finalize_figure` therefore
 takes `target_width_mm` and calibrates the canvas until the trimmed image is
-exactly the print width. All 20 preview figures land within 0.5 mm of their
+exactly the print width. All 21 preview figures land within 0.5 mm of their
 target.
 
 ## How to call the skill
@@ -161,7 +161,7 @@ A text variable goes in `$...$` (italic), a unit stays outside and upright:
 # verify the install on this machine
 python "<skill-dir>/scripts/check_wxl_style.py"
 
-# render all 20 chart types + an HTML gallery
+# render all 21 chart types + an HTML gallery
 python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
 
 # every chart type at 90 mm and 190 mm in one Word document
@@ -324,15 +324,15 @@ The skill never picks these for you.
 | `references/design-theory.md` | why 11 pt, the tight-crop trap, palette semantics, exceptions |
 | `references/common-patterns.md` | legend placement, multi-panel, dual axes, print-safe encoding |
 | `references/tutorials.md` | three end-to-end walkthroughs |
-| `references/demos.md` | the 20 chart types with core calls |
+| `references/demos.md` | the 21 chart types with core calls |
 | `assets/wxl_style.py` | importable style module (rcParams, palette, helpers, audit) |
 | `assets/wxl_docx.py` | Word assembly: 100 % insertion, captions, three-line tables |
 | `scripts/check_wxl_style.py` | installation self-test |
-| `examples/gallery.py` | render all 20 types + an HTML gallery |
+| `examples/gallery.py` | render all 21 types + an HTML gallery |
 | `examples/word_report.py` | render figures and assemble a Word report |
-| `examples/column_gallery.py` | all 20 types at 90 mm and 190 mm in one Word document |
+| `examples/column_gallery.py` | all 21 types at 90 mm and 190 mm in one Word document |
 | `requirements.txt` | dependencies (python-docx optional) |
-| `preview/*.png` | 300 dpi previews of the 20 chart types |
+| `preview/*.png` | 300 dpi previews of the 21 chart types |
 
 ## Regenerate
 
@@ -340,7 +340,7 @@ The skill never picks these for you.
 # installation self-test
 python "<skill-dir>/scripts/check_wxl_style.py"
 
-# all 20 figures + HTML gallery (default output ~/wxl_gallery)
+# all 21 figures + HTML gallery (default output ~/wxl_gallery)
 python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
 
 # figures assembled into a Word report (needs python-docx)

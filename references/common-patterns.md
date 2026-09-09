@@ -21,7 +21,7 @@ Placement is automatic. Write `framed_legend(ax)` with no `loc`, and
 4. `check_wxl_style` reports a soft warning naming the measured percentage when
    a legend still covers more than 2 % of the data.
 
-Measured result across all 20 chart types at both 90 mm and 190 mm: overlap
+Measured result across all 21 chart types at both 90 mm and 190 mm: overlap
 score 0.0000 for every legend (the radar chart's hand-placed legend, which is
 exempt, sits at 0.009).
 
@@ -95,7 +95,7 @@ annotate_bars(ax, bars, y_offset_frac=0.035)     # returns (kept, skipped)
 ```
 
 The same figure code then produces labelled bars in a 190 mm figure and clean
-bars in a 90 mm one. Measured across all 20 chart types at both widths: zero
+bars in a 90 mm one. Measured across all 21 chart types at both widths: zero
 text-collision warnings.
 
 What you still decide by hand:

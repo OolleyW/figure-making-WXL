@@ -1,6 +1,6 @@
-# Demos: the 20 chart types
+# Demos: the 21 chart types
 
-All 20 are implemented in `examples/gallery.py` and rendered by
+All 21 are implemented in `examples/gallery.py` and rendered by
 
 ```bash
 python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery

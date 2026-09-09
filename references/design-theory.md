@@ -190,4 +190,4 @@ fixed bounding box would clip it.
 - [../SKILL.md](../SKILL.md) — the hard rules
 - [api.md](api.md) — signatures and constants
 - [common-patterns.md](common-patterns.md) — operational patterns
-- [demos.md](demos.md) — the 20 chart types
+- [demos.md](demos.md) — the 21 chart types
