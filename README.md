@@ -90,36 +90,78 @@ takes `target_width_mm` and calibrates the canvas until the trimmed image is
 exactly the print width. All 20 preview figures land within 0.5 mm of their
 target.
 
-## Usage
+## How to call the skill
+
+The skill is a set of instructions plus a Python module. There are three ways in.
+
+### A. Through an agent (the typical case)
+
+An agent that has the skill installed loads it when the user asks for a
+publication figure / 科研绘图 / 论文配图, then follows `SKILL.md`:
+
+1. **Ask the user** for the chart type and panel count, the x / y axis labels
+   (text, units, and whether each symbol is italic), the line style, and the
+   colours. Do not decide these for them — see `references/preferences.md`.
+2. `apply_wxl_style()`.
+3. Draw with `WXL_PALETTE` colours and black edges; every label at 10 pt.
+4. `prepare_figure(fig)` then `check_wxl_style(fig)`; fix every reported problem.
+5. `finalize_figure(fig, ..., target_width_mm=WXL_WIDTH_MM[preset])`.
+6. Insert the PNG into Word at 100 %, or assemble the document with
+   `assets/wxl_docx.py`.
+
+### B. Directly in Python
 
 ```python
 import os
 import sys
 from pathlib import Path
 
+# Wherever the skill is installed; WXL_SKILL_DIR overrides the default.
 SKILL = Path(os.environ.get(
     "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-WXL"))
 sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (WXL_PALETTE as P, WXL_FIGSIZE, WXL_WIDTH_MM, apply_wxl_style,
-                       create_subplots, framed_legend, add_caption,
-                       finalize_figure, check_wxl_style)
+                       create_subplots, framed_legend, add_caption_below,
+                       finalize_figure, check_wxl_style, prepare_figure)
 
 apply_wxl_style()
 fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
-ax.bar([1, 2, 3], [0.7, 0.85, 0.92], color=P["primary"],
-       edgecolor="black", linewidth=0.8, label="Proposed")
-ax.set_xlabel("Scenario")
-ax.set_ylabel("Accuracy")
+ax.plot([1, 2, 3], [0.7, 0.85, 0.92], "-o", color=P["primary"], lw=1.5,
+        ms=3.2, mfc="white", mew=0.9, label="Proposed")
+ax.set_xlabel(r"Slip $s$ (mm)")          # symbol italic, unit upright
+ax.set_ylabel(r"Bond stress $\tau$ (MPa)")
 ax.set_ylim(0, 1.2)
 framed_legend(ax, loc="upper left")
-add_caption(fig, "Fig. 1  Accuracy across three scenarios.")
+add_caption_below(fig, r"$\mathbf{Fig.}$  1  Bond stress against slip.")
 
+prepare_figure(fig)
 report = check_wxl_style(fig)          # audit before saving
 assert report["ok"], report["problems"]
-finalize_figure(fig, "figures/accuracy", formats=["png", "pdf"], dpi=600,
+finalize_figure(fig, "figures/curve", formats=["png", "pdf"], dpi=600,
                 target_width_mm=WXL_WIDTH_MM["double"])
 ```
+
+A text variable goes in `$...$` (italic), a unit stays outside and upright:
+`r"Slip $s$ (mm)"`, `r"Bond stress $\tau$ (MPa)"`. The figure caption is
+`$\mathbf{Fig.}$  1  ...` so the "Fig." is bold and the number is not padded.
+
+### C. From the command line
+
+```bash
+# verify the install on this machine
+python "<skill-dir>/scripts/check_wxl_style.py"
+
+# render all 20 chart types + an HTML gallery
+python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
+
+# every chart type at 90 mm and 190 mm in one Word document
+python "<skill-dir>/examples/column_gallery.py" --out ./wxl_columns
+
+# render three figures and assemble a Word report
+python "<skill-dir>/examples/word_report.py" --out ./wxl_report
+```
+
 
 ## Chart types (20)
 
