@@ -237,6 +237,83 @@ and `multi_panel_1x3`, keep their full width).
 | <img src="preview/multi_panel.png" width="330"> | <img src="preview/multi_panel_1x3.png" width="330"> |
 
 
+## Style & colour palette
+
+The house style is fixed (an audit enforces it), but the per-figure choices
+below are confirmed with the user **before** drawing — see
+`references/preferences.md`.
+
+### Typography
+
+| Element | Size |
+|---|---|
+| Caption / axis label / tick / annotation / panel label | 11 pt |
+| Legend text | 10 pt |
+
+Times New Roman everywhere (mathtext = STIX). Bold and italic Times are allowed;
+never Helvetica, Arial or DejaVu Sans. CJK falls back to SimSun.
+
+### Structure
+
+| Contract | Value |
+|---|---|
+| Frame | all four spines, 0.8 pt |
+| Ticks | inward, 3 pt long |
+| Grid | none (radar chart is the exception) |
+| Legend | inside the axes, opaque white face, black 0.8 pt border |
+| Axis ends | on a tick value (no unlabelled strip) |
+| Export | PNG 600 dpi + vector PDF |
+| Single-column size | 90 × 76 mm |
+
+### Line styles
+
+| Attribute | Options |
+|---|---|
+| Markers | open circle (default, white fill), square, triangle, diamond, or none for dense data |
+| Line width | 1.5 pt (default), 1.0 pt for many series, 2.0 pt for the key curve |
+| Dash | solid (default) for the main series; dashed for a reference / baseline |
+| Marker frequency | every point (default), every 2nd–5th for dense data |
+
+### Colour palette
+
+The only colours allowed are the palette, black and white.
+
+![WXL_PALETTE](img/palette.png)
+
+| Key | Hex | Meaning | Typical use |
+|---|---|---|---|
+| `primary` | `#1F4E79` | the method you argue for | main bars, main curve |
+| `secondary` | `#4E86C6` | same family, supporting role | extra blue series |
+| `contrast` | `#B64342` | baseline / competitor | comparison bars / curves |
+| `improve` | `#2E8B7A` | improvement / variant | ablation, positive deltas |
+| `accent` | `#E0A030` | emphasis | annotations, secondary axis |
+| `neutral` | `#7B7B7B` | reference / background | gridlines, target lines |
+| `light` | `#C9DCF0` | fill, low-emphasis mass | histograms, bands |
+
+Default series order without an explicit mapping: `primary → contrast →
+improve → accent → secondary → neutral`.
+
+### Colour maps (matrices)
+
+![WXL_CMAPS](img/cmaps.png)
+
+| Key | Colormap | When |
+|---|---|---|
+| `diverging` | `RdBu_r` (default) | signed values, e.g. a correlation heatmap |
+| `sequential` | `Blues` | non-negative, e.g. a magnitude field |
+| `signed` | `coolwarm` | signed values with more contrast |
+
+### What to confirm before drawing
+
+1. **Chart type** and panel count.
+2. **Axis labels** — text, units, and whether each symbol is italic.
+3. **Line style** — markers, width, dash, per series.
+4. **Colours** — per-series mapping; the colormap for a matrix.
+5. **Output needs** — grayscale-safe, colour-blind safe, or a specific journal /
+   keyword palette (e.g. "Nature", "彩图 1"); whether any panel needs a title.
+
+The skill never picks these for you.
+
 ## Files
 
 | Path | Purpose |
