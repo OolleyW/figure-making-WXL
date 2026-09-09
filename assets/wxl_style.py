@@ -969,6 +969,60 @@ def measure_width_mm(path, dpi: int | None = None) -> float:
     return px / dpi * 25.4
 
 
+#: standard box for each panel of a multi-panel figure (width x height, mm), so
+#: every subplot is the same size as a single-column figure.
+WXL_AXES_PANEL_MM = (75.0, 55.0)
+
+
+def _resize_grid_panels(fig, w_mm: float, h_mm: float) -> int:
+    """Resize every panel of a grid to ``w_mm x h_mm``, keeping the layout.
+
+    Only the subplot boxes change: each panel keeps its column position (so the
+    horizontal ``wspace`` gap and the side margins are untouched), and the
+    vertical row gap is scaled with the height so ``hspace`` keeps its current
+    proportion. The grid stays vertically centred, and the caption is re-placed
+    by ``prepare_figure`` at the usual 14 pt gap. Returns the number of panels
+    resized.
+    """
+    fw, fh = (float(v) for v in fig.get_size_inches())
+    W, H = fw * 25.4, fh * 25.4
+    targets = [a for a in fig.get_axes()
+               if a.axison and not _is_polar(a) and not hasattr(a, "_colorbar")]
+    if not targets:
+        return 0
+    wf = w_mm / W
+    hf = h_mm / H
+    if wf >= 1.0 or hf >= 1.0:
+        return 0
+    # cluster the panels into rows by their current bottom edge
+    rows: dict[float, list] = {}
+    for a in targets:
+        rows.setdefault(round(a.get_position().y0, 6), []).append(a)
+    ys = sorted(rows, reverse=True)                    # top row first
+    old_h = max(a.get_position().height for a in targets)
+    new_gap = 0.0
+    if len(ys) > 1 and old_h > 0:
+        # keep hspace: the row gap keeps the same fraction of the panel height
+        old_gap = ys[0] - rows[ys[1]][0].get_position().y1
+        new_gap = old_gap * (hf / old_h)
+    total_h = len(ys) * hf + (len(ys) - 1) * new_gap
+    old_center = (min(a.get_position().y0 for a in targets) +
+                  max(a.get_position().y1 for a in targets)) / 2.0
+    y_top = old_center + total_h / 2.0
+    for i, y in enumerate(ys):
+        y0 = y_top - (i + 1) * hf - i * new_gap
+        for a in rows[y]:
+            p = a.get_position()
+            a.set_position([p.x0, y0, wf, hf])
+    for a in targets:
+        try:
+            a.set_aspect("auto")
+        except Exception:                              # pragma: no cover
+            pass
+    fig._wxl_no_tight = True
+    return len(targets)
+
+
 def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                     close: bool = True, pad: float = 0.06, layout: bool = True,
                     target_width_mm: float | None = None, tol_mm: float = 0.5,
@@ -1047,6 +1101,15 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
     else:
         _prepare()
         _relayout()
+
+    # a multi-panel figure brings every panel to the same box as a single-column
+    # figure; only the panel boxes change, the wspace/hspace proportions and the
+    # 14 pt caption gap are left as they are
+    panel_box = getattr(fig, "_wxl_panel_axes_mm", None)
+    if panel_box and not getattr(fig, "_wxl_skip_std_axes", False):
+        if _resize_grid_panels(fig, *panel_box):
+            _prepare()
+            _relayout()
 
     saved = []
     for ext in formats:

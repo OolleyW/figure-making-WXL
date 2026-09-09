@@ -216,6 +216,12 @@ renders) so the **trimmed** image is exactly that wide while keeping the text at
 158 mm instead of 190 mm, and stretching it to fill the column drops the text to
 about 8.3 pt.
 
+A multi-panel figure can bring every subplot to one physical size: set
+`fig._wxl_panel_axes_mm = WXL_AXES_PANEL_MM` (75 × 55 mm) before saving.
+`finalize_figure` then resizes each panel to that box while leaving the layout
+alone — the column position, the `wspace` / `hspace` proportions and the 14 pt
+caption gap are unchanged, so only the black frames change size.
+
 ```python
 finalize_figure(fig, "figures/result", formats=["png", "pdf"], dpi=600,
                 target_width_mm=WXL_WIDTH_MM["double"])
