@@ -8,15 +8,6 @@ inserted at its original size.
 论文配图样式技能：Times New Roman 统一 11 pt、深蓝主色系、四边全包围、图例带黑框、
 刻度朝内、无网格，图幅按 90 / 140 / 190 mm 印刷宽度校准。
 
-<p align="center">
-  <img src="preview/grouped_bar.png" width="46%">
-  <img src="preview/line_trend.png" width="46%">
-</p>
-<p align="center">
-  <img src="preview/heatmap.png" width="46%">
-  <img src="preview/multi_panel.png" width="46%">
-</p>
-
 ## Install for an agent
 
 The skill is a plain directory: no build step, no absolute paths, no config file.
