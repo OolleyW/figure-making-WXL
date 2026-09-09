@@ -220,7 +220,17 @@ A multi-panel figure can bring every subplot to one physical size: set
 `fig._wxl_panel_axes_mm = WXL_AXES_PANEL_MM` (75 × 55 mm) before saving.
 `finalize_figure` then resizes each panel to that box while leaving the layout
 alone — the column position, the `wspace` / `hspace` proportions and the 14 pt
-caption gap are unchanged, so only the black frames change size.
+caption gap are unchanged, so only the black frames change size. The rows below
+the first are also shifted so the top row's panel titles clear the next row by
+the same 14 pt the caption uses.
+
+Every single-column figure is saved at the same overall (trimmed) size,
+`WXL_SIZE_SINGLE_MM = (90.0, 76.0)`: after the width calibration, the axes
+height is adjusted (measured from probe saves) so the trimmed image is exactly
+76 mm tall, which leaves the width at 90 mm. Figures carrying a colorbar and the
+polar/pie charts are exempt, because a bar plus its labels cannot fit the column
+and a circle cannot fill a 90 × 76 box. Set `fig._wxl_skip_uniform_size = True`
+to opt a figure out.
 
 ```python
 finalize_figure(fig, "figures/result", formats=["png", "pdf"], dpi=600,

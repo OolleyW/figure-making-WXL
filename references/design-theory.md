@@ -64,6 +64,18 @@ Because everything is one size, hierarchy comes from **weight, color and
 position** instead of size: panel tags are bold, emphasis annotations use
 `accent`, reference lines use `neutral` and a dashed style.
 
+### One size for every single-column figure
+
+`finalize_figure` saves every single-column figure at the same overall (trimmed)
+size, `WXL_SIZE_SINGLE_MM = (90.0, 76.0)` mm, so a run of single-column figures
+in a manuscript looks like one consistent set. The width calibration fixes the
+90 mm; the axes height is then adjusted (measured from probe saves) until the
+image is 76 mm tall, which only moves the vertical extent and leaves the width
+alone. Colorbar figures and the polar/pie charts are exempt, because a colorbar
+plus its labels cannot fit the column and a circle cannot fill a 90 × 76 box. A
+multi-panel figure instead brings each subplot to `WXL_AXES_PANEL_MM`
+(75 × 55 mm) without changing the spacing.
+
 ### Single-column caution
 
 At 90 mm width, 11 pt text consumes a much larger share of the canvas. A

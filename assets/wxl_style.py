@@ -973,6 +973,58 @@ def measure_width_mm(path, dpi: int | None = None) -> float:
 #: every subplot is the same size as a single-column figure.
 WXL_AXES_PANEL_MM = (75.0, 55.0)
 
+#: overall (trimmed) size of a single-column figure in millimetres, so every
+#: single-column figure is the same size on the page. Figures that carry a
+#: colorbar are exempt: a slim bar plus its tick labels and title cannot fit the
+#: 90 mm column inside this box.
+WXL_SIZE_SINGLE_MM = (90.0, 76.0)
+
+
+def _fit_trimmed_height(fig, h_mm: float, probe, dpi: int,
+                        pad: float = 0.06, tol_mm: float = 0.25,
+                        rounds: int = 8, caption_max_mm: float | None = None) -> bool:
+    """Grow or shrink the axes until the saved (tight) image is ``h_mm`` tall.
+
+    Only the height moves: the width calibration has already fixed the width and
+    changing the axes height does not move the left/right labels. The height is
+    measured from a real probe save, because ``get_tightbbox`` disagrees with
+    ``bbox_inches="tight"`` by up to about 1 mm. Legends, annotations and the
+    caption are re-placed at each step; ``caption_max_mm`` must be passed so the
+    caption keeps wrapping to the column width instead of falling back to one
+    over-wide line. Returns True when it converged.
+    """
+    H_canvas = float(fig.get_size_inches()[1]) * 25.4
+    if H_canvas <= 0:
+        return False
+    ok = False
+    for _ in range(rounds):
+        fig.savefig(probe, dpi=dpi, bbox_inches="tight", pad_inches=pad)
+        cur = _png_height_mm(probe, dpi)
+        err = h_mm - cur
+        if abs(err) <= tol_mm:
+            ok = True
+            break
+        dh = err / H_canvas
+        for a in fig.get_axes():
+            p = a.get_position()
+            a.set_position([p.x0, p.y0, p.width, p.height + dh])
+        fig._wxl_no_tight = True
+        prepare_figure(fig, caption_max_mm=caption_max_mm)
+    return ok
+
+
+def _png_height_mm(path, dpi: int) -> float:
+    """Physical height of a saved raster file, in millimetres."""
+    path = Path(path)
+    try:
+        from PIL import Image
+        with Image.open(path) as im:
+            px = im.size[1]
+    except Exception:                                  # pragma: no cover
+        import matplotlib.image as mpimg
+        px = mpimg.imread(str(path)).shape[0]
+    return px / dpi * 25.4
+
 
 def _resize_grid_panels(fig, w_mm: float, h_mm: float) -> int:
     """Resize every panel of a grid to ``w_mm x h_mm``, keeping the layout.
@@ -1156,6 +1208,25 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
             if _match_row_gap_to_caption(fig):
                 _prepare()
                 _relayout()
+
+    # every single-column figure gets the same overall (trimmed) size, so a set
+    # of them reads as one consistent size on the page. Figures that carry a
+    # colorbar (the bar plus its labels cannot fit the column) and the
+    # polar/pie figures (a circle cannot fill a 90 x 76 box) are exempt.
+    _all_axes = fig.get_axes()
+    _uniform_ok = (target_width_mm == 90.0
+                   and not getattr(fig, "_wxl_skip_std_axes", False)
+                   and not getattr(fig, "_wxl_skip_uniform_size", False)
+                   and not any(hasattr(a, "_colorbar") for a in _all_axes)
+                   and not any(_is_polar(a) for a in _all_axes)
+                   and any(a.axison and not hasattr(a, "_colorbar")
+                           for a in _all_axes))
+    if _uniform_ok:
+        probe_h = stem.with_suffix(".probe_h.png")
+        if _fit_trimmed_height(fig, WXL_SIZE_SINGLE_MM[1], probe_h, dpi, pad=pad,
+                               caption_max_mm=target_width_mm):
+            _relayout()
+        probe_h.unlink(missing_ok=True)
 
     saved = []
     for ext in formats:
