@@ -26,8 +26,7 @@ The options and their recommended print widths are in `references/demos.md`.
 
 Recommended width: `single` 90 mm / `onehalf` 140 mm / `double` 190 mm. A 2 × 2
 grid and a wide matrix want `double`; a single compact series often fits
-`single`. Every single-column figure shares the standard 62 × 44 mm axes box
-(black frame), so the rendered figure is normally narrower than 90 mm.
+`single`.
 
 ## 2) Axis labels and italic
 

@@ -72,7 +72,7 @@ def render_variant(spec, preset, outdir: Path, reuse: bool = False):
     png = outdir / f'{spec["id"]}_{preset}.png'
     if reuse and png.exists():
         mm = measure_width_mm(png, DPI)
-        ok = mm <= WXL_WIDTH_MM[preset] + 0.6
+        ok = abs(mm - WXL_WIDTH_MM[preset]) <= 0.6
         report = {"ok": ok, "sizes": ["reused"], "warnings": [], "problems": []}
         return png, mm, report, ok
     apply_wxl_style()
@@ -94,11 +94,7 @@ def render_variant(spec, preset, outdir: Path, reuse: bool = False):
                     target_width_mm=WXL_WIDTH_MM[preset])
     plt.close(fig)
     mm = measure_width_mm(png, DPI)
-    # With a fixed standard box the single-column content is naturally narrower
-    # than the column (there is no way to pad a 62 x 44 box out to 90 mm). The
-    # real constraint is that the figure must FIT the printed column, so accept
-    # anything up to the target width; only exceed it is a failure.
-    ok = report["ok"] and mm <= WXL_WIDTH_MM[preset] + 0.6
+    ok = report["ok"] and abs(mm - WXL_WIDTH_MM[preset]) <= 0.6
     return png, mm, report, ok
 
 

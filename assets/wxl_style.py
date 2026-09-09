@@ -374,40 +374,23 @@ def _legend_right_panel(fig, ax, leg):
         except Exception:                                  # pragma: no cover
             pass
     pos = ax.get_position()
-    # Keep the data axes at its full (standard) width and place the legend
-    # panel to its right, instead of shrinking the data box. This keeps the
-    # black frame the same size across single-column figures even when a
-    # legend needs a dedicated panel. The whole (data + panel) block is
-    # centred horizontally.
     leg_w = 0.30 * pos.width
-    gap = 0.02 * pos.width
-    total = pos.width + gap + leg_w
-    if total <= 1.0:
-        x_start = (1.0 - total) / 2.0
-        data_x = pos.width
-        ax.set_position([x_start, pos.y0, data_x, pos.height])
-        leg_x = x_start + data_x + gap
-        leg_ax = fig.add_axes([leg_x, pos.y0, leg_w, pos.height])
-    else:                                      # pragma: no cover
-        # figure too narrow; fall back to shrinking the data box
-        data_w = pos.width - leg_w - gap
-        ax.set_position([pos.x0, pos.y0, data_w, pos.height])
-        leg_ax = fig.add_axes([pos.x0 + data_w + gap, pos.y0, leg_w, pos.height])
+    data_w = pos.width - leg_w - 0.02 * pos.width
+    ax.set_position([pos.x0, pos.y0, data_w, pos.height])
+    leg_ax = fig.add_axes([pos.x0 + data_w + 0.02 * pos.width, pos.y0,
+                           leg_w, pos.height])
     leg_ax.set_axis_off()
     leg_ax.set_facecolor("none")
-    hand = leg_ax.legend(handles, labels, loc="center", frameon=True,
+    new_leg = leg_ax.legend(handles, labels, loc="center", frameon=True,
                             fontsize=WXL_FONTSIZE["legend"], ncol=1,
                             handlelength=1.6, handletextpad=0.6,
                             borderaxespad=0.0)
-    hand.get_frame().set_edgecolor("black")
-    hand.get_frame().set_linewidth(0.8)
-    hand.get_frame().set_alpha(1.0)
-    # mark panel so _standardize_axes_box can drop it when a single-column box
-    # leaves no room for a right panel
-    leg_ax._wxl_legend_panel = True
+    new_leg.get_frame().set_edgecolor("black")
+    new_leg.get_frame().set_linewidth(0.8)
+    new_leg.get_frame().set_alpha(1.0)
     # tight_layout would reset the manual positions and hide the panel again
     fig._wxl_no_tight = True
-    return hand
+    return new_leg
 
 
 def place_all_legends(fig, rounds: int = 2, candidates=None,
@@ -447,8 +430,7 @@ def place_all_legends(fig, rounds: int = 2, candidates=None,
                 elif flat is not None:
                     set_ncols(1)
                     place_legend_smart(ax, leg, candidates, fig)
-        if (res is not None and res[0] > panel_threshold
-                and not getattr(fig, "_wxl_no_panel", False)):
+        if res is not None and res[0] > panel_threshold:
             _legend_right_panel(fig, ax, leg)
             res = (0.0, "panel")
         out.append((ax, res))
@@ -987,75 +969,6 @@ def measure_width_mm(path, dpi: int | None = None) -> float:
     return px / dpi * 25.4
 
 
-#: standard single-column axes box (width x height) in millimetres, so every
-#: single-column figure's black frame is the same size.
-WXL_AXES_SINGLE_MM = (62.0, 44.0)
-
-
-def _standardize_axes_box(fig, w_mm: float, h_mm: float) -> int:
-    """Force every rectangular Cartesian axes to a fixed physical box.
-
-    Single-column figures otherwise get different axes sizes because each
-    figure's labels, legend and colorbar pull ``tight_layout`` differently. This
-    sets each rectilinear axes (polar axes and axes with ``axison == False`` are
-    skipped) to ``w_mm x h_mm``, centred horizontally, and tucks a colorbar next
-    to its host. Returns the number of axes resized.
-    """
-    fw, fh = (float(v) for v in fig.get_size_inches())
-    W, H = fw * 25.4, fh * 25.4
-    targets = [a for a in fig.get_axes()
-               if a.axison and not _is_polar(a) and not hasattr(a, "_colorbar")]
-    if not targets:
-        return 0
-    wf = w_mm / W
-    hf = h_mm / H
-    if wf >= 1.0 or hf >= 1.0:
-        return 0
-    x0 = (1.0 - wf) / 2.0
-    y0 = 0.07
-    for a in targets:
-        # an imshow / pcolorbox axes would otherwise override the box with its
-        # own aspect ratio, so force the box to be filled exactly
-        try:
-            a.set_aspect("auto")
-        except Exception:                                  # pragma: no cover
-            pass
-        a.set_position([x0, y0, wf, hf])
-    host = next((t for t in targets if t.images), None)
-    if host is not None:
-        hp = host.get_position()
-        for a in fig.get_axes():
-            if hasattr(a, "_colorbar"):
-                a.set_position([hp.x1 + 0.015 * hp.width, hp.y0,
-                                0.05 * hp.width, hp.height])
-    fig._wxl_no_tight = True
-    # A single-column figure has only ~10 mm of spare width once the standard
-    # 62 x 44 box and its axis labels are in place, so a right legend panel
-    # would overflow the column. Keep legends in-axes for these figures.
-    fig._wxl_no_panel = True
-    # Remove any legend-panel axes an earlier layout pass created, so the legend
-    # moves back in-axes and the total width stays inside the column.
-    for a in fig.get_axes()[:]:
-        if getattr(a, "_wxl_legend_panel", False):
-            hand = a.get_legend()
-            if hand is not None:
-                _hl = [(h, t.get_text()) for h, t in
-                       zip(hand.legend_handles, hand.get_texts())]
-                if _hl and targets:
-                    host = targets[0]
-                    host.legend([h for h, _ in _hl], [t for _, t in _hl],
-                                loc="best", frameon=True,
-                                fontsize=WXL_FONTSIZE["legend"],
-                                handlelength=1.6, handletextpad=0.6,
-                                borderaxespad=0.0)
-                    lg = host.get_legend()
-                    lg.get_frame().set_edgecolor("black")
-                    lg.get_frame().set_linewidth(0.8)
-                    lg.get_frame().set_alpha(1.0)
-            fig.delaxes(a)
-    return len(targets)
-
-
 def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                     close: bool = True, pad: float = 0.06, layout: bool = True,
                     target_width_mm: float | None = None, tol_mm: float = 0.5,
@@ -1071,16 +984,8 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
     ``figsize=(7.48, 5.20)`` (190 mm) often saves as ~158 mm wide. Inserting that
     image at its natural size keeps the text at 11 pt, but stretching it to fill
     a 190 mm column shrinks the text to ~8.3 pt. When ``target_width_mm`` is
-    given, the canvas width is calibrated (up to eight probe renders) so the
-    trimmed image is exactly that wide, and the aspect ratio is preserved.
-
-    Single-column output (``target_width_mm == 90.0``) is then put on the shared
-    standard box ``WXL_AXES_SINGLE_MM = (62.0, 44.0)`` mm: every rectilinear
-    Cartesian axes is resized to that box so all single-column black frames are
-    identical; polar axes, pies/donuts and colorbar axes are exempt and a
-    colorbar is tucked next to its host. Legends are kept in-axes at that size
-    (a right panel would overflow the column). Set ``fig._wxl_skip_std_axes =
-    True`` before calling to opt out of the standard box.
+    given, the canvas width is calibrated (two probe renders) so the trimmed
+    image is exactly that wide, and the aspect ratio is preserved.
     """
     out_path = Path(out_path)
     formats = formats or [out_path.suffix.lstrip(".") or "pdf"]
@@ -1142,13 +1047,6 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
     else:
         _prepare()
         _relayout()
-
-    # single-column figures share one standard axes box, so all their black
-    # frames are the same size; re-run the layout at that box
-    if target_width_mm == 90.0 and not getattr(fig, "_wxl_skip_std_axes", False):
-        if _standardize_axes_box(fig, *WXL_AXES_SINGLE_MM):
-            _prepare()
-            _relayout()
 
     saved = []
     for ext in formats:

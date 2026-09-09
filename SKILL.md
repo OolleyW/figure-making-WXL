@@ -68,27 +68,18 @@ These rules supersede any conflicting style text in `references/` or in upstream
    `bbox_inches="tight"` trims the canvas, always pass
    `target_width_mm=WXL_WIDTH_MM[preset]` to `finalize_figure` so the saved
    image is exactly the print width instead of ~17 % narrower.
-4. **One black frame size for every single-column figure.** After the width
-   calibration, `finalize_figure` forces each single-column figure's axes onto
-   the standard `WXL_AXES_SINGLE_MM = (62.0, 44.0)` mm box (polar axes, pies
-   and colorbar axes exempt), so the black frames match across all single-column
-   figures regardless of labels or legends. The trimmed image is then usually
-   narrower than 90 mm — fitting the column is the rule, not filling it.
-5. **Full box on every Cartesian axes.** All four spines drawn at 0.8 pt.
+4. **Full box on every Cartesian axes.** All four spines drawn at 0.8 pt.
    Exceptions: polar axes (radar), axes with `axison = False` (pie/donut) and
    colorbar axes.
-6. **Legend inside the axes, framed, and never covering data.** Opaque white
+5. **Legend inside the axes, framed, and never covering data.** Opaque white
    face, black 0.8 pt border, `framealpha = 1`. Placement is automatic:
    `prepare_figure` (called by `finalize_figure`) measures the real overlap
    between the legend box and the plotted lines, bars and points, tries the nine
    candidate positions, and if none is clear it grows the y-range and retries.
    `check_wxl_style` reports any legend that still covers more than 2 % of the
-   data. Use `ncol` for long label lists. A dedicated legend panel on the right
-   is used at 140 / 190 mm only when no position works; single-column figures
-   keep the legend in-axes (their standard box leaves no room for a panel) even
-   if that means a small residual overlap on dense charts. Never place it
-   outside the figure.
-7. **Ticks point inward, no grid, and both axis ends land on a tick value.**
+   data. Use `ncol` for long label lists, and fall back to a dedicated legend
+   panel only when no position works. Never place it outside the figure.
+6. **Ticks point inward, no grid, and both axis ends land on a tick value.**
    Ticks are 3 pt long at 0.8 pt width. Every numeric Cartesian axis must start
    and end exactly on its first and last tick label, so a reader never sees an
    unlabelled strip at either end. `finalize_figure` calls `lock_axis_ends_all`
@@ -97,18 +88,18 @@ These rules supersede any conflicting style text in `references/` or in upstream
    neutral grid so the values stay readable. Image axes (heatmaps), polar axes,
    colorbar axes and pie/donut axes are exempt because their ticks are
    categorical and already span the full extent.
-8. **Caption below the figure**, centered, via `add_caption`. Never
+7. **Caption below the figure**, centered, via `add_caption`. Never
    `fig.suptitle` and never a title on top of the axes. Panel labels go just
    below their own panel, centered, **not bold**, and carry a number plus a short
    title (`(a) Grouped bars`), not a bare `(a)`.
-9. **Deep-blue palette only.** Colors come from `WXL_PALETTE`; black, white and
+8. **Deep-blue palette only.** Colors come from `WXL_PALETTE`; black, white and
    the palette are the only allowed colors. See `references/design-theory.md`
    for the semantics.
-10. **Export PNG 600 dpi + PDF vector.** Saving uses `bbox_inches="tight"` so
-    the below-figure caption survives.
-11. **Run the audit.** Call `check_wxl_style(fig)` before saving and fix every
+9. **Export PNG 600 dpi + PDF vector.** Saving uses `bbox_inches="tight"` so
+   the below-figure caption survives.
+10. **Run the audit.** Call `check_wxl_style(fig)` before saving and fix every
     reported problem.
-12. **No text over the data.** Legends, value labels, annotations and tick labels
+11. **No text over the data.** Legends, value labels, annotations and tick labels
     must not cover the plotted artists. `prepare_figure` measures every text box
     against the lines, bars, points and other text: it nudges colliding
     annotations to a free offset, thins crowded tick labels by increasing the
@@ -116,7 +107,7 @@ These rules supersede any conflicting style text in `references/` or in upstream
     canvas size. `check_wxl_style` reports any remaining collision. When a label
     cannot be placed legibly, drop it rather than printing overlapping numbers.
 
-13. **Ask before you plot; do not decide for the user.** Before drawing, confirm
+12. **Ask before you plot; do not decide for the user.** Before drawing, confirm
     four things in a single question set: the **chart type** and how many panels,
     the **x and y axis labels** (text, units, and whether each symbol is
     italic), the **line style** (markers, width, dash pattern), and the

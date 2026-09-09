@@ -36,7 +36,7 @@ Ordered color cycle used when a helper is called without explicit colors:
 ### WXL_FONTSIZE
 
 ```python
-{"caption": 11, "label": 11, "tick": 11, "legend": 10, "annot": 11, "panel": 11}
+{"caption": 11, "label": 11, "tick": 11, "legend": 11, "annot": 11, "panel": 11}
 ```
 
 Uniform 11 pt for body text, 10 pt for the legend. The audit fails on any other size.
@@ -115,16 +115,12 @@ Candidates are tried in this order: `best`, `upper right`, `upper left`,
 `center right`. The score is computed by `_legend_overlap_score`; the search
 stops at the first position with score 0.
 
-### place_all_legends(fig, rounds=2, candidates=None, panel_threshold=0.01)
+### place_all_legends(fig, rounds=2, candidates=None)
 
 Refines every in-axes legend of a figure. If no candidate is clear, it grows the
 y-range on the side where the legend sits (35 % of the span), re-locks the axis
 ends and retries, up to `rounds` times. Polar axes, colorbar axes and axes with
-`axison == False` keep their hand-placed legend. When a legend still covers more
-than `panel_threshold` of the data it is moved into a dedicated legend-panel
-axes on the right (`_legend_right_panel`), unless `fig._wxl_no_panel = True`
-(the single-column standard box sets this, because a 62 × 44 mm axes leaves no
-column space for a panel).
+`axison == False` keep their hand-placed legend.
 
 ### prepare_figure(fig, lock_ends=True, auto_legend=True, auto_text=True)
 
@@ -214,23 +210,11 @@ uses `bbox_inches="tight"`. Returns the list of saved paths. Use
 numeric axis ends exactly on a tick label. Set it to `False` only for a figure
 whose axes must keep hand-set limits.
 
-`target_width_mm` iteratively calibrates the canvas width (up to eight probe
+`target_width_mm` iteratively calibrates the canvas width (up to six probe
 renders) so the **trimmed** image is exactly that wide while keeping the text at
 11 pt. Pass `WXL_WIDTH_MM[preset]`; without it a `double` figure saves around
 158 mm instead of 190 mm, and stretching it to fill the column drops the text to
 about 8.3 pt.
-
-For `target_width_mm == 90.0` (the single column) the axes are then forced onto
-the shared **standard box** `WXL_AXES_SINGLE_MM = (62.0, 44.0)`: every
-rectilinear Cartesian axes is resized to that physical size, centred
-horizontally, so all single-column black frames are identical regardless of the
-labels and legends around them. Polar axes (radar), pies/donuts and colorbar
-axes are excluded; a colorbar is tucked against its host. Because the box is
-fixed, the trimmed figure is normally *narrower* than 90 mm — the binding
-constraint is that it must fit the column, not fill it exactly. Legends stay
-in-axes (the right-panel fallback is disabled at this size: a 62 × 44 box plus a
-panel would overflow the column). Set `fig._wxl_skip_std_axes = True` before
-calling `finalize_figure` to opt a figure out of the standard box.
 
 ```python
 finalize_figure(fig, "figures/result", formats=["png", "pdf"], dpi=600,

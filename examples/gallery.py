@@ -800,11 +800,9 @@ def build(outdir: Path):
         width_mm = measure_width_mm(paths[0], 300)
         report["width_mm"] = round(width_mm, 2)
         report["target_mm"] = WXL_WIDTH_MM[spec["width"]]
-        # A single-column figure with the fixed standard box is naturally
-        # narrower than the printed column; only exceeding it is a failure.
-        if width_mm > report["target_mm"] + 0.6:
+        if abs(width_mm - report["target_mm"]) > 0.6:
             report["problems"].append(
-                f"saved width {width_mm:.2f} mm exceeds target "
+                f"saved width {width_mm:.2f} mm misses target "
                 f"{report['target_mm']:.0f} mm")
             report["ok"] = not report["problems"]
         records.append({**spec, "report": report, "png": paths[0].name})
