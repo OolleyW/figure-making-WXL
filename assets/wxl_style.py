@@ -1023,6 +1023,47 @@ def _resize_grid_panels(fig, w_mm: float, h_mm: float) -> int:
     return len(targets)
 
 
+def _match_row_gap_to_caption(fig, pad_pt: float = WXL_CAPTION_PAD_PT) -> bool:
+    """Set the gap between a panel row and the panel titles above it.
+
+    The top row's panel titles must sit ``pad_pt`` above the next row's panels,
+    the same distance the caption sits below the grid, so the two gaps read
+    alike. Rows below the first are shifted down (never the top row), which
+    keeps the column positions and the horizontal spacing untouched. Returns
+    True when the rows were moved.
+    """
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    axes = [a for a in fig.get_axes()
+            if a.axison and not _is_polar(a) and not hasattr(a, "_colorbar")]
+    if len(axes) < 2:
+        return False
+    rows: dict[float, list] = {}
+    for a in axes:
+        bb = a.get_window_extent()
+        rows.setdefault(round((bb.y0 + bb.y1) / 2.0, 3), []).append(a)
+    ys = sorted(rows, reverse=True)                    # top row first
+    if len(ys) < 2:
+        return False
+    lows = [t.get_window_extent(r).y0
+            for a in rows[ys[0]] for t in a.texts]
+    if not lows:
+        return False
+    next_top = max(a.get_window_extent().y1 for a in rows[ys[1]])
+    gap_px = min(lows) - next_top
+    target_px = pad_pt / 72.0 * fig.dpi
+    delta_px = target_px - gap_px
+    if abs(delta_px) < 0.5:
+        return False
+    dy = delta_px / (float(fig.get_size_inches()[1]) * fig.dpi)
+    for y in ys[1:]:
+        for a in rows[y]:
+            p = a.get_position()
+            a.set_position([p.x0, p.y0 - dy, p.width, p.height])
+    fig._wxl_no_tight = True
+    return True
+
+
 def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
                     close: bool = True, pad: float = 0.06, layout: bool = True,
                     target_width_mm: float | None = None, tol_mm: float = 0.5,
@@ -1110,6 +1151,11 @@ def finalize_figure(fig, out_path, formats=None, dpi: int | None = None,
         if _resize_grid_panels(fig, *panel_box):
             _prepare()
             _relayout()
+            # the top row's panel titles must clear the next row by the same
+            # 14 pt the caption uses below the grid
+            if _match_row_gap_to_caption(fig):
+                _prepare()
+                _relayout()
 
     saved = []
     for ext in formats:
