@@ -86,8 +86,11 @@ in `preview/`.
 | `references/tutorials.md` | three end-to-end walkthroughs |
 | `references/demos.md` | the 20 chart types with core calls |
 | `assets/wxl_style.py` | importable style module (rcParams, palette, helpers, audit) |
+| `assets/wxl_docx.py` | Word assembly: 100 % insertion, captions, three-line tables |
 | `scripts/check_wxl_style.py` | installation self-test |
 | `examples/gallery.py` | render all 20 types + an HTML gallery |
+| `examples/word_report.py` | render figures and assemble a Word report |
+| `requirements.txt` | dependencies (python-docx optional) |
 | `preview/*.png` | 300 dpi previews of the 20 chart types |
 
 ## Regenerate
@@ -98,6 +101,28 @@ python "<skill-dir>/scripts/check_wxl_style.py"
 
 # all 20 figures + HTML gallery (default output ~/wxl_gallery)
 python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
+
+# figures assembled into a Word report (needs python-docx)
+python "<skill-dir>/examples/word_report.py" --out ./wxl_report
+```
+
+## Word assembly
+
+`assets/wxl_docx.py` (needs `python-docx`) applies the same contract to the
+document: A4 with 10 mm side margins so the usable width is 190 mm, figures
+inserted at 100 % of their measured physical width, captions below figures,
+table captions above three-line tables, headings in black CJK serif bold with
+double spacing, body text in Times New Roman 10 pt with a two-character indent.
+
+```python
+from wxl_docx import new_document, add_heading, add_figure_block, add_three_line_table
+
+doc = new_document()
+add_heading(doc, "1  Results")
+add_figure_block(doc, "figures/accuracy.png", "Fig. 1  Accuracy across scenarios.")
+add_three_line_table(doc, ["Method", "Accuracy"], [["Proposed", "0.94"]],
+                     col_widths_cm=[12.0, 7.0], caption="表 1  Accuracy by method")
+doc.save("report.docx")
 ```
 
 ## Requirements

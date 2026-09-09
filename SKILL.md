@@ -24,6 +24,29 @@ Publication figures in the WXL house style. Open `references/` only as needed;
 do not preload every file. Start from the table at the bottom, then follow links
 inside the document you opened.
 
+## Installation
+
+This skill is self-contained and has no absolute paths. To install it on another
+machine or for another agent:
+
+1. **Copy the whole `figure-making-WXL` directory** into that agent's skills
+   directory. Common locations are `~/.dsh/skills/` (DSH) and
+   `~/.claude/skills/` (Claude Code). Keep the directory name.
+2. **Install the Python dependencies**: `pip install -r requirements.txt`
+   (matplotlib ≥ 3.5, numpy, Pillow, and python-docx for the Word assembly
+   module in `assets/wxl_docx.py`). The core style module needs only the first
+   three.
+3. **Verify the machine can reproduce the style**:
+   `python "<skill-dir>/scripts/check_wxl_style.py"` must print
+   `RESULT: PASS`. If it reports a font problem, install Times New Roman (or the
+   metric-compatible Nimbus Roman No9 L / Liberation Serif) and rerun.
+4. **Point your scripts at the skill** with the idiom in Quickstart below. Your
+   skill loader already knows the directory; `WXL_SKILL_DIR` overrides the
+   default `~/.dsh/skills/figure-making-WXL`.
+
+Nothing else needs configuring. See the Portability section for what is
+guaranteed on any conforming machine and what varies with the installed fonts.
+
 ## Hard rules (non-negotiable)
 
 These rules supersede any conflicting style text in `references/` or in upstream
@@ -110,6 +133,42 @@ The 20 chart types the style covers, each with its core call, are listed in
 `references/demos.md`; runnable code for all of them lives in
 `examples/gallery.py`.
 
+## Assembling the figures into Word
+
+`assets/wxl_docx.py` turns finished figures into a manuscript-ready `.docx`
+(requires `python-docx`). It applies the same paper contract the figures follow:
+A4 with 10 mm side margins so the usable width is exactly 190 mm, figures
+inserted at 100 % of their measured physical width, captions below figures,
+table captions above three-line tables, section headings in black CJK serif bold
+with double spacing, body text in Times New Roman 10 pt with a two-character
+first-line indent.
+
+```python
+from wxl_docx import (new_document, add_heading, add_paragraph,
+                      add_figure_block, add_three_line_table)
+
+doc = new_document()                       # A4, 190 mm usable width
+add_paragraph(doc, "Results are shown in Fig. 1.", spacing=1.5)
+add_heading(doc, "1  Results")
+add_figure_block(doc, "figures/accuracy.png", "Fig. 1  Accuracy across scenarios.",
+                 dpi=600)
+add_three_line_table(doc, ["Method", "Accuracy"], [["Proposed", "0.94"]],
+                     col_widths_cm=[12.0, 7.0],
+                     caption="表 1  Accuracy by method")
+doc.save("report.docx")
+```
+
+A complete runnable pipeline (render three figures, audit them, assemble the
+document, print the inserted widths) is `examples/word_report.py`:
+
+```bash
+python "<skill-dir>/examples/word_report.py" --out ./wxl_report
+```
+
+Figures must come from `finalize_figure(..., target_width_mm=...)` so their
+physical width is the print width; otherwise `add_figure` inserts a wrongly sized
+image and the 10 pt match is lost.
+
 ## Portability (another machine or another agent)
 
 The skill is self-contained and has no absolute paths. Scripts resolve the skill
@@ -125,7 +184,7 @@ style.
 | Times New Roman | Mandatory **by name**. Present on Windows and on macOS with Office. On Linux the stack falls back to Nimbus Roman No9 L or Liberation Serif, which are metric-compatible Times clones, and `check_wxl_style` accepts them. A few glyph details differ. |
 | CJK text | SimSun on Windows. Elsewhere install a CJK serif (Noto Serif CJK, Songti) or keep figure text in English. |
 | `legend.set_ncols` | Used for the flatten fallback when available (matplotlib ≥ 3.6); skipped silently otherwise. |
-| `python-docx` | Never imported by the skill. Only needed by Word-assembly scripts you write yourself. |
+| `python-docx` | Only imported by `assets/wxl_docx.py`; the core style module never imports it. Figures work without it. |
 
 What is guaranteed on any conforming machine: 10 pt Times text, the deep-blue
 palette, full-box axes, framed legends placed by measured overlap, inward ticks,
@@ -157,5 +216,8 @@ axis ends on tick values, the 90 / 140 / 190 mm width calibration, and a
 | [references/tutorials.md](references/tutorials.md) | End-to-end walkthroughs (bar, trend + band, heatmap) |
 | [references/demos.md](references/demos.md) | The 20 chart types and where the runnable code lives |
 | `assets/wxl_style.py` | The importable style module (rcParams, palette, helpers, audit) |
+| `assets/wxl_docx.py` | Word assembly: 100 % insertion, captions, three-line tables |
 | `scripts/check_wxl_style.py` | Run `python scripts/check_wxl_style.py` to self-test the install |
 | `examples/gallery.py` | Render all 20 chart types plus an HTML preview gallery |
+| `examples/word_report.py` | Render figures and assemble a Word report end to end |
+| `requirements.txt` | Python dependencies (matplotlib, numpy, Pillow; python-docx optional) |

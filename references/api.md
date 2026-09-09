@@ -190,6 +190,54 @@ Physical width of a saved raster file in millimetres (`px / dpi × 25.4`). Use i
 to verify that a figure really is 90 / 140 / 190 mm wide before inserting it into
 a manuscript.
 
+---
+
+## Word assembly (`assets/wxl_docx.py`)
+
+Optional module that assembles finished figures into a manuscript-style `.docx`.
+It needs `python-docx`. Import it the same way as `wxl_style`.
+
+### new_document(side_mm=10, top_mm=20, bottom_mm=20, base_size=10) -> Document
+
+A4 document whose usable text width is `210 − 2 × side_mm` millimetres, 190 mm by
+default. Body style is Times New Roman 10 pt with a CJK fallback.
+
+### add_heading(doc, text, size=12)
+
+Section heading in black CJK serif bold, double line spacing, no indent.
+
+### add_paragraph(doc, text, size=10, bold=False, align=None, font=TNR, spacing=2.0, indent_chars=2, space_after=0)
+
+Body paragraph with the paper contract defaults: 10 pt Times, double spacing,
+two-character first-line indent.
+
+### add_caption(doc, text, size=10, spacing=1.5, space_after=6)
+
+Centered caption. Use it **below** a figure and **above** a table.
+
+### add_figure(doc, png, dpi=600, space_after=4) -> float
+
+Inserts the image centered at 100 % of its measured physical width and returns
+that width in millimetres. The PNG must come from
+`finalize_figure(..., target_width_mm=...)`, otherwise the inserted size is wrong
+and the 10 pt match is lost.
+
+### add_figure_block(doc, png, caption, dpi=600) -> float
+
+`add_figure` followed by `add_caption`.
+
+### add_three_line_table(doc, headers, rows, col_widths_cm=None, caption=None, font_size=10, spacing=1.5)
+
+Three-line table: 1.5 pt top rule, 0.75 pt header rule, 1.5 pt bottom rule, no
+vertical rules. The caption goes above the table. Column widths default to an
+even split of the 190 mm usable width.
+
+### add_page_break(doc)
+
+Insert a page break.
+
+---
+
 ### check_wxl_style(fig, style=None, strict_sizes=True) -> dict
 
 Audits a live figure. Returns:
