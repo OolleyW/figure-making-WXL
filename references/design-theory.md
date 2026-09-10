@@ -98,13 +98,13 @@ ink edges keep the figures print-safe.
 
 | Key | Hex | Name | Meaning | Typical use |
 |---|---|---|---|---|
-| `primary` | `#1875BA` | Periwinkle Blue | the method or series you are arguing for | main bars, main curve |
-| `secondary` | `#68A8CC` | Lavender Dusk | supporting role | extra series |
-| `contrast` | `#C21F30` | Coral Bloom | baseline or competitor | comparison bars/curves |
-| `improve` | `#0C8B94` | Seafoam Mist | improvement, variant | ablation, positive deltas |
-| `accent` | `#E7674A` | Coral Peach | emphasis | annotations, highlighted points |
-| `neutral` | `#777F85` | Slate Violet | reference, background | gridlines, target lines |
-| `light` | `#FCB796` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
+| `primary` | `#8FA2D6` | Periwinkle Blue | the method or series you are arguing for | main bars, main curve |
+| `secondary` | `#6A5C95` | Lavender Dusk | supporting role | extra series |
+| `contrast` | `#D99AAE` | Coral Bloom | baseline or competitor | comparison bars/curves |
+| `improve` | `#A9CBB8` | Seafoam Mist | improvement, variant | ablation, positive deltas |
+| `accent` | `#E7A889` | Coral Peach | emphasis | annotations, highlighted points |
+| `neutral` | `#5B608C` | Slate Violet | reference, background | gridlines, target lines |
+| `light` | `#CFE3E6` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
 
 Design intent:
 

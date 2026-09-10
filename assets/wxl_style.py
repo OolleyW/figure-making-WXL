@@ -33,20 +33,20 @@ from matplotlib.font_manager import findfont
 # Constants
 # --------------------------------------------------------------------------
 
-#: Spectra-derived science palette. The six colours were sampled off a
-#: multi-panel XRD / FTIR / XPS / Raman figure: a deep blue and a light blue for
-#: the two main traces, a dark red for the reference / competitor trace, a teal
-#: for the fitted components, an orange for the Raman bands and a peach for the
-#: light fit fills. The sheet has no grey, so ``neutral`` is derived from the
-#: primary by dropping its saturation to 10 % at value 0.52.
+#: Soft pastel science palette. The seven colours are the "extracted core
+#: palette" supplied by the user: a diffuse lavender / deep slate pair for the
+#: main roles, a coral pair (bloom / peach) and a seafoam for the comparison and
+#: gain roles, and a pale aqua for light fills. The light members carry the large
+#: areas so a big bar or stacked area stays calm; the two deep violets are kept
+#: for thin lines, emphasis and references.
 WXL_PALETTE = {
-    "primary": "#1875BA",    # deep blue   - proposed method / main series
-    "secondary": "#68A8CC",  # light blue  - supporting series
-    "contrast": "#C21F30",   # dark red    - baseline / competing method
-    "improve": "#0C8B94",    # teal        - improvement / positive variant
-    "accent": "#E7674A",     # orange      - emphasis, annotations
-    "neutral": "#777F85",    # derived grey- reference lines, grid, background
-    "light": "#FCB796",      # peach       - light fill, uncertainty bands
+    "primary": "#8FA2D6",    # Periwinkle Blue - proposed method / main series
+    "secondary": "#6A5C95",  # Lavender Dusk   - supporting series
+    "contrast": "#D99AAE",   # Coral Bloom     - baseline / competing method
+    "improve": "#A9CBB8",    # Seafoam Mist    - improvement / positive variant
+    "accent": "#E7A889",     # Coral Peach     - emphasis, annotations
+    "neutral": "#5B608C",    # Slate Violet    - reference lines, grid, background
+    "light": "#CFE3E6",      # Pale Aqua       - light fill, uncertainty bands
 }
 
 #: Ink for text: axis labels, tick labels and annotations. Pure black, so the
@@ -60,14 +60,13 @@ WXL_INK = "#000000"
 WXL_FRAME = "#000000"
 
 #: Colour-map stops, interpolated from the palette so a heatmap or contour is
-#: always the same family as the line work around it. ``div`` runs dark red ->
-#: peach -> clear -> light blue -> deep blue through a neutral centre (signed
-#: data); ``seq`` runs near-white -> light blue -> deep blue (single-sided
-#: magnitudes).
+#: always the same family as the line work around it. ``div`` runs coral bloom ->
+#: clear -> periwinkle through a neutral centre (signed data); ``seq`` runs
+#: near-white -> seafoam -> periwinkle -> slate violet (single-sided magnitudes).
 WXL_CMAP_STOPS = {
-    "div_rose_blue": ["#C21F30", "#E7674A", "#FCB796", "#F6F7F9", "#8FC0DA",
-                      "#1875BA"],
-    "seq_blue": ["#F6F9FC", "#CFE3F0", "#68A8CC", "#1875BA", "#0F4670"],
+    "div_rose_blue": ["#C9738F", "#D99AAE", "#F2DEE4", "#F6F7FA", "#C9D4EE",
+                      "#8FA2D6", "#6E86C4"],
+    "seq_blue": ["#F5F7FC", "#D7E6EA", "#A9CBB8", "#8FA2D6", "#5B608C"],
 }
 for _name, _stops in WXL_CMAP_STOPS.items():
     matplotlib.colormaps.register(
