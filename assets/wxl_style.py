@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 import matplotlib.transforms
 import numpy as np
 from matplotlib import text as mtext
-from matplotlib.colors import to_hex
+from matplotlib.colors import LinearSegmentedColormap, to_hex
 from matplotlib.font_manager import findfont
 
 # --------------------------------------------------------------------------
@@ -35,15 +35,18 @@ from matplotlib.font_manager import findfont
 
 #: Soft science palette (muted pastel series, journal-figure look). The light
 #: members carry the large fills, so a big bar or stacked area stays calm; the
-#: two deep violets are kept for thin lines, emphasis and references.
+#: two deep violets are kept for thin lines, emphasis and references. The seven
+#: values were sampled off the reference stacked-bar chart (mode colour of each
+#: segment) and adopted as-is; ``light`` is a 68 %-toward-white tint of
+#: ``primary``, since the reference chart has no light fill role.
 WXL_PALETTE = {
-    "primary": "#8FA2D6",    # Periwinkle Blue  - proposed method / main series
-    "secondary": "#6A5C95",  # Lavender Dusk    - supporting series
-    "contrast": "#D99AAE",   # Coral Bloom      - baseline / competing method
-    "improve": "#A9CBB8",    # Seafoam Mist     - improvement / positive variant
-    "accent": "#E7A889",     # Coral Peach      - emphasis, annotations
-    "neutral": "#5B608C",    # Slate Violet     - reference lines, grid, background
-    "light": "#CFE3E6",      # Pale Aqua        - light fill, uncertainty bands
+    "primary": "#9FB2DD",    # Periwinkle Blue  - proposed method / main series
+    "secondary": "#8780B8",  # Lavender Dusk    - supporting series
+    "contrast": "#E69AB0",   # Coral Bloom      - baseline / competing method
+    "improve": "#B8D3C4",    # Seafoam Mist     - improvement / positive variant
+    "accent": "#EEBEA8",     # Coral Peach      - emphasis, annotations
+    "neutral": "#555C82",    # Slate Violet     - reference lines, grid, background
+    "light": "#E0E6F4",      # pale Periwinkle  - light fill, uncertainty bands
 }
 
 #: Ink for text, axes, annotations and every outline. A deep slate rather than
@@ -51,11 +54,26 @@ WXL_PALETTE = {
 #: keeping the contrast of a near-black.
 WXL_INK = "#2E3142"
 
-#: Default diverging colour map for matrices and correlation heatmaps.
-WXL_CMAP = "RdBu_r"
+#: Colour-map stops, interpolated from the palette so a heatmap or contour is
+#: always the same family as the line work around it. ``div`` runs rose -> clear
+#: -> periwinkle through a neutral centre (signed data); ``seq`` runs near-white
+#: -> periwinkle -> deep slate violet (single-sided magnitudes).
+WXL_CMAP_STOPS = {
+    "div_rose_blue": ["#C9738F", "#E69AB0", "#F2DEE4", "#F6F7FA",
+                      "#C9D4EE", "#9FB2DD", "#6E86C4"],
+    "seq_blue": ["#F5F7FC", "#D3DCF1", "#9FB2DD", "#8780B8", "#555C82"],
+}
+for _name, _stops in WXL_CMAP_STOPS.items():
+    matplotlib.colormaps.register(
+        LinearSegmentedColormap.from_list(f"wxl_{_name}", _stops), force=True)
 
-#: Sequential / signed colour maps that stay inside the house look.
-WXL_CMAPS = {"diverging": "RdBu_r", "sequential": "Blues", "signed": "coolwarm"}
+#: Default diverging colour map for matrices and correlation heatmaps.
+WXL_CMAP = "wxl_div_rose_blue"
+
+#: Colour maps that stay inside the house look. ``signed`` uses the same
+#: rose <-> blue ramp as ``diverging``; the palette has no second diverging pair.
+WXL_CMAPS = {"diverging": "wxl_div_rose_blue", "sequential": "wxl_seq_blue",
+             "signed": "wxl_div_rose_blue"}
 
 #: Colour cycle used when a helper is called without explicit colours.
 WXL_SERIES = [

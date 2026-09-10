@@ -74,7 +74,7 @@ the colours — the skill never decides these for them. See `references/preferen
 | Target | Elsevier / IEEE / Springer |
 | Font | Times New Roman + STIX math, SimSun for CJK |
 | Type scale | 11 pt body, legend 10 pt |
-| Palette | soft science 7-colour set: Periwinkle Blue `#8FA2D6` primary, Coral Bloom `#D99AAE` contrast, Seafoam Mist `#A9CBB8` improve, Coral Peach `#E7A889` accent, Lavender Dusk `#6A5C95` secondary, Slate Violet `#5B608C` neutral, Pale Aqua `#CFE3E6` light |
+| Palette | soft science 7-colour set: Periwinkle Blue `#9FB2DD` primary, Coral Bloom `#E69AB0` contrast, Seafoam Mist `#B8D3C4` improve, Coral Peach `#EEBEA8` accent, Lavender Dusk `#8780B8` secondary, Slate Violet `#555C82` neutral, Pale Aqua `#E0E6F4` light |
 | Axes | full box, 0.8 pt spines |
 | Legend | inside the axes, white face, ink (#2E3142) 0.8 pt border |
 | Ticks | inward, no grid, both axis ends land on a tick label |
@@ -291,13 +291,13 @@ The only colours allowed are the palette, the ink `#2E3142`, black and white.
 
 | Key | Hex | Name | Meaning | Typical use |
 |---|---|---|---|---|
-| `primary` | `#8FA2D6` | Periwinkle Blue | the method you argue for | main bars, main curve |
-| `secondary` | `#6A5C95` | Lavender Dusk | supporting series | extra series |
-| `contrast` | `#D99AAE` | Coral Bloom | baseline / competitor | comparison bars / curves |
-| `improve` | `#A9CBB8` | Seafoam Mist | improvement / variant | ablation, positive deltas |
-| `accent` | `#E7A889` | Coral Peach | emphasis | annotations, highlighted points |
-| `neutral` | `#5B608C` | Slate Violet | reference / background | gridlines, target lines |
-| `light` | `#CFE3E6` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
+| `primary` | `#9FB2DD` | Periwinkle Blue | the method you argue for | main bars, main curve |
+| `secondary` | `#8780B8` | Lavender Dusk | supporting series | extra series |
+| `contrast` | `#E69AB0` | Coral Bloom | baseline / competitor | comparison bars / curves |
+| `improve` | `#B8D3C4` | Seafoam Mist | improvement / variant | ablation, positive deltas |
+| `accent` | `#EEBEA8` | Coral Peach | emphasis | annotations, highlighted points |
+| `neutral` | `#555C82` | Slate Violet | reference / background | gridlines, target lines |
+| `light` | `#E0E6F4` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
 
 The light members carry the area and the two deep violets carry the lines: only
 Lavender Dusk and Slate Violet are dark (luminance ≈ 99/255), so the large fills
@@ -313,9 +313,9 @@ improve → accent → secondary → neutral`.
 
 | Key | Colormap | When |
 |---|---|---|
-| `diverging` | `RdBu_r` (default) | signed values, e.g. a correlation heatmap |
-| `sequential` | `Blues` | non-negative, e.g. a magnitude field |
-| `signed` | `coolwarm` | signed values with more contrast |
+| `diverging` | `wxl_div_rose_blue` (default) | signed values, e.g. a correlation heatmap |
+| `sequential` | `wxl_seq_blue` | non-negative, e.g. a magnitude field |
+| `signed` | `wxl_div_rose_blue` | same rose -> blue ramp |
 
 ### What to confirm before drawing
 

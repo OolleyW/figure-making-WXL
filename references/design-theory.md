@@ -91,26 +91,29 @@ at most a two-entry legend. If a panel feels crowded at 90 mm, move it to
 A soft, low-saturation "science" set of seven colours, in the spirit of the soft
 pastel palettes used by modern journal-figure libraries (for example SciPalette's
 pastel sets, the AAAS/Nature palettes in `ggsci`, and the `science` preset in
-`plotstyle`). Muted fills with ink edges keep the figures calm and print-safe.
+`plotstyle`). The source colours were taken to **85 % HSV saturation** (hue and
+value unchanged) after a saturation review on the stacked-area chart: the layers
+stay separable while the fills keep the calm, low-chroma look. Muted fills with
+ink edges keep the figures print-safe.
 
 | Key | Hex | Name | Meaning | Typical use |
 |---|---|---|---|---|
-| `primary` | `#8FA2D6` | Periwinkle Blue | the method or series you are arguing for | main bars, main curve |
-| `secondary` | `#6A5C95` | Lavender Dusk | supporting role | extra series |
-| `contrast` | `#D99AAE` | Coral Bloom | baseline or competitor | comparison bars/curves |
-| `improve` | `#A9CBB8` | Seafoam Mist | improvement, variant | ablation, positive deltas |
-| `accent` | `#E7A889` | Coral Peach | emphasis | annotations, highlighted points |
-| `neutral` | `#5B608C` | Slate Violet | reference, background | gridlines, target lines |
-| `light` | `#CFE3E6` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
+| `primary` | `#9FB2DD` | Periwinkle Blue | the method or series you are arguing for | main bars, main curve |
+| `secondary` | `#8780B8` | Lavender Dusk | supporting role | extra series |
+| `contrast` | `#E69AB0` | Coral Bloom | baseline or competitor | comparison bars/curves |
+| `improve` | `#B8D3C4` | Seafoam Mist | improvement, variant | ablation, positive deltas |
+| `accent` | `#EEBEA8` | Coral Peach | emphasis | annotations, highlighted points |
+| `neutral` | `#555C82` | Slate Violet | reference, background | gridlines, target lines |
+| `light` | `#E0E6F4` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
 
 Design intent:
 
 - **The light members carry the area, the deep ones carry the line.** This set
-  has only two dark colours (Lavender Dusk #6A5C95 and Slate Violet #5B608C,
-  both luminance ≈ 99/255); the other five sit at 162–223. Putting a deep violet
-  on `primary` fills the largest bar or stacked area with the darkest ink and
-  makes the whole figure read heavy, so `primary` is the light periwinkle and the
-  deep violets are reserved for thin lines, emphasis and references.
+  has only two dark colours (Lavender Dusk and Slate Violet, both luminance
+  ≈ 95/255); the other five sit at 160–222. Putting a deep violet on `primary`
+  fills the largest bar or stacked area with the darkest ink and makes the whole
+  figure read heavy, so `primary` is the light periwinkle and the deep violets are
+  reserved for thin lines, emphasis and references.
 - Coral is reserved for the thing you compare against, so a reader who only skims
   the colour still reads the comparison.
 - Seafoam marks gain; peach marks emphasis. Do not use them as a second baseline.
@@ -126,8 +129,8 @@ Design intent:
   survives a black-and-white print. When more than four series are needed, add
   hatch or marker-shape encoding rather than new hues.
 
-Colour maps: `RdBu_r` for signed matrices (correlation), `Blues` for
-non-negative fields (intensity, temperature), `coolwarm` when the sign matters
+Colour maps: `wxl_div_rose_blue` for signed matrices (correlation), `wxl_seq_blue` for
+non-negative fields (intensity, temperature), `wxl_seq_blue` when the sign matters
 and more contrast is needed.
 
 ---

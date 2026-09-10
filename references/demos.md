@@ -57,8 +57,8 @@ wider than it looks inside the 75 × 55 mm single-column frame.
 
 | id | Chart | Width | Core call |
 |---|---|---|---|
-| `heatmap` | Annotated correlation heatmap | double | `ax.imshow(m, cmap="RdBu_r", vmin=-1, vmax=1)` |
-| `contour` | Filled contour field | double | `ax.contourf(X, Y, Z, levels=12, cmap="Blues")` |
+| `heatmap` | Annotated correlation heatmap | double | `ax.imshow(m, cmap="wxl_div_rose_blue", vmin=-1, vmax=1)` |
+| `contour` | Filled contour field | double | `ax.contourf(X, Y, Z, levels=12, cmap=WXL_CMAPS["sequential"])` |
 
 ## Special family
 

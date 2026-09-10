@@ -24,7 +24,7 @@ SKILL = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (  # noqa: E402
-    WXL_AXES_PANEL_MM, WXL_CMAP, WXL_FIGSIZE, WXL_FONTSIZE, WXL_INK,
+    WXL_AXES_PANEL_MM, WXL_CMAP, WXL_CMAPS, WXL_FIGSIZE, WXL_FONTSIZE, WXL_INK,
     WXL_PALETTE, WXL_WIDTH_MM, add_caption, add_caption_below, annotate_bars,
     apply_wxl_style, center_grid, check_wxl_style, create_subplots,
     finalize_figure, framed_legend, measure_width_mm, panel_tag, prepare_figure,
@@ -443,8 +443,8 @@ def fig_strip_mean():
 # matrix family
 # --------------------------------------------------------------------------
 @figure("heatmap", "热图（带色条与数值）", "matrix",
-        "相关系数矩阵，RdBu_r 发散色图，单元格标数值。只出单栏版。",
-        'im = ax.imshow(m, cmap="RdBu_r", vmin=-1, vmax=1)\n'
+        "相关系数矩阵，玫红↔蓝发散色图（采样配色适配），单元格标数值。只出单栏版。",
+        'im = ax.imshow(m, cmap=WXL_CMAP, vmin=-1, vmax=1)\n'
         'cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)\n'
         'cb.outline.set_linewidth(0.8)', width="single")
 def fig_heatmap():
@@ -470,7 +470,8 @@ def fig_heatmap():
 
 @figure("contour", "填色等值线图", "matrix",
         "二维场分布，色条显示量级，适合应力场、温度场等。",
-        'cf = ax.contourf(X, Y, Z, levels=12, cmap="Blues")\n'
+        'cf = ax.contourf(X, Y, Z, levels=12,\n'
+        '                 cmap=WXL_CMAPS["sequential"])\n'
         'cb = fig.colorbar(cf, ax=ax, fraction=0.046, pad=0.03)')
 def fig_contour():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
@@ -478,7 +479,7 @@ def fig_contour():
     y = np.linspace(-3, 3, 160)
     X, Y = np.meshgrid(x, y)
     Z = np.exp(-(X ** 2 + Y ** 2) / 2) + 0.6 * np.exp(-((X - 1.2) ** 2 + (Y + 1.0) ** 2))
-    cf = ax.contourf(X, Y, Z, levels=12, cmap="Blues")
+    cf = ax.contourf(X, Y, Z, levels=12, cmap=WXL_CMAPS["sequential"])
     ax.set_xlabel("x (mm)")
     ax.set_ylabel("y (mm)")
     cb = fig.colorbar(cf, ax=ax, fraction=0.046, pad=0.03)
@@ -745,7 +746,7 @@ HTML_HEAD = """<!doctype html>
   .card .head{display:flex;justify-content:space-between;align-items:baseline;
               gap:10px;padding:9px 12px 6px;border-bottom:1px solid #e6e6e6}
   .card .head h3{margin:0;font-family:"Times New Roman",serif;font-size:15px}
-  .card .cat{font-size:11.5px;color:#fff;background:#6A5C95;padding:1px 7px;border-radius:2px}
+  .card .cat{font-size:11.5px;color:#fff;background:#8780B8;padding:1px 7px;border-radius:2px}
   .card img{width:100%;height:auto;display:block;background:#fff;cursor:zoom-in;
             border-bottom:1px solid #e6e6e6}
   .card .body{padding:9px 12px 12px;font-size:12.5px;color:#333}

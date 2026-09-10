@@ -118,7 +118,7 @@ m = rng.uniform(-1, 1, (6, 6))
 m = (m + m.T) / 2
 np.fill_diagonal(m, 1.0)
 
-im = ax.imshow(m, cmap="RdBu_r", vmin=-1, vmax=1)   # WXL_CMAP
+im = ax.imshow(m, cmap="wxl_div_rose_blue", vmin=-1, vmax=1)   # WXL_CMAP
 ticks = [f"V{i+1}" for i in range(6)]
 ax.set_xticks(range(6), ticks)
 ax.set_yticks(range(6), ticks)

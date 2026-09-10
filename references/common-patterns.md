@@ -178,7 +178,7 @@ add_caption(fig, "Fig. 4  Multi-panel comparison of the four settings.")
   40 mm wide, which cannot hold a 11 pt legend. Render multi-panel figures in
   double column only.
 - Keep a heatmap out of the grid. A colorbar adds a fifth axes, its aspect is
-  fixed, and the shared `RdBu_r` scale competes with the other panels. Show it as
+  fixed, and the shared `wxl_div_rose_blue` scale competes with the other panels. Show it as
   its own figure instead.
 - Mixing types in one grid (bar + line + box + scatter) is fine as long as the
   type scale, spine width and color semantics stay identical.
@@ -194,7 +194,7 @@ cb.outline.set_linewidth(0.8)
 ```
 
 - Always set `vmin`/`vmax` explicitly; auto-scaling makes panels incomparable.
-- Use `RdBu_r` for signed data and `Blues` for non-negative fields.
+- Use `wxl_div_rose_blue` for signed data and `wxl_seq_blue` for non-negative fields.
 - Annotate cells only when the matrix is 8 × 8 or smaller.
 - Colorbar axes are exempt from the full-box check but must still use inward
   ticks and a 0.8 pt outline.

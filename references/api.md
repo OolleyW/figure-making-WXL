@@ -11,13 +11,13 @@ skill's `assets/` directory to `sys.path`.
 
 ```python
 WXL_PALETTE = {
-    "primary":   "#8FA2D6",   # Periwinkle Blue - proposed method / main series
-    "secondary": "#6A5C95",   # Lavender Dusk   - supporting series
-    "contrast":  "#D99AAE",   # Coral Bloom     - baseline / competing method
-    "improve":   "#A9CBB8",   # Seafoam Mist    - improvement / positive variant
-    "accent":    "#E7A889",   # Coral Peach     - emphasis, annotations
-    "neutral":   "#5B608C",   # Slate Violet    - reference lines, grid, background
-    "light":     "#CFE3E6",   # Pale Aqua       - light fill, uncertainty bands
+    "primary":   "#9FB2DD",   # Periwinkle Blue - proposed method / main series
+    "secondary": "#8780B8",   # Lavender Dusk   - supporting series
+    "contrast":  "#E69AB0",   # Coral Bloom     - baseline / competing method
+    "improve":   "#B8D3C4",   # Seafoam Mist    - improvement / positive variant
+    "accent":    "#EEBEA8",   # Coral Peach     - emphasis, annotations
+    "neutral":   "#555C82",   # Slate Violet    - reference lines, grid, background
+    "light":     "#E0E6F4",   # Pale Aqua       - light fill, uncertainty bands
 }
 ```
 
@@ -40,8 +40,10 @@ is still accepted by the audit.
 
 ### WXL_CMAP / WXL_CMAPS
 
-`WXL_CMAP = "RdBu_r"` is the default diverging map. `WXL_CMAPS` also offers
-`"Blues"` (sequential) and `"coolwarm"` (signed) for matrices and fields.
+`WXL_CMAP = "wxl_div_rose_blue"` is the default diverging map, built by
+interpolating the palette (rose -> neutral -> periwinkle) so a heatmap always
+matches the line work around it. `WXL_CMAPS` also offers `"wxl_seq_blue"`
+(near-white -> periwinkle -> deep slate) for single-sided fields.
 
 ### WXL_SERIES
 

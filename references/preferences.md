@@ -75,8 +75,8 @@ Ask the per-series colour mapping, and for matrices the colormap.
   Bloom pink (`contrast`), gain = Seafoam Mist sage (`improve`), emphasis = Coral
   Peach (`accent`), supporting = Lavender Dusk (`secondary`), reference = Slate
   Violet (`neutral`).
-- Matrices: `WXL_CMAP` = `RdBu_r` (signed), `Blues` (non-negative),
-  `coolwarm` (signed, more contrast).
+- Matrices: `WXL_CMAPS`: `wxl_div_rose_blue` (diverging, signed values),
+  `wxl_seq_blue` (sequential, non-negative).
 - If the user names a keyword (e.g. "Nature", "Science", "彩图1"), map it to a
   palette and confirm the concrete colours.
 
