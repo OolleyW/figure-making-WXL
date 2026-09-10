@@ -33,20 +33,30 @@ from matplotlib.font_manager import findfont
 # Constants
 # --------------------------------------------------------------------------
 
-#: Soft pastel science palette, lifted for an airy print look. The "extracted
-#: core palette" seven colours are taken 35 % toward white (hue unchanged), so a
-#: large fill never reads as a heavy mass: measured on a stacked bar the mean
-#: luminance of the non-white pixels rises from 141 to 165. The light members
-#: still carry the biggest areas; the two violets stay on thin lines, emphasis
-#: and references.
+#: Fill palette (light). Used for every large filled area - bars, stacked areas,
+#: violin bodies, histograms, box fills, uncertainty bands - so a big mass never
+#: reads heavy. Each key has a darker twin in :data:`WXL_LINE_PALETTE`.
 WXL_PALETTE = {
-    "primary": "#B6C3E4",    # Periwinkle Blue - proposed method / main series
-    "secondary": "#9E95BA",  # Lavender Dusk   - supporting series
-    "contrast": "#E6BDCA",   # Coral Bloom     - baseline / competing method
-    "improve": "#C7DDD1",    # Seafoam Mist    - improvement / positive variant
-    "accent": "#EFC6B2",     # Coral Peach     - emphasis, annotations
-    "neutral": "#9498B4",    # Slate Violet    - reference lines, grid, background
-    "light": "#E0EDEF",      # Pale Aqua       - light fill, uncertainty bands
+    "primary": "#B7CCF2",    # Periwinkle Blue - proposed method / main series
+    "secondary": "#968EBE",  # Lavender Dusk   - supporting series
+    "contrast": "#F5C0D5",   # Coral Bloom     - baseline / competing method
+    "improve": "#CDE9D7",    # Seafoam Mist    - improvement / positive variant
+    "accent": "#FFC4B1",     # Coral Peach     - emphasis, annotations
+    "neutral": "#8D95B6",    # Slate Violet    - reference areas, background
+    "light": "#ECFEFF",      # Pale Aqua       - light fill, uncertainty bands
+}
+
+#: Line palette (deep). The darker twin of each fill colour, used for curves,
+#: markers, marker edges, error bars and reference lines, so lines stay crisp
+#: and coloured instead of grey against the light fills.
+WXL_LINE_PALETTE = {
+    "primary": "#4E76C1",    # deep blue
+    "secondary": "#392A86",  # deep violet
+    "contrast": "#C35D86",   # deep rose
+    "improve": "#80B793",    # green
+    "accent": "#D05D38",     # burnt orange
+    "neutral": "#2F3D7E",    # navy
+    "light": "#AACDCF",      # teal
 }
 
 #: Ink for text: axis labels, tick labels and annotations. Pure black, so the
@@ -80,10 +90,16 @@ WXL_CMAP = "wxl_div_rose_blue"
 WXL_CMAPS = {"diverging": "wxl_div_rose_blue", "sequential": "wxl_seq_blue",
              "signed": "wxl_div_rose_blue"}
 
-#: Colour cycle used when a helper is called without explicit colours.
+#: Colour cycle used when a helper is called without explicit colours. The fill
+#: cycle is for patches; the line cycle is for curves and markers.
 WXL_SERIES = [
     WXL_PALETTE["primary"], WXL_PALETTE["contrast"], WXL_PALETTE["improve"],
     WXL_PALETTE["accent"], WXL_PALETTE["secondary"], WXL_PALETTE["neutral"],
+]
+WXL_SERIES_LINE = [
+    WXL_LINE_PALETTE["primary"], WXL_LINE_PALETTE["contrast"],
+    WXL_LINE_PALETTE["improve"], WXL_LINE_PALETTE["accent"],
+    WXL_LINE_PALETTE["secondary"], WXL_LINE_PALETTE["neutral"],
 ]
 
 #: 11 pt type scale for body text, with the legend restored to 10 pt.
@@ -1502,6 +1518,7 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
 
     # ---- colours -------------------------------------------------------
     allowed_colors = ({v.upper() for v in WXL_PALETTE.values()}
+                      | {v.upper() for v in WXL_LINE_PALETTE.values()}
                       | {WXL_FRAME.upper(), WXL_INK.upper(), "#FFFFFF"})
     for art in fig.findobj(lambda a: isinstance(a, matplotlib.lines.Line2D)):
         if not art.get_visible():

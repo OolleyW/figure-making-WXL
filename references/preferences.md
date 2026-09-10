@@ -69,12 +69,13 @@ would just smear.
 Ask the per-series colour mapping, and for matrices the colormap.
 
 - Default series order: `WXL_SERIES` = primary, contrast, improve, accent,
-  secondary, neutral.
-- Colour semantics to confirm: proposed / key method = Periwinkle Blue
-  (`primary`, light so a large fill stays calm), baseline / competitor = Coral
-  Bloom pink (`contrast`), gain = Seafoam Mist sage (`improve`), emphasis = Coral
-  Peach (`accent`), supporting = Lavender Dusk (`secondary`), reference = Slate
-  Violet (`neutral`).
+  secondary, neutral (both the fill and the line cycle).
+- Two palettes share the same keys: **fills** use the light `WXL_PALETTE`, **lines
+  and markers** use the deep `WXL_LINE_PALETTE`. Confirm the per-series key, and
+  whether a series is drawn as a filled area, a line, or a line with markers.
+- Colour semantics to confirm: proposed / key method = `primary`, baseline /
+  competitor = `contrast`, gain = `improve`, emphasis = `accent`, supporting =
+  `secondary`, reference = `neutral`.
 - Matrices: `WXL_CMAPS`: `wxl_div_rose_blue` (diverging, signed values),
   `wxl_seq_blue` (sequential, non-negative).
 - If the user names a keyword (e.g. "Nature", "Science", "彩图1"), map it to a

@@ -7,36 +7,39 @@ skill's `assets/` directory to `sys.path`.
 
 ## Constants
 
-### WXL_PALETTE
+### WXL_PALETTE / WXL_LINE_PALETTE
+
+Two palettes share the same seven keys. `WXL_PALETTE` is the light **fill** set;
+`WXL_LINE_PALETTE` is the deep **line / marker** set.
 
 ```python
-WXL_PALETTE = {
-    "primary":   "#B6C3E4",   # Periwinkle Blue - proposed method / main series
-    "secondary": "#9E95BA",   # Lavender Dusk   - supporting series
-    "contrast":  "#E6BDCA",   # Coral Bloom     - baseline / competing method
-    "improve":   "#C7DDD1",   # Seafoam Mist    - improvement / positive variant
-    "accent":    "#EFC6B2",   # Coral Peach     - emphasis, annotations
-    "neutral":   "#9498B4",   # Slate Violet    - reference lines, grid, background
-    "light":     "#E0EDEF",   # Pale Aqua       - light fill, uncertainty bands
+WXL_PALETTE = {                       # light fills
+    "primary":   "#B7CCF2", "secondary": "#968EBE", "contrast": "#F5C0D5",
+    "improve":   "#CDE9D7", "accent":    "#FFC4B1", "neutral":  "#8D95B6",
+    "light":     "#ECFEFF",
+}
+WXL_LINE_PALETTE = {                  # deep lines / markers
+    "primary":   "#4E76C1", "secondary": "#392A86", "contrast": "#C35D86",
+    "improve":   "#80B793", "accent":    "#D05D38", "neutral":  "#2F3D7E",
+    "light":     "#AACDCF",
 }
 ```
 
-Only these colors plus the ink `#2E3142`, black and white are allowed.
-`check_wxl_style` enforces it.
+Filled artists (`bar`, `stackplot`, `hist`, `violin`, `box`, `fill_between`,
+`pie`) take `WXL_PALETTE` with the ink outline on top. Lines and points (`plot`,
+`scatter`, `step`, `errorbar`, marker edges, reference lines) take
+`WXL_LINE_PALETTE`; markers stay white-filled with a line-colour edge. Only these
+colours plus black and white are allowed, and `check_wxl_style` enforces it.
 
-### WXL_INK
+### WXL_INK / WXL_FRAME
 
 ```python
-WXL_INK = "#2E3142"
+WXL_INK = "#000000"    # text, axis labels, tick labels, annotations
+WXL_FRAME = "#000000"  # spines, tick marks, legend border, bar / marker outlines
 ```
 
-The colour for text, axis labels, tick labels, annotations, spines, tick marks,
-the legend border and every bar / marker outline. A deep slate instead of pure
-black, so the line work reads calmer against the pastel fills while keeping
-near-black contrast. `apply_wxl_style` installs it for `text.color`,
-`axes.labelcolor`, `axes.edgecolor`, `xtick.color`, `ytick.color` and
-`legend.edgecolor`; pass `edgecolor=WXL_INK` on patches and markers. Pure black
-is still accepted by the audit.
+Both are pure black by default and are kept as separate constants so the frame
+and the type can diverge later (for example a deep slate frame with black text).
 
 ### WXL_CMAP / WXL_CMAPS
 
@@ -45,9 +48,10 @@ interpolating the palette (rose -> neutral -> periwinkle) so a heatmap always
 matches the line work around it. `WXL_CMAPS` also offers `"wxl_seq_blue"`
 (near-white -> periwinkle -> deep slate) for single-sided fields.
 
-### WXL_SERIES
+### WXL_SERIES / WXL_SERIES_LINE
 
-Ordered color cycle used when a helper is called without explicit colors:
+Ordered colour cycles used when a helper is called without explicit colours:
+the fill cycle `WXL_SERIES` and the line cycle `WXL_SERIES_LINE`, both
 `primary, contrast, improve, accent, secondary, neutral`.
 
 ### WXL_FONTSIZE

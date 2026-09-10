@@ -25,12 +25,13 @@ sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (  # noqa: E402
     WXL_AXES_PANEL_MM, WXL_CMAP, WXL_CMAPS, WXL_FIGSIZE, WXL_FONTSIZE, WXL_INK,
-    WXL_PALETTE, WXL_WIDTH_MM, add_caption, add_caption_below, annotate_bars,
-    apply_wxl_style, center_grid, check_wxl_style, create_subplots,
+    WXL_LINE_PALETTE, WXL_PALETTE, WXL_WIDTH_MM, add_caption, add_caption_below,
+    annotate_bars, apply_wxl_style, center_grid, check_wxl_style, create_subplots,
     finalize_figure, framed_legend, measure_width_mm, panel_tag, prepare_figure,
 )
 
-P = WXL_PALETTE
+P = WXL_PALETTE          # light fills
+PL = WXL_LINE_PALETTE    # deep lines / markers
 RNG = np.random.default_rng(20260910)
 
 # --------------------------------------------------------------------------
@@ -82,8 +83,8 @@ def fig_line_markers():
          [0.22, 0.34, 0.44, 0.53, 0.60, 0.66, 0.71, 0.76, 0.80, 0.83, 0.86]),
     ]
     for name, key, mk, vals in series:
-        ax.plot(x, vals, "-", marker=mk, color=P[key], lw=2.0, ms=5.0,
-                mfc="white", mec=P[key], mew=0.6, label=name)
+        ax.plot(x, vals, "-", marker=mk, color=PL[key], lw=2.0, ms=5.0,
+                mfc="white", mec=PL[key], mew=0.6, label=name)
     ax.set_xlabel("Age (d)")
     ax.set_ylabel("Degree of hydration (-)")
     ax.set_xlim(0, 10)
@@ -115,7 +116,7 @@ def fig_grouped_bar():
         e = np.full_like(v, 0.02)
         bars = ax.bar(x + (i - 1) * w, v, w, yerr=e, label=name,
                       color=P[key], edgecolor=WXL_INK, linewidth=0.5,
-                      error_kw=dict(elinewidth=0.5, capsize=2, ecolor=P[key]))
+                      error_kw=dict(elinewidth=0.5, capsize=2, ecolor=PL[key]))
         annotate_bars(ax, bars, y_offset_frac=0.035)   # skipped when too wide
     ax.set_xticks(x)
     ax.set_xticklabels(cats)
@@ -196,7 +197,7 @@ def fig_line_trend():
               ("Method D", "accent", "D", 0.50, 0.015)]
     for name, key, mk, base, slope in curves:
         y = base + slope * x + RNG.normal(0, 0.005, x.size)
-        ax.plot(x, y, "-", marker=mk, color=P[key], lw=1.5, ms=3.5, mfc="white",
+        ax.plot(x, y, "-", marker=mk, color=PL[key], lw=1.5, ms=3.5, mfc="white",
                 mew=0.6, label=name)
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Score")
@@ -219,8 +220,8 @@ def fig_line_band():
         y = base + slope * x
         band = sd * (1 + 0.12 * x)
         ax.fill_between(x, y - band, y + band, color=P["light"] if key == "primary"
-                        else P["neutral"], alpha=0.35, edgecolor=P[key], linewidth=0.5)
-        ax.plot(x, y, "-", color=P[key], lw=1.5, label=label)
+                        else P["neutral"], alpha=0.35, edgecolor=PL[key], linewidth=0.5)
+        ax.plot(x, y, "-", color=PL[key], lw=1.5, label=label)
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Response (mV)")
     framed_legend(ax, loc="upper left")
@@ -262,11 +263,11 @@ def fig_scatter_fit():
                                     ("Group II", "accent", 0.86, 0.9)]:
         x = RNG.uniform(2, 9, 45)
         y = slope * x + RNG.normal(0, noise, x.size)
-        ax.scatter(x, y, s=14, color=P[key], edgecolor=WXL_INK, linewidth=0.4,
+        ax.scatter(x, y, s=14, color=PL[key], edgecolor=WXL_INK, linewidth=0.4,
                    alpha=0.85, label=name)
         k, b = np.polyfit(x, y, 1)
         xs = np.linspace(x.min(), x.max(), 50)
-        ax.plot(xs, k * xs + b, "-", color=P[key], lw=1.2)
+        ax.plot(xs, k * xs + b, "-", color=PL[key], lw=1.2)
     ax.set_xlabel("Measured")
     ax.set_ylabel("Predicted")
     framed_legend(ax, loc="upper left")
@@ -283,10 +284,10 @@ def fig_bubble():
     x = RNG.uniform(1, 10, 18)
     y = 0.6 * x + RNG.normal(0, 1.0, 18)
     size = RNG.uniform(20, 260, 18)
-    ax.scatter(x, y, s=size, color=P["primary"], edgecolor=WXL_INK,
+    ax.scatter(x, y, s=size, color=PL["primary"], edgecolor=WXL_INK,
                linewidth=0.4, alpha=0.75, label="Sample")
     big = np.argsort(size)[-3:]
-    ax.scatter(x[big], y[big], s=size[big], color=P["accent"], edgecolor=WXL_INK,
+    ax.scatter(x[big], y[big], s=size[big], color=PL["accent"], edgecolor=WXL_INK,
                linewidth=0.4, alpha=0.9, label="Outlier candidate")
     ax.set_xlabel("Dosage (mg)")
     ax.set_ylabel("Response")
@@ -305,10 +306,10 @@ def fig_errorbar():
     y = 1.8 * np.log(x) + 0.9
     xe = np.full_like(x, 0.25)
     ye = np.full_like(x, 0.18)
-    ax.errorbar(x, y, xerr=xe, yerr=ye, fmt="o", color=P["primary"],
+    ax.errorbar(x, y, xerr=xe, yerr=ye, fmt="o", color=PL["primary"],
                 mfc="white", ms=3.5, mew=0.6, elinewidth=0.5, capsize=2,
                 label="Measured")
-    ax.plot(x, 1.8 * np.log(x) + 0.9, "-", color=P["contrast"], lw=1.5,
+    ax.plot(x, 1.8 * np.log(x) + 0.9, "-", color=PL["contrast"], lw=1.5,
             label="Model")
     ax.set_xlabel("Strain (%)")
     ax.set_ylabel("Stress (MPa)")
@@ -386,8 +387,8 @@ def fig_hist_kde():
     ax.hist(data, bins=22, density=True, color=P["light"], edgecolor=WXL_INK,
             linewidth=0.5, label="Histogram")
     grid = np.linspace(data.min() - 0.5, data.max() + 0.5, 400)
-    ax.plot(grid, _kde(data, grid), "-", color=P["primary"], lw=1.5, label="KDE")
-    ax.axvline(float(np.mean(data)), color=P["contrast"], lw=1.2, ls="--",
+    ax.plot(grid, _kde(data, grid), "-", color=PL["primary"], lw=1.5, label="KDE")
+    ax.axvline(float(np.mean(data)), color=PL["contrast"], lw=1.2, ls="--",
                label="Mean")
     ax.set_xlabel("Residual (mm)")
     ax.set_ylabel("Density")
@@ -429,7 +430,7 @@ def fig_strip_mean():
     sds = [1.1, 1.4, 0.9, 1.6]
     for i, (key, mu, sd) in enumerate(zip(keys, means, sds)):
         y = RNG.normal(mu, sd, 26)
-        ax.scatter(i + RNG.normal(0, 0.07, y.size), y, s=12, color=P[key],
+        ax.scatter(i + RNG.normal(0, 0.07, y.size), y, s=12, color=PL[key],
                    alpha=0.6, edgecolor=WXL_INK, linewidth=0.3,
                    label=labels[i])
     ax.errorbar(np.arange(4), means, yerr=sds, fmt="s", color=WXL_INK,
@@ -511,7 +512,7 @@ def fig_radar():
     for name, key, vals in [("Mix A", "primary", [0.85, 0.72, 0.90, 0.55, 0.80]),
                             ("Mix B", "contrast", [0.70, 0.88, 0.65, 0.78, 0.60])]:
         v = np.concatenate([vals, vals[:1]])
-        ax.plot(theta, v, "-o", color=P[key], lw=1.5, ms=3.5, mfc="white",
+        ax.plot(theta, v, "-o", color=PL[key], lw=1.5, ms=3.5, mfc="white",
                 mew=0.6, label=name)
         ax.fill(theta, v, color=P[key], alpha=0.12)
     ax.set_xticks(theta[:-1])
@@ -519,7 +520,7 @@ def fig_radar():
     ax.set_ylim(0, 1.05)
     ax.set_yticks([0.25, 0.5, 0.75, 1.0])
     ax.set_yticklabels(["0.25", "0.50", "0.75", "1.00"])
-    ax.grid(True, color=P["neutral"], alpha=0.35, linewidth=0.5)
+    ax.grid(True, color=PL["neutral"], alpha=0.35, linewidth=0.5)
     ax.tick_params(direction="in")
     framed_legend(ax, loc="lower right", bbox_to_anchor=(1.16, -0.08))
     add_caption_below(fig, r"$\mathbf{Fig.}$  18  Radar chart of five performance indices.")
@@ -616,9 +617,9 @@ def fig_multi_panel():
 
     ax = axes[1]
     x = np.linspace(0, 10, 11)
-    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=1.5, ms=3.5,
+    ax.plot(x, 0.5 + 0.03 * x, "-o", color=PL["primary"], lw=1.5, ms=3.5,
             mfc="white", mew=0.6, label="Curve 1")
-    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=1.5, ms=3.5,
+    ax.plot(x, 0.45 + 0.02 * x, "-s", color=PL["improve"], lw=1.5, ms=3.5,
             mfc="white", mew=0.6, label="Curve 2")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
@@ -644,7 +645,7 @@ def fig_multi_panel():
                                     ("Set 2", "accent", 0.85, 0.9)]:
         xs = RNG.uniform(2, 9, 40)
         ys = slope * xs + RNG.normal(0, noise, xs.size)
-        ax.scatter(xs, ys, s=14, color=P[key], edgecolor=WXL_INK, linewidth=0.4,
+        ax.scatter(xs, ys, s=14, color=PL[key], edgecolor=WXL_INK, linewidth=0.4,
                    alpha=0.85, label=name)
     ax.set_xlabel("Measured")
     ax.set_ylabel("Predicted")
@@ -684,9 +685,9 @@ def fig_multi_panel_1x3():
 
     ax = axes[1]
     x = np.linspace(0, 10, 11)
-    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=1.5, ms=3.5,
+    ax.plot(x, 0.5 + 0.03 * x, "-o", color=PL["primary"], lw=1.5, ms=3.5,
             mfc="white", mew=0.6, label="Curve 1")
-    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=1.5, ms=3.5,
+    ax.plot(x, 0.45 + 0.02 * x, "-s", color=PL["improve"], lw=1.5, ms=3.5,
             mfc="white", mew=0.6, label="Curve 2")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")

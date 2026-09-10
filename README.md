@@ -286,24 +286,28 @@ accepted by the audit for backward compatibility.
 
 ### Colour palette
 
-The only colours allowed are the palette, the ink `#2E3142`, black and white.
+Two palettes share the same seven keys. **Fills** use the light set, **lines and
+markers** use the deep set, so a large filled area stays airy while a curve or a
+point stays crisp and coloured.
 
 ![WXL_PALETTE](img/palette.png)
 
-| Key | Hex | Name | Meaning | Typical use |
-|---|---|---|---|---|
-| `primary` | `#B6C3E4` | Periwinkle Blue | the method you argue for | main bars, main curve |
-| `secondary` | `#9E95BA` | Lavender Dusk | supporting series | extra series |
-| `contrast` | `#E6BDCA` | Coral Bloom | baseline / competitor | comparison bars / curves |
-| `improve` | `#C7DDD1` | Seafoam Mist | improvement / variant | ablation, positive deltas |
-| `accent` | `#EFC6B2` | Coral Peach | emphasis | annotations, highlighted points |
-| `neutral` | `#9498B4` | Slate Violet | reference / background | gridlines, target lines |
-| `light` | `#E0EDEF` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
+| Key | Fill `WXL_PALETTE` | Line `WXL_LINE_PALETTE` | Meaning |
+|---|---|---|---|
+| `primary` | `#B7CCF2` | `#4E76C1` | the method you argue for |
+| `secondary` | `#968EBE` | `#392A86` | supporting series |
+| `contrast` | `#F5C0D5` | `#C35D86` | baseline / competitor |
+| `improve` | `#CDE9D7` | `#80B793` | improvement / variant |
+| `accent` | `#FFC4B1` | `#D05D38` | emphasis |
+| `neutral` | `#8D95B6` | `#2F3D7E` | reference / background |
+| `light` | `#ECFEFF` | `#AACDCF` | light fill / faint line |
 
-The light members carry the area and the two deep violets carry the lines: only
-Lavender Dusk and Slate Violet are dark (luminance ≈ 99/255), so the large fills
-use the light periwinkle, coral, seafoam and peach, and the deep violets are kept
-for thin lines, emphasis and references.
+- Bars, stacked areas, violin bodies, histograms, box fills, uncertainty bands
+  and pies take the **fill** colour, with the 0.5 pt ink outline on top.
+- Curves, scatter points, markers, marker edges, error bars and reference lines
+  take the **line** colour; markers stay white-filled with a line-colour edge.
+- A legend handle for a filled artist shows the fill colour; a line handle shows
+  the line colour.
 
 Default series order without an explicit mapping: `primary → contrast →
 improve → accent → secondary → neutral`.

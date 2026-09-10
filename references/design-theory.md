@@ -91,43 +91,37 @@ at most a two-entry legend. If a panel feels crowded at 90 mm, move it to
 A soft, low-saturation "science" set of seven colours, in the spirit of the soft
 pastel palettes used by modern journal-figure libraries (for example SciPalette's
 pastel sets, the AAAS/Nature palettes in `ggsci`, and the `science` preset in
-`plotstyle`). The source colours were taken to **85 % HSV saturation** (hue and
-value unchanged) after a saturation review on the stacked-area chart: the layers
-stay separable while the fills keep the calm, low-chroma look. Muted fills with
-ink edges keep the figures print-safe.
+`plotstyle`). The palette is **split in two**: a light set for fills and a deep
+set for lines, so a large area never reads as a heavy mass while a curve or a
+point stays crisp and coloured.
 
-| Key | Hex | Name | Meaning | Typical use |
-|---|---|---|---|---|
-| `primary` | `#B6C3E4` | Periwinkle Blue | the method or series you are arguing for | main bars, main curve |
-| `secondary` | `#9E95BA` | Lavender Dusk | supporting role | extra series |
-| `contrast` | `#E6BDCA` | Coral Bloom | baseline or competitor | comparison bars/curves |
-| `improve` | `#C7DDD1` | Seafoam Mist | improvement, variant | ablation, positive deltas |
-| `accent` | `#EFC6B2` | Coral Peach | emphasis | annotations, highlighted points |
-| `neutral` | `#9498B4` | Slate Violet | reference, background | gridlines, target lines |
-| `light` | `#E0EDEF` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
+| Key | Fill | Line | Meaning |
+|---|---|---|---|
+| `primary` | `#B7CCF2` | `#4E76C1` | the method or series you are arguing for |
+| `secondary` | `#968EBE` | `#392A86` | supporting role |
+| `contrast` | `#F5C0D5` | `#C35D86` | baseline or competitor |
+| `improve` | `#CDE9D7` | `#80B793` | improvement, variant |
+| `accent` | `#FFC4B1` | `#D05D38` | emphasis |
+| `neutral` | `#8D95B6` | `#2F3D7E` | reference, background |
+| `light` | `#ECFEFF` | `#AACDCF` | fill / faint line |
 
 Design intent:
 
-- **The light members carry the area, the deep ones carry the line.** This set
-  has only two dark colours (Lavender Dusk and Slate Violet, both luminance
-  ≈ 95/255); the other five sit at 160–222. Putting a deep violet on `primary`
-  fills the largest bar or stacked area with the darkest ink and makes the whole
-  figure read heavy, so `primary` is the light periwinkle and the deep violets are
-  reserved for thin lines, emphasis and references.
+- **Fills are light, lines are deep.** Bars, stacked areas, violin bodies,
+  histograms, box fills, bands and pies take `WXL_PALETTE` (light) with the
+  0.5 pt ink outline on top; curves, scatter points, markers, marker edges, error
+  bars and reference lines take `WXL_LINE_PALETTE` (deep). A marker is white-filled
+  with a line-colour edge, so the shape — not the fill — carries the series.
 - Coral is reserved for the thing you compare against, so a reader who only skims
   the colour still reads the comparison.
 - Seafoam marks gain; peach marks emphasis. Do not use them as a second baseline.
-- Slate violet is the deliberate low-chroma one: it is the only colour used for
-  reference lines and grids, so nothing in the data competes with it.
-- These are 300 dpi-ready pastels, so the 0.5 pt ink edge on every patch does
-  the definition work that a saturated fill would otherwise do.
-- **Ink, not black.** Text, axes, annotations and every outline use
-  `WXL_INK = "#2E3142"`, a deep slate. It keeps near-black contrast but reads
-  calmer against the pastels than pure black. The audit accepts pure black too,
-  so existing figures do not break.
-- Grayscale safety: the set separates by lightness as well as hue, so the figure
-  survives a black-and-white print. When more than four series are needed, add
-  hatch or marker-shape encoding rather than new hues.
+- Slate violet / navy is the deliberate low-chroma pair: `neutral` is the only key
+  used for reference lines and grids, so nothing in the data competes with it.
+- Text and the frame are pure black (`WXL_INK` / `WXL_FRAME = "#000000"`), kept as
+  separate constants so the frame can diverge from the type later.
+- Grayscale safety: each key separates by lightness between its fill and line, so
+  the figure survives a black-and-white print. When more than four series are
+  needed, add hatch or marker-shape encoding rather than new hues.
 
 Colour maps: `wxl_div_rose_blue` for signed matrices (correlation), `wxl_seq_blue` for
 non-negative fields (intensity, temperature), `wxl_seq_blue` when the sign matters

@@ -101,9 +101,10 @@ These rules supersede any conflicting style text in `references/` or in upstream
    `fig.suptitle` and never a title on top of the axes. Panel labels go just
    below their own panel, centered, **not bold**, and carry a number plus a short
    title (`(a) Grouped bars`), not a bare `(a)`.
-9. **Soft science palette only.** Colors come from `WXL_PALETTE`; black, white and
-   the palette are the only allowed colors. See `references/design-theory.md`
-   for the semantics.
+9. **Soft science palette only, in two sets.** Fills come from the light
+   `WXL_PALETTE`, lines and markers from the deep `WXL_LINE_PALETTE`; black, white
+   and those two palettes are the only allowed colors. See
+   `references/design-theory.md` for the semantics.
 10. **Export PNG 600 dpi + PDF vector.** Saving uses `bbox_inches="tight"` so
     the below-figure caption survives.
 11. **Run the audit.** Call `check_wxl_style(fig)` before saving and fix every
@@ -151,14 +152,16 @@ SKILL = Path(os.environ.get(
     "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-wxl"))
 sys.path.insert(0, str(SKILL / "assets"))
 
-from wxl_style import (WXL_PALETTE as P, WXL_FIGSIZE, apply_wxl_style,
-                       create_subplots, framed_legend, add_caption,
-                       finalize_figure, check_wxl_style)
+from wxl_style import (WXL_PALETTE as P, WXL_LINE_PALETTE as PL, WXL_FIGSIZE,
+                       apply_wxl_style, create_subplots, framed_legend,
+                       add_caption, finalize_figure, check_wxl_style)
 
 apply_wxl_style()
 fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
-ax.bar([1, 2, 3], [0.7, 0.85, 0.92], color=P["primary"],
-       edgecolor="black", linewidth=0.8, label="Proposed")
+ax.bar([1, 2, 3], [0.7, 0.85, 0.92], color=P["primary"],        # light fill
+       edgecolor="black", linewidth=0.5, label="Proposed")
+ax.plot([1, 2, 3], [0.6, 0.7, 0.8], "-o", color=PL["contrast"], # deep line
+        mfc="white", mec=PL["contrast"], mew=0.6, ms=3.5, label="Baseline")
 ax.set_xlabel("Scenario")
 ax.set_ylabel("Accuracy")
 ax.set_ylim(0, 1.2)
