@@ -167,7 +167,7 @@ python "<skill-dir>/examples/word_report.py" --out ./wxl_report
 ## Chart types (21)
 
 Bar: grouped with error bars, stacked, horizontal.
-Line: multi-curve marker chart (distinct marker style and fill per series),
+Line: multi-curve marker chart (one marker shape per series, all white-filled),
 multi-series trend, trend + uncertainty band, stacked area.
 Relationship: scatter + fit, bubble, bidirectional error bars.
 Distribution: box, violin, histogram + KDE, ECDF, strip + mean.
@@ -197,7 +197,7 @@ layouts, `multi_panel` and `multi_panel_1x3`, keep their full width).
 |---|---|---|
 | <img src="preview/line_trend.png" width="300"> | <img src="preview/line_band.png" width="300"> | <img src="preview/stacked_area.png" width="300"> |
 
-| **Multi-curve marker chart** — five curves, each with its own marker shape and fill |
+| **Multi-curve marker chart** — five curves, one white-filled marker shape each |
 |---|
 | <img src="preview/line_markers.png" width="420"> |
 
@@ -277,8 +277,8 @@ accepted by the audit for backward compatibility.
 
 | Attribute | Options |
 |---|---|
-| Markers | open circle (default, white fill), square, triangle, diamond, down-triangle, or none for dense data |
-| Marker fill | solid colour, hollow white, or half-filled (`fillstyle`) — vary it per series so a black-and-white print still separates them |
+| Markers | open circle (default), square, triangle, diamond, down-triangle, or none for dense data |
+| Marker fill | white fill with a coloured edge, so only the shape carries the series identity and the figure survives a black-and-white print |
 | Line width | 1.5 pt (default), 1.0 pt for many series, 2.0 pt for the key curve |
 | Dash | solid (default) for the main series; dashed for a reference / baseline |
 | Marker frequency | every point (default), every 2nd–5th for dense data |

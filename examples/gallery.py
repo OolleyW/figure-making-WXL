@@ -58,33 +58,32 @@ def _kde(x, grid, bw=None):
 # --------------------------------------------------------------------------
 # line / marker family (shown first)
 # --------------------------------------------------------------------------
-@figure("line_markers", "多曲线点线图（不同点样式与填充）", "line",
-        "一张图叠放五条测量曲线，每条曲线的标记形状和填充方式都不同，"
-        "即使黑白打印也能靠点形和实心/空心区分。",
-        'for name, key, mk, filled, vals in series:\n'
+@figure("line_markers", "多曲线点线图（不同点样式）", "line",
+        "一张图叠放五条测量曲线，每条曲线的标记形状都不同、统一白色填充，"
+        "即使黑白打印也能靠点形区分。",
+        'for name, key, mk, vals in series:\n'
         '    ax.plot(x, vals, "-", marker=mk, color=PALETTE[key], lw=1.5,\n'
-        '            mfc=PALETTE[key] if filled else "white",\n'
-        '            mec=PALETTE[key], mew=0.9, ms=4.2, label=name)')
+        '            mfc="white", mec=PALETTE[key], mew=0.9, ms=4.2, label=name)')
 def fig_line_markers():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["single"])
     x = np.linspace(0, 10, 11)
-    # (label, palette key, marker, solid fill?, values)
+    # (label, palette key, marker, values) - every marker is white-filled, so
+    # only the shape carries the series identity
     series = [
-        ("Mix A", "primary", "o", True,
+        ("Mix A", "primary", "o",
          [0.30, 0.43, 0.54, 0.62, 0.69, 0.75, 0.79, 0.83, 0.86, 0.89, 0.91]),
-        ("Mix B", "contrast", "s", False,
+        ("Mix B", "contrast", "s",
          [0.15, 0.26, 0.36, 0.44, 0.51, 0.57, 0.62, 0.67, 0.71, 0.75, 0.78]),
-        ("Mix C", "improve", "^", True,
+        ("Mix C", "improve", "^",
          [0.08, 0.17, 0.25, 0.32, 0.38, 0.44, 0.49, 0.54, 0.58, 0.62, 0.66]),
-        ("Mix D", "accent", "D", False,
+        ("Mix D", "accent", "D",
          [0.38, 0.52, 0.63, 0.72, 0.78, 0.83, 0.87, 0.90, 0.92, 0.94, 0.95]),
-        ("Mix E", "secondary", "v", True,
+        ("Mix E", "secondary", "v",
          [0.22, 0.34, 0.44, 0.53, 0.60, 0.66, 0.71, 0.76, 0.80, 0.83, 0.86]),
     ]
-    for name, key, mk, filled, vals in series:
+    for name, key, mk, vals in series:
         ax.plot(x, vals, "-", marker=mk, color=P[key], lw=1.5, ms=4.2,
-                mfc=P[key] if filled else "white", mec=P[key], mew=0.9,
-                label=name)
+                mfc="white", mec=P[key], mew=0.9, label=name)
     ax.set_xlabel("Age (d)")
     ax.set_ylabel("Degree of hydration (-)")
     ax.set_xlim(0, 10)
@@ -92,7 +91,7 @@ def fig_line_markers():
     ax.set_ylim(0, 1.55)
     framed_legend(ax, loc="upper left", ncol=2, columnspacing=0.9,
                   handlelength=1.3, handletextpad=0.5, labelspacing=0.35)
-    add_caption_below(fig, r"$\mathbf{Fig.}$  1  Multi-series line chart with distinct marker styles and fills.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  1  Multi-series line chart with distinct marker shapes.")
     return fig
 
 
