@@ -2,7 +2,7 @@
 
 Why the WXL style looks the way it does. Everything here is derived from the
 locked decisions: Elsevier / IEEE / Springer target, Times New Roman, uniform
-11 pt, deep-blue palette, full box, framed legend, inward ticks, no grid.
+11 pt, soft science palette, full box, framed legend, inward ticks, no grid.
 
 ---
 
@@ -88,27 +88,39 @@ at most a two-entry legend. If a panel feels crowded at 90 mm, move it to
 
 ## 2) Palette semantics
 
-| Key | Hex | Meaning | Typical use |
-|---|---|---|---|
-| `primary` | `#1F4E79` | the method or series you are arguing for | main bars, main curve |
-| `secondary` | `#4E86C6` | same family, supporting role | extra blue series |
-| `contrast` | `#B64342` | baseline or competitor | comparison bars/curves |
-| `improve` | `#2E8B7A` | improvement, variant | ablation, positive deltas |
-| `accent` | `#E0A030` | emphasis | annotations, secondary axis |
-| `neutral` | `#7B7B7B` | reference, background | gridlines, target lines |
-| `light` | `#C9DCF0` | fill, low-emphasis mass | histograms, bands |
+A soft, low-saturation "science" set of seven colours, in the spirit of the soft
+pastel palettes used by modern journal-figure libraries (for example SciPalette's
+pastel sets, the AAAS/Nature palettes in `ggsci`, and the `science` preset in
+`plotstyle`). Muted fills with black edges keep the figures calm and print-safe.
+
+| Key | Hex | Name | Meaning | Typical use |
+|---|---|---|---|---|
+| `primary` | `#8FA2D6` | Periwinkle Blue | the method or series you are arguing for | main bars, main curve |
+| `secondary` | `#6A5C95` | Lavender Dusk | supporting role | extra series |
+| `contrast` | `#D99AAE` | Coral Bloom | baseline or competitor | comparison bars/curves |
+| `improve` | `#A9CBB8` | Seafoam Mist | improvement, variant | ablation, positive deltas |
+| `accent` | `#E7A889` | Coral Peach | emphasis | annotations, highlighted points |
+| `neutral` | `#5B608C` | Slate Violet | reference, background | gridlines, target lines |
+| `light` | `#CFE3E6` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
 
 Design intent:
 
-- Blues carry the argument. If two blue series appear together, the darker one
-  is the primary.
-- Red is reserved for the thing you are comparing against, so a reader who only
-  skims the color still reads the comparison.
-- Teal marks gain; amber marks emphasis. Do not use them as a second baseline.
-- Grayscale safety: `primary` vs `contrast` vs `improve` differ in both hue and
-  lightness, so the figure survives a black-and-white print. When more than
-  four series are needed, add hatch or marker-shape encoding rather than new
-  hues.
+- **The light members carry the area, the deep ones carry the line.** This set
+  has only two dark colours (Lavender Dusk #6A5C95 and Slate Violet #5B608C,
+  both luminance ≈ 99/255); the other five sit at 162–223. Putting a deep violet
+  on `primary` fills the largest bar or stacked area with the darkest ink and
+  makes the whole figure read heavy, so `primary` is the light periwinkle and the
+  deep violets are reserved for thin lines, emphasis and references.
+- Coral is reserved for the thing you compare against, so a reader who only skims
+  the colour still reads the comparison.
+- Seafoam marks gain; peach marks emphasis. Do not use them as a second baseline.
+- Slate violet is the deliberate low-chroma one: it is the only colour used for
+  reference lines and grids, so nothing in the data competes with it.
+- These are 300 dpi-ready pastels, so the 0.8 pt black edge on every patch does
+  the definition work that a saturated fill would otherwise do.
+- Grayscale safety: the set separates by lightness as well as hue, so the figure
+  survives a black-and-white print. When more than four series are needed, add
+  hatch or marker-shape encoding rather than new hues.
 
 Colour maps: `RdBu_r` for signed matrices (correlation), `Blues` for
 non-negative fields (intensity, temperature), `coolwarm` when the sign matters

@@ -5,7 +5,8 @@ IEEE and Springer submissions. Every text element is Times New Roman at a
 uniform **11 pt**, so figure text matches Word 11 pt body text when the image is
 inserted at its original size.
 
-论文配图样式技能：Times New Roman 统一 11 pt、深蓝主色系、四边全包围、图例带黑框、
+论文配图样式技能：Times New Roman 统一 11 pt、柔和科研配色（Lavender Dusk /
+Coral Bloom / Seafoam Mist 等 7 色）、四边全包围、图例带黑框、
 刻度朝内、无网格，图幅按 90 / 140 / 190 mm 印刷宽度校准。
 
 ## Install for an agent
@@ -73,7 +74,7 @@ the colours — the skill never decides these for them. See `references/preferen
 | Target | Elsevier / IEEE / Springer |
 | Font | Times New Roman + STIX math, SimSun for CJK |
 | Type scale | 11 pt body, legend 10 pt |
-| Palette | deep blue `#1F4E79` primary, `#B64342` contrast, `#2E8B7A` improve, `#E0A030` accent, `#7B7B7B` neutral, `#C9DCF0` light |
+| Palette | soft science 7-colour set: Periwinkle Blue `#8FA2D6` primary, Coral Bloom `#D99AAE` contrast, Seafoam Mist `#A9CBB8` improve, Coral Peach `#E7A889` accent, Lavender Dusk `#6A5C95` secondary, Slate Violet `#5B608C` neutral, Pale Aqua `#CFE3E6` light |
 | Axes | full box, 0.8 pt spines |
 | Legend | inside the axes, white face, black 0.8 pt border |
 | Ticks | inward, no grid, both axis ends land on a tick label |
@@ -271,15 +272,20 @@ The only colours allowed are the palette, black and white.
 
 ![WXL_PALETTE](img/palette.png)
 
-| Key | Hex | Meaning | Typical use |
-|---|---|---|---|
-| `primary` | `#1F4E79` | the method you argue for | main bars, main curve |
-| `secondary` | `#4E86C6` | same family, supporting role | extra blue series |
-| `contrast` | `#B64342` | baseline / competitor | comparison bars / curves |
-| `improve` | `#2E8B7A` | improvement / variant | ablation, positive deltas |
-| `accent` | `#E0A030` | emphasis | annotations, secondary axis |
-| `neutral` | `#7B7B7B` | reference / background | gridlines, target lines |
-| `light` | `#C9DCF0` | fill, low-emphasis mass | histograms, bands |
+| Key | Hex | Name | Meaning | Typical use |
+|---|---|---|---|---|
+| `primary` | `#8FA2D6` | Periwinkle Blue | the method you argue for | main bars, main curve |
+| `secondary` | `#6A5C95` | Lavender Dusk | supporting series | extra series |
+| `contrast` | `#D99AAE` | Coral Bloom | baseline / competitor | comparison bars / curves |
+| `improve` | `#A9CBB8` | Seafoam Mist | improvement / variant | ablation, positive deltas |
+| `accent` | `#E7A889` | Coral Peach | emphasis | annotations, highlighted points |
+| `neutral` | `#5B608C` | Slate Violet | reference / background | gridlines, target lines |
+| `light` | `#CFE3E6` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
+
+The light members carry the area and the two deep violets carry the lines: only
+Lavender Dusk and Slate Violet are dark (luminance ≈ 99/255), so the large fills
+use the light periwinkle, coral, seafoam and peach, and the deep violets are kept
+for thin lines, emphasis and references.
 
 Default series order without an explicit mapping: `primary → contrast →
 improve → accent → secondary → neutral`.

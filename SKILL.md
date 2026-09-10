@@ -3,7 +3,7 @@ name: figure-making-wxl
 description: >-
   Publication-ready matplotlib figures in the WXL house style for Elsevier,
   IEEE and Springer submissions: every text element is Times New Roman at
-  11 pt (legend at 10 pt), with a deep-blue semantic palette, full-box axes,
+  11 pt (legend at 10 pt), with a soft science semantic palette, full-box axes,
   framed in-plot legends, inward ticks, no grid, captions below the figure, and
   figure widths fixed to the final print width (90 / 140 / 190 mm). Before
   plotting it always asks the user for the chart type, the x/y axis labels (and
@@ -101,7 +101,7 @@ These rules supersede any conflicting style text in `references/` or in upstream
    `fig.suptitle` and never a title on top of the axes. Panel labels go just
    below their own panel, centered, **not bold**, and carry a number plus a short
    title (`(a) Grouped bars`), not a bare `(a)`.
-9. **Deep-blue palette only.** Colors come from `WXL_PALETTE`; black, white and
+9. **Soft science palette only.** Colors come from `WXL_PALETTE`; black, white and
    the palette are the only allowed colors. See `references/design-theory.md`
    for the semantics.
 10. **Export PNG 600 dpi + PDF vector.** Saving uses `bbox_inches="tight"` so
@@ -133,7 +133,7 @@ These rules supersede any conflicting style text in `references/` or in upstream
 | Chart type | which chart, how many panels | grouped bar / trend / ... |
 | Axis labels | x and y text, units, italic or not | italic symbol, upright unit |
 | Line style | markers, width, dash pattern | open markers, 1.5 pt, solid |
-| Colours | per-series colours; colormap for matrices | deep-blue `WXL_PALETTE` |
+| Colours | per-series colours; colormap for matrices | soft science `WXL_PALETTE` |
 
 For a variable, italicise the symbol and keep the unit upright, e.g.
 `r"Slip $s$ (mm)"` and `r"Bond stress $\tau$ (MPa)"`.
@@ -227,7 +227,7 @@ style.
 | `legend.set_ncols` | Used for the flatten fallback when available (matplotlib ≥ 3.6); skipped silently otherwise. |
 | `python-docx` | Only imported by `assets/wxl_docx.py`; the core style module never imports it. Figures work without it. |
 
-What is guaranteed on any conforming machine: 11 pt Times text, the deep-blue
+What is guaranteed on any conforming machine: 11 pt Times text, the soft science
 palette, full-box axes, framed legends placed by measured overlap, inward ticks,
 axis ends on tick values, the 90 / 140 / 190 mm width calibration, and a
 `check_wxl_style` audit that fails on any deviation.

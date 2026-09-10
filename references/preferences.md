@@ -1,6 +1,6 @@
 # Ask before you plot (per-figure preferences)
 
-The house style (11 pt Times, deep-blue palette, full box, framed legends,
+The house style (11 pt Times, soft science palette, full box, framed legends,
 inward ticks, axis ends on ticks) is the default, but four decisions belong to
 the user and must be confirmed **before** drawing each figure. Never pick them
 yourself, and never silently reuse a previous figure's choices.
@@ -70,13 +70,15 @@ Ask the per-series colour mapping, and for matrices the colormap.
 
 - Default series order: `WXL_SERIES` = primary, contrast, improve, accent,
   secondary, neutral.
-- Colour semantics to confirm: proposed / key method = primary blue, baseline /
-  competitor = red (`contrast`), gain = teal (`improve`), emphasis = amber
-  (`accent`), reference = grey (`neutral`).
+- Colour semantics to confirm: proposed / key method = Periwinkle Blue
+  (`primary`, light so a large fill stays calm), baseline / competitor = Coral
+  Bloom pink (`contrast`), gain = Seafoam Mist sage (`improve`), emphasis = Coral
+  Peach (`accent`), supporting = Lavender Dusk (`secondary`), reference = Slate
+  Violet (`neutral`).
 - Matrices: `WXL_CMAP` = `RdBu_r` (signed), `Blues` (non-negative),
   `coolwarm` (signed, more contrast).
-- If the user names a keyword (e.g. "Nature", "彩图1"), map it to a palette and
-  confirm the concrete colours.
+- If the user names a keyword (e.g. "Nature", "Science", "彩图1"), map it to a
+  palette and confirm the concrete colours.
 
 ---
 
@@ -89,7 +91,7 @@ Ask the per-series colour mapping, and for matrices the colormap.
  2. x-axis label      -> text: 'Slip $s$ (mm)'?  italic symbol s?
     y-axis label      -> text: 'Bond stress $\\tau$ (MPa)'?  italic symbol τ?
  3. line style        -> [open markers, 1.5 pt, solid (recommended) | dashed | ...]
- 4. colours           -> [deep-blue house palette (recommended) | keyword | custom]"
+ 4. colours           -> [soft science house palette (recommended) | keyword | custom]"
 ```
 
 Only after the user answers do you call `apply_wxl_style()` and draw. If a

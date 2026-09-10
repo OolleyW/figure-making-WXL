@@ -7,7 +7,7 @@ figure is inserted at its original physical size.
 Hard rules (see SKILL.md):
   * Times New Roman everywhere, STIX math glyphs, no sans-serif faces.
   * Uniform 11 pt text (caption / axis label / tick / legend / annotation).
-  * Deep-blue palette only.
+  * Soft science palette only (muted pastel series; see WXL_PALETTE).
   * Full box on every Cartesian axes (all four spines).
   * Legend inside the axes, opaque white face, black 0.8 pt border.
   * Ticks point inward, no grid.
@@ -33,15 +33,17 @@ from matplotlib.font_manager import findfont
 # Constants
 # --------------------------------------------------------------------------
 
-#: Deep-blue semantic palette (WXL house palette).
+#: Soft science palette (muted pastel series, journal-figure look). The light
+#: members carry the large fills, so a big bar or stacked area stays calm; the
+#: two deep violets are kept for thin lines, emphasis and references.
 WXL_PALETTE = {
-    "primary": "#1F4E79",    # proposed method / main series
-    "secondary": "#4E86C6",  # secondary blue, supporting series
-    "contrast": "#B64342",   # baseline / competing method
-    "improve": "#2E8B7A",    # improvement / positive variant
-    "accent": "#E0A030",     # emphasis, annotations, secondary axis
-    "neutral": "#7B7B7B",    # reference lines, background categories
-    "light": "#C9DCF0",      # light fill, uncertainty bands
+    "primary": "#8FA2D6",    # Periwinkle Blue  - proposed method / main series
+    "secondary": "#6A5C95",  # Lavender Dusk    - supporting series
+    "contrast": "#D99AAE",   # Coral Bloom      - baseline / competing method
+    "improve": "#A9CBB8",    # Seafoam Mist     - improvement / positive variant
+    "accent": "#E7A889",     # Coral Peach      - emphasis, annotations
+    "neutral": "#5B608C",    # Slate Violet     - reference lines, grid, background
+    "light": "#CFE3E6",      # Pale Aqua        - light fill, uncertainty bands
 }
 
 #: Default diverging colour map for matrices and correlation heatmaps.

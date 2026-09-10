@@ -705,7 +705,7 @@ HTML_HEAD = """<!doctype html>
   .card .head{display:flex;justify-content:space-between;align-items:baseline;
               gap:10px;padding:9px 12px 6px;border-bottom:1px solid #e6e6e6}
   .card .head h3{margin:0;font-family:"Times New Roman",serif;font-size:15px}
-  .card .cat{font-size:11.5px;color:#fff;background:#1F4E79;padding:1px 7px;border-radius:2px}
+  .card .cat{font-size:11.5px;color:#fff;background:#6A5C95;padding:1px 7px;border-radius:2px}
   .card img{width:100%;height:auto;display:block;background:#fff;cursor:zoom-in;
             border-bottom:1px solid #e6e6e6}
   .card .body{padding:9px 12px 12px;font-size:12.5px;color:#333}
@@ -726,7 +726,7 @@ HTML_HEAD = """<!doctype html>
 <body>
 <header>
   <h1>figure-making-WXL · 全部图型预览</h1>
-  <p class="sub">统一 11 pt · Times New Roman · 深蓝主色系 · 四边全包围 · 图例带黑框 · 刻度朝内 · 无网格</p>
+  <p class="sub">统一 11 pt · Times New Roman · 柔和科研配色 · 四边全包围 · 图例带黑框 · 刻度朝内 · 无网格</p>
 </header>
 <main>
 <section>
