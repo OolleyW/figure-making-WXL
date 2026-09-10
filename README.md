@@ -74,9 +74,9 @@ the colours — the skill never decides these for them. See `references/preferen
 | Target | Elsevier / IEEE / Springer |
 | Font | Times New Roman + STIX math, SimSun for CJK |
 | Type scale | 11 pt body, legend 10 pt |
-| Palette | soft science 7-colour set: Periwinkle Blue `#8FA2D6` primary, Coral Bloom `#D99AAE` contrast, Seafoam Mist `#A9CBB8` improve, Coral Peach `#E7A889` accent, Lavender Dusk `#6A5C95` secondary, Slate Violet `#5B608C` neutral, Pale Aqua `#CFE3E6` light |
-| Axes | full box, 0.8 pt spines |
-| Legend | inside the axes, white face, ink (#2E3142) 0.8 pt border |
+| Palette | soft science 7-colour set: Periwinkle Blue `#B6C3E4` primary, Coral Bloom `#E6BDCA` contrast, Seafoam Mist `#C7DDD1` improve, Coral Peach `#EFC6B2` accent, Lavender Dusk `#9E95BA` secondary, Slate Violet `#9498B4` neutral, Pale Aqua `#E0EDEF` light |
+| Axes | full box, 0.5 pt spines |
+| Legend | inside the axes, white face, ink (#2E3142) 0.5 pt border |
 | Ticks | inward, no grid, both axis ends land on a tick label |
 | Caption | below the figure, centered |
 | Width | single 90 mm / onehalf 140 mm / double 190 mm |
@@ -254,10 +254,10 @@ never Helvetica, Arial or DejaVu Sans. CJK falls back to SimSun.
 
 | Contract | Value |
 |---|---|
-| Frame | all four spines, 0.8 pt |
+| Frame | all four spines, 0.5 pt |
 | Ticks | inward, 3 pt long |
 | Grid | none (radar chart is the exception) |
-| Legend | inside the axes, opaque white face, ink (#2E3142) 0.8 pt border |
+| Legend | inside the axes, opaque white face, ink (#2E3142) 0.5 pt border |
 | Axis ends | on a tick value (no unlabelled strip) |
 | Export | PNG 600 dpi + vector PDF |
 | Single-column black frame | one fixed 75 × 55 mm box in every figure |
@@ -279,8 +279,8 @@ accepted by the audit for backward compatibility.
 |---|---|
 | Markers | open circle (default), square, triangle, diamond, down-triangle, or none for dense data |
 | Marker fill | white fill with a coloured edge, so only the shape carries the series identity and the figure survives a black-and-white print |
-| Marker size | 5.0 pt (house default) |
-| Line width | 2.0 pt (house default); 1.2 pt for a fitted or reference line |
+| Marker size | 3.5 pt (house default) |
+| Line width | 1.5 pt (house default); 1.2 pt for a fitted or reference line |
 | Dash | solid (default) for the main series; dashed for a reference / baseline |
 | Marker frequency | every point (default), every 2nd–5th for dense data |
 
@@ -292,13 +292,13 @@ The only colours allowed are the palette, the ink `#2E3142`, black and white.
 
 | Key | Hex | Name | Meaning | Typical use |
 |---|---|---|---|---|
-| `primary` | `#8FA2D6` | Periwinkle Blue | the method you argue for | main bars, main curve |
-| `secondary` | `#6A5C95` | Lavender Dusk | supporting series | extra series |
-| `contrast` | `#D99AAE` | Coral Bloom | baseline / competitor | comparison bars / curves |
-| `improve` | `#A9CBB8` | Seafoam Mist | improvement / variant | ablation, positive deltas |
-| `accent` | `#E7A889` | Coral Peach | emphasis | annotations, highlighted points |
-| `neutral` | `#5B608C` | Slate Violet | reference / background | gridlines, target lines |
-| `light` | `#CFE3E6` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
+| `primary` | `#B6C3E4` | Periwinkle Blue | the method you argue for | main bars, main curve |
+| `secondary` | `#9E95BA` | Lavender Dusk | supporting series | extra series |
+| `contrast` | `#E6BDCA` | Coral Bloom | baseline / competitor | comparison bars / curves |
+| `improve` | `#C7DDD1` | Seafoam Mist | improvement / variant | ablation, positive deltas |
+| `accent` | `#EFC6B2` | Coral Peach | emphasis | annotations, highlighted points |
+| `neutral` | `#9498B4` | Slate Violet | reference / background | gridlines, target lines |
+| `light` | `#E0EDEF` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
 
 The light members carry the area and the two deep violets carry the lines: only
 Lavender Dusk and Slate Violet are dark (luminance ≈ 99/255), so the large fills

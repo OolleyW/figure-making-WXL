@@ -22,7 +22,7 @@ below gives the figure id, the width preset used, and the core call to copy.
 | id | Chart | Width | Core call |
 |---|---|---|---|
 | `line_markers` | Multi-curve marker chart: one white-filled marker shape per series | double | `ax.plot(x, y, "-", marker=mk, mfc="white", mec=key, mew=0.9, ms=4.2)` |
-| `line_trend` | Multi-series trend with markers | double | `ax.plot(x, y, "-o", mfc="white", mew=0.9, ms=5.0, lw=2.0)` |
+| `line_trend` | Multi-series trend with markers | double | `ax.plot(x, y, "-o", mfc="white", mew=0.6, ms=3.5, lw=1.5)` |
 | `line_band` | Trend with uncertainty band | double | `ax.fill_between(x, y-sd, y+sd, alpha=0.35)` |
 | `stacked_area` | Stacked area | double | `ax.stackplot(x, *series, edgecolor=WXL_INK)` |
 
@@ -31,6 +31,7 @@ each series a distinct marker shape (circle, square, triangle, diamond,
 down-triangle) and keep every marker white-filled, so the shape alone carries the
 series identity and the figure stays readable in a black-and-white print. Defaults
 that were tuned and agreed: marker size 5.0 pt, line width 2.0 pt, alpha 1.0 —
+(the rest of the gallery keeps the house default of 3.5 pt / 1.5 pt) —
 below 0.8 alpha the overlapping curves bleed into each other and print grey. Keep
 the legend to two columns and leave headroom on the y-axis: a five-entry legend is
 wider than it looks inside the 75 × 55 mm single-column frame.

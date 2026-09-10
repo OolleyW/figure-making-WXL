@@ -98,13 +98,13 @@ ink edges keep the figures print-safe.
 
 | Key | Hex | Name | Meaning | Typical use |
 |---|---|---|---|---|
-| `primary` | `#8FA2D6` | Periwinkle Blue | the method or series you are arguing for | main bars, main curve |
-| `secondary` | `#6A5C95` | Lavender Dusk | supporting role | extra series |
-| `contrast` | `#D99AAE` | Coral Bloom | baseline or competitor | comparison bars/curves |
-| `improve` | `#A9CBB8` | Seafoam Mist | improvement, variant | ablation, positive deltas |
-| `accent` | `#E7A889` | Coral Peach | emphasis | annotations, highlighted points |
-| `neutral` | `#5B608C` | Slate Violet | reference, background | gridlines, target lines |
-| `light` | `#CFE3E6` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
+| `primary` | `#B6C3E4` | Periwinkle Blue | the method or series you are arguing for | main bars, main curve |
+| `secondary` | `#9E95BA` | Lavender Dusk | supporting role | extra series |
+| `contrast` | `#E6BDCA` | Coral Bloom | baseline or competitor | comparison bars/curves |
+| `improve` | `#C7DDD1` | Seafoam Mist | improvement, variant | ablation, positive deltas |
+| `accent` | `#EFC6B2` | Coral Peach | emphasis | annotations, highlighted points |
+| `neutral` | `#9498B4` | Slate Violet | reference, background | gridlines, target lines |
+| `light` | `#E0EDEF` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
 
 Design intent:
 
@@ -119,7 +119,7 @@ Design intent:
 - Seafoam marks gain; peach marks emphasis. Do not use them as a second baseline.
 - Slate violet is the deliberate low-chroma one: it is the only colour used for
   reference lines and grids, so nothing in the data competes with it.
-- These are 300 dpi-ready pastels, so the 0.8 pt ink edge on every patch does
+- These are 300 dpi-ready pastels, so the 0.5 pt ink edge on every patch does
   the definition work that a saturated fill would otherwise do.
 - **Ink, not black.** Text, axes, annotations and every outline use
   `WXL_INK = "#2E3142"`, a deep slate. It keeps near-black contrast but reads
@@ -137,9 +137,9 @@ and more contrast is needed.
 
 ## 3) Geometry
 
-- **Spines**: 0.8 pt on all four sides. A full box makes the plot area read as a
+- **Spines**: 0.5 pt on all four sides. A full box makes the plot area read as a
   bounded region and matches the table rules used in the same manuscripts.
-- **Ticks**: inward, 3 pt long, 0.8 pt wide. Inward ticks keep the outer canvas
+- **Ticks**: inward, 3 pt long, 0.5 pt wide. Inward ticks keep the outer canvas
   clean and avoid collisions with adjacent panels.
 - **Axis ends**: every numeric axis starts and ends exactly on a tick label.
   Matplotlib's default autoscaling leaves a 5 % margin, so the last tick often
@@ -153,11 +153,11 @@ and more contrast is needed.
 - **Grid**: none. Tick values plus the full box carry the reading task. The only
   exception is the radar chart, where a light `neutral` grid at 35 % alpha is
   required to read values off the polar axes.
-- **Line width**: 2.0 pt for data curves (1.2 pt for a fitted or reference
-  line), 0.8 pt for error bars and edges.
+- **Line width**: 1.5 pt for data curves (1.2 pt for a fitted or reference
+  line), 0.5 pt for error bars and edges.
 - **Markers**: 4 pt, white fill, 0.9 pt colored edge, so overlapping points stay
   distinguishable.
-- **Bars**: 0.8 pt ink edge. In grouped bars, bar width 0.26 of the category
+- **Bars**: 0.5 pt ink edge. In grouped bars, bar width 0.26 of the category
   spacing leaves a visible gap without looking sparse.
 
 ## 4) Layout
@@ -194,7 +194,7 @@ fixed bounding box would clip it.
 | Radar (polar) | keeps a light grid, no rectangular spines | polar axes have no four-spine frame, and values are unreadable without a grid |
 | Pie / donut | `ax.set_axis_off()` | there are no axes to frame |
 | Categorical axes | not end-locked | category labels sit at bar / box centers, and locking the ends would clip half of the first and last category |
-| Colorbar | spines not checked | the colorbar draws its own 0.8 pt outline |
+| Colorbar | spines not checked | the colorbar draws its own 0.5 pt outline |
 | Slide export | `WXL_FIGSIZE["slide"]` | slides are viewed, not printed, so the 11 pt/print-width contract does not apply |
 
 ## 7) Reproduction checklist

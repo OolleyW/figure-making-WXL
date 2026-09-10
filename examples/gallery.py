@@ -62,8 +62,8 @@ def _kde(x, grid, bw=None):
         "一张图叠放五条测量曲线，每条曲线的标记形状都不同、统一白色填充，"
         "即使黑白打印也能靠点形区分。",
         'for name, key, mk, vals in series:\n'
-        '    ax.plot(x, vals, "-", marker=mk, color=PALETTE[key], lw=2.0,\n'
-        '            mfc="white", mec=PALETTE[key], mew=0.9, ms=5.0, label=name)')
+        '    ax.plot(x, vals, "-", marker=mk, color=PALETTE[key], lw=1.5,\n'
+        '            mfc="white", mec=PALETTE[key], mew=0.6, ms=3.5, label=name)')
 def fig_line_markers():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["single"])
     x = np.linspace(0, 10, 11)
@@ -83,7 +83,7 @@ def fig_line_markers():
     ]
     for name, key, mk, vals in series:
         ax.plot(x, vals, "-", marker=mk, color=P[key], lw=2.0, ms=5.0,
-                mfc="white", mec=P[key], mew=0.9, label=name)
+                mfc="white", mec=P[key], mew=0.6, label=name)
     ax.set_xlabel("Age (d)")
     ax.set_ylabel("Degree of hydration (-)")
     ax.set_xlim(0, 10)
@@ -101,8 +101,8 @@ def fig_line_markers():
 @figure("grouped_bar", "分组柱状图（含误差棒）", "bar",
         "三组方法在四个场景下的对比，柱顶标数值，误差棒表示标准差。",
         'ax.bar(x + (i-1)*w, vals, w, yerr=err, color=PALETTE[key],\n'
-        '       edgecolor=WXL_INK, linewidth=0.8,\n'
-        '       error_kw=dict(elinewidth=0.8, capsize=2))')
+        '       edgecolor=WXL_INK, linewidth=0.5,\n'
+        '       error_kw=dict(elinewidth=0.5, capsize=2))')
 def fig_grouped_bar():
     cats = ["S1", "S2", "S3", "S4"]
     series = [("Proposed", [0.82, 0.88, 0.91, 0.94], "primary"),
@@ -114,8 +114,8 @@ def fig_grouped_bar():
         v = np.asarray(vals)
         e = np.full_like(v, 0.02)
         bars = ax.bar(x + (i - 1) * w, v, w, yerr=e, label=name,
-                      color=P[key], edgecolor=WXL_INK, linewidth=0.8,
-                      error_kw=dict(elinewidth=0.8, capsize=2, ecolor=P[key]))
+                      color=P[key], edgecolor=WXL_INK, linewidth=0.5,
+                      error_kw=dict(elinewidth=0.5, capsize=2, ecolor=P[key]))
         annotate_bars(ax, bars, y_offset_frac=0.035)   # skipped when too wide
     ax.set_xticks(x)
     ax.set_xticklabels(cats)
@@ -142,7 +142,7 @@ def fig_stacked_bar():
     for name, vals, key in parts:
         v = np.asarray(vals, float)
         ax.bar(x, v, 0.5, bottom=bottom, label=name, color=P[key],
-               edgecolor=WXL_INK, linewidth=0.8)
+               edgecolor=WXL_INK, linewidth=0.5)
         bottom += v
     ax.set_xticks(x)
     ax.set_xticklabels(cats)
@@ -168,7 +168,7 @@ def fig_horizontal_bar():
     vals = vals[order]
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     y = np.arange(len(names))
-    ax.barh(y, vals, 0.55, color=P["primary"], edgecolor=WXL_INK, linewidth=0.8)
+    ax.barh(y, vals, 0.55, color=P["primary"], edgecolor=WXL_INK, linewidth=0.5)
     for yi, v in zip(y, vals):
         ax.text(v + 1.2, yi, f"{v:.1f}", va="center", ha="left")
     ax.set_yticks(y)
@@ -183,31 +183,34 @@ def fig_horizontal_bar():
 # line family
 # --------------------------------------------------------------------------
 @figure("line_trend", "多序列折线图（带标记）", "line",
-        "最常见的趋势图，四组方法随 epoch 变化，标记点区分序列。",
-        'ax.plot(x, y, "-o", color=PALETTE[key], lw=2.0, ms=5.0,\n'
-        '        mfc="white", mew=0.9, label=name)')
+        "最常见的趋势图，四组方法随 epoch 变化，每条曲线用不同的点形区分，"
+        "黑白打印也能读。",
+        'ax.plot(x, y, "-", marker=mk, color=PALETTE[key], lw=1.5, ms=3.5,\n'
+        '        mfc="white", mew=0.6, label=name)')
 def fig_line_trend():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     x = np.linspace(0, 10, 11)
-    curves = [("Method A", "primary", 0.62, 0.030), ("Method B", "contrast", 0.58, 0.024),
-              ("Method C", "improve", 0.54, 0.020), ("Method D", "accent", 0.50, 0.015)]
-    for name, key, base, slope in curves:
+    curves = [("Method A", "primary", "o", 0.62, 0.030),
+              ("Method B", "contrast", "s", 0.58, 0.024),
+              ("Method C", "improve", "^", 0.54, 0.020),
+              ("Method D", "accent", "D", 0.50, 0.015)]
+    for name, key, mk, base, slope in curves:
         y = base + slope * x + RNG.normal(0, 0.005, x.size)
-        ax.plot(x, y, "-o", color=P[key], lw=2.0, ms=5.0, mfc="white",
-                mew=0.9, label=name)
+        ax.plot(x, y, "-", marker=mk, color=P[key], lw=1.5, ms=3.5, mfc="white",
+                mew=0.6, label=name)
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Score")
     framed_legend(ax, loc="upper left", ncol=2, columnspacing=1.0,
                   handlelength=1.6, handletextpad=0.5)
-    add_caption_below(fig, r"$\mathbf{Fig.}$  5  Multi-series trend lines with markers.")
+    add_caption_below(fig, r"$\mathbf{Fig.}$  5  Multi-series trend lines with distinct markers.")
     return fig
 
 
 @figure("line_band", "折线 + 不确定度带", "line",
         "用 fill_between 画置信区间或标准差带，主曲线压在上层。",
         'ax.fill_between(x, y-sd, y+sd, color=PALETTE["light"],\n'
-        '                edgecolor=PALETTE["primary"], linewidth=0.6)\n'
-        'ax.plot(x, y, "-", color=PALETTE["primary"], lw=2.0)')
+        '                edgecolor=PALETTE["primary"], linewidth=0.5)\n'
+        'ax.plot(x, y, "-", color=PALETTE["primary"], lw=1.5)')
 def fig_line_band():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     x = np.linspace(0, 10, 60)
@@ -216,8 +219,8 @@ def fig_line_band():
         y = base + slope * x
         band = sd * (1 + 0.12 * x)
         ax.fill_between(x, y - band, y + band, color=P["light"] if key == "primary"
-                        else P["neutral"], alpha=0.35, edgecolor=P[key], linewidth=0.6)
-        ax.plot(x, y, "-", color=P[key], lw=2.0, label=label)
+                        else P["neutral"], alpha=0.35, edgecolor=P[key], linewidth=0.5)
+        ax.plot(x, y, "-", color=P[key], lw=1.5, label=label)
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Response (mV)")
     framed_legend(ax, loc="upper left")
@@ -295,7 +298,7 @@ def fig_bubble():
 @figure("errorbar", "误差棒图（x、y 双向）", "rel",
         "实验点同时带 x 和 y 方向误差，常用于标定曲线。",
         'ax.errorbar(x, y, xerr=xe, yerr=ye, fmt="o", color=PALETTE["primary"],\n'
-        '            mfc="white", ms=5.0, elinewidth=0.8, capsize=2)')
+        '            mfc="white", ms=3.5, elinewidth=0.5, capsize=2)')
 def fig_errorbar():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     x = np.linspace(1, 9, 9)
@@ -303,9 +306,9 @@ def fig_errorbar():
     xe = np.full_like(x, 0.25)
     ye = np.full_like(x, 0.18)
     ax.errorbar(x, y, xerr=xe, yerr=ye, fmt="o", color=P["primary"],
-                mfc="white", ms=5.0, mew=0.9, elinewidth=0.8, capsize=2,
+                mfc="white", ms=3.5, mew=0.6, elinewidth=0.5, capsize=2,
                 label="Measured")
-    ax.plot(x, 1.8 * np.log(x) + 0.9, "-", color=P["contrast"], lw=2.0,
+    ax.plot(x, 1.8 * np.log(x) + 0.9, "-", color=P["contrast"], lw=1.5,
             label="Model")
     ax.set_xlabel("Strain (%)")
     ax.set_ylabel("Stress (MPa)")
@@ -330,15 +333,15 @@ def fig_boxplot():
     data = [RNG.normal(m, s, 60) for m, s in [(10, 1.6), (12, 2.2), (11, 1.1), (13, 2.8)]]
     bp = ax.boxplot(data, patch_artist=True, widths=0.55,
                     medianprops=dict(color=WXL_INK, linewidth=1.2),
-                    whiskerprops=dict(color=WXL_INK, linewidth=0.8),
-                    capprops=dict(color=WXL_INK, linewidth=0.8),
-                    boxprops=dict(edgecolor=WXL_INK, linewidth=0.8))
+                    whiskerprops=dict(color=WXL_INK, linewidth=0.5),
+                    capprops=dict(color=WXL_INK, linewidth=0.5),
+                    boxprops=dict(edgecolor=WXL_INK, linewidth=0.5))
     for patch, key in zip(bp["boxes"], keys):
         patch.set_facecolor(P[key])
     ax.set_xticklabels(labels)
     ax.set_ylabel("Value")
     framed_legend(ax, handles=[Patch(facecolor=P[k], edgecolor=WXL_INK,
-                                     linewidth=0.8, label=l)
+                                     linewidth=0.5, label=l)
                                for k, l in zip(keys, labels)], loc="upper left")
     add_caption_below(fig, r"$\mathbf{Fig.}$  11  Box plots of four groups.")
     return fig
@@ -359,14 +362,14 @@ def fig_violin():
     for body, key in zip(vp["bodies"], keys):
         body.set_facecolor(P[key])
         body.set_edgecolor(WXL_INK)
-        body.set_linewidth(0.8)
+        body.set_linewidth(0.5)
         body.set_alpha(0.9)
     vp["cmeans"].set_color(WXL_INK)
     ax.set_xticks([1, 2, 3])
     ax.set_xticklabels(labels)
     ax.set_ylabel("Normalised response")
     framed_legend(ax, handles=[Patch(facecolor=P[k], edgecolor=WXL_INK,
-                                     linewidth=0.8, label=l)
+                                     linewidth=0.5, label=l)
                                for k, l in zip(keys, labels)], loc="upper left")
     add_caption_below(fig, r"$\mathbf{Fig.}$  12  Violin plots with mean markers.")
     return fig
@@ -375,15 +378,15 @@ def fig_violin():
 @figure("hist_kde", "直方图 + 核密度曲线", "dist",
         "直方图用浅色填充黑边，核密度曲线叠加显示分布形态。",
         'ax.hist(data, bins=20, color=PALETTE["light"], edgecolor=WXL_INK,\n'
-        '        linewidth=0.6, label="Histogram")\n'
-        'ax.plot(grid, kde, color=PALETTE["primary"], lw=2.0, label="KDE")')
+        '        linewidth=0.5, label="Histogram")\n'
+        'ax.plot(grid, kde, color=PALETTE["primary"], lw=1.5, label="KDE")')
 def fig_hist_kde():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     data = np.concatenate([RNG.normal(0, 1.0, 400), RNG.normal(3.2, 0.8, 160)])
     ax.hist(data, bins=22, density=True, color=P["light"], edgecolor=WXL_INK,
-            linewidth=0.6, label="Histogram")
+            linewidth=0.5, label="Histogram")
     grid = np.linspace(data.min() - 0.5, data.max() + 0.5, 400)
-    ax.plot(grid, _kde(data, grid), "-", color=P["primary"], lw=2.0, label="KDE")
+    ax.plot(grid, _kde(data, grid), "-", color=P["primary"], lw=1.5, label="KDE")
     ax.axvline(float(np.mean(data)), color=P["contrast"], lw=1.2, ls="--",
                label="Mean")
     ax.set_xlabel("Residual (mm)")
@@ -396,7 +399,7 @@ def fig_hist_kde():
 @figure("ecdf", "经验累积分布（ECDF）", "dist",
         "比直方图更稳健的分布比较，用阶梯线绘制。",
         'ax.step(x_sorted, np.arange(1, n+1)/n, where="post",\n'
-        '        color=PALETTE[key], lw=2.0, label=name)',
+        '        color=PALETTE[key], lw=1.5, label=name)',
         width="single")
 def fig_ecdf():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["single"])
@@ -404,7 +407,7 @@ def fig_ecdf():
                               ("Set B", "contrast", 0.8, 1.2)]:
         x = np.sort(RNG.normal(mu, sd, 220))
         ax.step(x, np.arange(1, x.size + 1) / x.size, where="post",
-                color=P[key], lw=2.0, label=name)
+                color=P[key], lw=1.5, label=name)
     ax.set_xlabel("Value")
     ax.set_ylabel("Cumulative probability")
     ax.set_ylim(0, 1.02)
@@ -430,7 +433,7 @@ def fig_strip_mean():
                    alpha=0.6, edgecolor=WXL_INK, linewidth=0.3,
                    label=labels[i])
     ax.errorbar(np.arange(4), means, yerr=sds, fmt="s", color=WXL_INK,
-                ms=5.0, elinewidth=1.0, capsize=3)
+                ms=3.5, elinewidth=0.5, capsize=3)
     ax.set_xticks(np.arange(4))
     ax.set_xticklabels(labels)
     ax.set_ylabel("Measured value")
@@ -446,7 +449,7 @@ def fig_strip_mean():
         "相关系数矩阵，玫红↔蓝发散色图（采样配色适配），单元格标数值。只出单栏版。",
         'im = ax.imshow(m, cmap=WXL_CMAP, vmin=-1, vmax=1)\n'
         'cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)\n'
-        'cb.outline.set_linewidth(0.8)', width="single")
+        'cb.outline.set_linewidth(0.5)', width="single")
 def fig_heatmap():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     m = RNG.uniform(-1, 1, (6, 6))
@@ -463,7 +466,7 @@ def fig_heatmap():
     cb = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
     cb.set_label("Correlation")
     cb.ax.tick_params(direction="in", width=0.8)
-    cb.outline.set_linewidth(0.8)
+    cb.outline.set_linewidth(0.5)
     add_caption_below(fig, r"$\mathbf{Fig.}$  16  Correlation heatmap with annotated values.")
     return fig
 
@@ -485,7 +488,7 @@ def fig_contour():
     cb = fig.colorbar(cf, ax=ax, fraction=0.046, pad=0.03)
     cb.set_label("Normalised intensity")
     cb.ax.tick_params(direction="in", width=0.8)
-    cb.outline.set_linewidth(0.8)
+    cb.outline.set_linewidth(0.5)
     add_caption_below(fig, r"$\mathbf{Fig.}$  17  Filled contour map of a two-dimensional field.")
     return fig
 
@@ -496,7 +499,7 @@ def fig_contour():
 @figure("radar", "雷达图（极坐标）", "special",
         "多指标综合对比，极坐标例外地保留浅灰网格以便读数。只出单栏版。",
         'ax = fig.add_subplot(projection="polar")\n'
-        'ax.plot(theta, values, "-o", color=PALETTE[key], lw=2.0, ms=5.0)',
+        'ax.plot(theta, values, "-o", color=PALETTE[key], lw=1.5, ms=3.5)',
         width="single")
 def fig_radar():
     fig = plt.figure(figsize=WXL_FIGSIZE["double"])
@@ -508,15 +511,15 @@ def fig_radar():
     for name, key, vals in [("Mix A", "primary", [0.85, 0.72, 0.90, 0.55, 0.80]),
                             ("Mix B", "contrast", [0.70, 0.88, 0.65, 0.78, 0.60])]:
         v = np.concatenate([vals, vals[:1]])
-        ax.plot(theta, v, "-o", color=P[key], lw=2.0, ms=5.0, mfc="white",
-                mew=0.9, label=name)
+        ax.plot(theta, v, "-o", color=P[key], lw=1.5, ms=3.5, mfc="white",
+                mew=0.6, label=name)
         ax.fill(theta, v, color=P[key], alpha=0.12)
     ax.set_xticks(theta[:-1])
     ax.set_xticklabels(labels)
     ax.set_ylim(0, 1.05)
     ax.set_yticks([0.25, 0.5, 0.75, 1.0])
     ax.set_yticklabels(["0.25", "0.50", "0.75", "1.00"])
-    ax.grid(True, color=P["neutral"], alpha=0.35, linewidth=0.6)
+    ax.grid(True, color=P["neutral"], alpha=0.35, linewidth=0.5)
     ax.tick_params(direction="in")
     framed_legend(ax, loc="lower right", bbox_to_anchor=(1.16, -0.08))
     add_caption_below(fig, r"$\mathbf{Fig.}$  18  Radar chart of five performance indices.")
@@ -526,7 +529,7 @@ def fig_radar():
 @figure("donut", "环形图 / 饼图", "special",
         "占比展示，坐标轴关闭，图例带黑框置于图内空白处。",
         'ax.pie(vals, colors=[PALETTE[k] for k in keys], startangle=90,\n'
-        '       wedgeprops=dict(width=0.42, edgecolor=WXL_INK, linewidth=0.8))\n'
+        '       wedgeprops=dict(width=0.42, edgecolor=WXL_INK, linewidth=0.5))\n'
         'ax.set_axis_off()', width="single")
 def fig_donut():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["single"])
@@ -535,10 +538,10 @@ def fig_donut():
     vals = [34, 41, 17, 8]
     wedges, _ = ax.pie(vals, colors=[P[k] for k in keys], startangle=90,
                        counterclock=False,
-                       wedgeprops=dict(width=0.42, edgecolor=WXL_INK, linewidth=0.8))
+                       wedgeprops=dict(width=0.42, edgecolor=WXL_INK, linewidth=0.5))
     ax.set_axis_off()
     framed_legend(ax, handles=[Patch(facecolor=P[k], edgecolor=WXL_INK,
-                                     linewidth=0.8, label=f"{l} ({v}%)")
+                                     linewidth=0.5, label=f"{l} ({v}%)")
                                for k, l, v in zip(keys, labels, vals)],
                   loc="center left", bbox_to_anchor=(0.92, 0.5))
     add_caption_below(fig, r"$\mathbf{Fig.}$  19  Donut chart of mixture proportions.")
@@ -549,13 +552,13 @@ def fig_donut():
         "两个量纲不同的变量共用横轴，右轴用强调色区分。",
         'ax2 = ax.twinx()\n'
         'ax.bar(x, a, color=PALETTE["light"], edgecolor=WXL_INK)\n'
-        'ax2.plot(x, b, "-o", color=PALETTE["contrast"], lw=2.0)')
+        'ax2.plot(x, b, "-o", color=PALETTE["contrast"], lw=1.5)')
 def fig_dual_axis():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     x = np.arange(6)
     load = np.array([12, 26, 41, 55, 68, 74], float)
     temp = np.array([22, 35, 52, 68, 79, 84], float)
-    ax.bar(x, load, 0.5, color=P["light"], edgecolor=WXL_INK, linewidth=0.8,
+    ax.bar(x, load, 0.5, color=P["light"], edgecolor=WXL_INK, linewidth=0.5,
            label="Load")
     ax.set_ylabel("Load (kN)")
     ax.set_xticks(x)
@@ -563,13 +566,13 @@ def fig_dual_axis():
     ax.set_xlabel("Time (h)")
     ax.set_ylim(0, 95)
     ax2 = ax.twinx()
-    ax2.plot(x, temp, "-o", color=P["contrast"], lw=2.0, ms=5.0, mfc="white",
-             mew=0.9, label="Temperature")
+    ax2.plot(x, temp, "-o", color=P["contrast"], lw=1.5, ms=3.5, mfc="white",
+             mew=0.6, label="Temperature")
     ax2.set_ylabel("Temperature (C)")
     ax2.set_ylim(0, 110)
     for side in ("top", "bottom", "left", "right"):
         ax2.spines[side].set_visible(True)
-        ax2.spines[side].set_linewidth(0.8)
+        ax2.spines[side].set_linewidth(0.5)
     ax2.tick_params(direction="in", width=0.8)
     ax2.grid(False)
     h1, l1 = ax.get_legend_handles_labels()
@@ -602,7 +605,7 @@ def fig_multi_panel():
     for i, (name, key, vals) in enumerate([("S1", "primary", [0.7, 0.8, 0.9]),
                                            ("S2", "contrast", [0.5, 0.6, 0.7])]):
         ax.bar(np.arange(3) + (i - 0.5) * 0.3, vals, 0.3, label=name,
-               color=P[key], edgecolor=WXL_INK, linewidth=0.8)
+               color=P[key], edgecolor=WXL_INK, linewidth=0.5)
     ax.set_xticks(np.arange(3))
     ax.set_xticklabels(cats)
     ax.set_xlabel("Scenario")
@@ -613,10 +616,10 @@ def fig_multi_panel():
 
     ax = axes[1]
     x = np.linspace(0, 10, 11)
-    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=2.0, ms=5.0,
-            mfc="white", mew=0.9, label="Curve 1")
-    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=2.0, ms=5.0,
-            mfc="white", mew=0.9, label="Curve 2")
+    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=1.5, ms=3.5,
+            mfc="white", mew=0.6, label="Curve 1")
+    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=1.5, ms=3.5,
+            mfc="white", mew=0.6, label="Curve 2")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
     framed_legend(ax, loc="upper left")
@@ -626,9 +629,9 @@ def fig_multi_panel():
     data = [RNG.normal(m, 1.0, 50) for m in (0, 1, 2)]
     bp = ax.boxplot(data, patch_artist=True, widths=0.55,
                     medianprops=dict(color=WXL_INK, linewidth=1.2),
-                    whiskerprops=dict(color=WXL_INK, linewidth=0.8),
-                    capprops=dict(color=WXL_INK, linewidth=0.8),
-                    boxprops=dict(edgecolor=WXL_INK, linewidth=0.8))
+                    whiskerprops=dict(color=WXL_INK, linewidth=0.5),
+                    capprops=dict(color=WXL_INK, linewidth=0.5),
+                    boxprops=dict(edgecolor=WXL_INK, linewidth=0.5))
     for patch, key in zip(bp["boxes"], ["primary", "contrast", "improve"]):
         patch.set_facecolor(P[key])
     ax.set_xticklabels(["G1", "G2", "G3"])
@@ -670,7 +673,7 @@ def fig_multi_panel_1x3():
     for i, (name, key, vals) in enumerate([("S1", "primary", [0.7, 0.8, 0.9]),
                                            ("S2", "contrast", [0.5, 0.6, 0.7])]):
         ax.bar(np.arange(3) + (i - 0.5) * 0.3, vals, 0.3, label=name,
-               color=P[key], edgecolor=WXL_INK, linewidth=0.8)
+               color=P[key], edgecolor=WXL_INK, linewidth=0.5)
     ax.set_xticks(np.arange(3))
     ax.set_xticklabels(cats)
     ax.set_xlabel("Scenario")
@@ -681,10 +684,10 @@ def fig_multi_panel_1x3():
 
     ax = axes[1]
     x = np.linspace(0, 10, 11)
-    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=2.0, ms=5.0,
-            mfc="white", mew=0.9, label="Curve 1")
-    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=2.0, ms=5.0,
-            mfc="white", mew=0.9, label="Curve 2")
+    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=1.5, ms=3.5,
+            mfc="white", mew=0.6, label="Curve 1")
+    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=1.5, ms=3.5,
+            mfc="white", mew=0.6, label="Curve 2")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
     ax.set_ylim(0.35, 0.95)
@@ -695,9 +698,9 @@ def fig_multi_panel_1x3():
     data = [RNG.normal(m, 1.0, 50) for m in (0, 1, 2)]
     bp = ax.boxplot(data, patch_artist=True, widths=0.55,
                     medianprops=dict(color=WXL_INK, linewidth=1.2),
-                    whiskerprops=dict(color=WXL_INK, linewidth=0.8),
-                    capprops=dict(color=WXL_INK, linewidth=0.8),
-                    boxprops=dict(edgecolor=WXL_INK, linewidth=0.8))
+                    whiskerprops=dict(color=WXL_INK, linewidth=0.5),
+                    capprops=dict(color=WXL_INK, linewidth=0.5),
+                    boxprops=dict(edgecolor=WXL_INK, linewidth=0.5))
     for patch, key in zip(bp["boxes"], ["primary", "contrast", "improve"]):
         patch.set_facecolor(P[key])
     ax.set_xticklabels(["G1", "G2", "G3"])
@@ -746,7 +749,7 @@ HTML_HEAD = """<!doctype html>
   .card .head{display:flex;justify-content:space-between;align-items:baseline;
               gap:10px;padding:9px 12px 6px;border-bottom:1px solid #e6e6e6}
   .card .head h3{margin:0;font-family:"Times New Roman",serif;font-size:15px}
-  .card .cat{font-size:11.5px;color:#fff;background:#6A5C95;padding:1px 7px;border-radius:2px}
+  .card .cat{font-size:11.5px;color:#fff;background:#9E95BA;padding:1px 7px;border-radius:2px}
   .card img{width:100%;height:auto;display:block;background:#fff;cursor:zoom-in;
             border-bottom:1px solid #e6e6e6}
   .card .body{padding:9px 12px 12px;font-size:12.5px;color:#333}

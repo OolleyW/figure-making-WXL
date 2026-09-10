@@ -77,11 +77,11 @@ These rules supersede any conflicting style text in `references/` or in upstream
    against their host; polar axes and pies have no rectangular frame. A
    multi-panel figure brings each subplot to `WXL_AXES_PANEL_MM` (75 × 55 mm)
    without touching the spacing.
-5. **Full box on every Cartesian axes.** All four spines drawn at 0.8 pt.
+5. **Full box on every Cartesian axes.** All four spines drawn at 0.5 pt.
    Exceptions: polar axes (radar), axes with `axison = False` (pie/donut) and
    colorbar axes.
 6. **Legend inside the axes, framed, and never covering data.** Opaque white
-   face, ink (#2E3142) 0.8 pt border, `framealpha = 1`. Placement is automatic:
+   face, ink (#2E3142) 0.5 pt border, `framealpha = 1`. Placement is automatic:
    `prepare_figure` (called by `finalize_figure`) measures the real overlap
    between the legend box and the plotted lines, bars and points, tries the nine
    candidate positions, and if none is clear it grows the y-range and retries.
@@ -89,7 +89,7 @@ These rules supersede any conflicting style text in `references/` or in upstream
    data. Use `ncol` for long label lists, and fall back to a dedicated legend
    panel only when no position works. Never place it outside the figure.
 7. **Ticks point inward, no grid, and both axis ends land on a tick value.**
-   Ticks are 3 pt long at 0.8 pt width. Every numeric Cartesian axis must start
+   Ticks are 3 pt long at 0.5 pt width. Every numeric Cartesian axis must start
    and end exactly on its first and last tick label, so a reader never sees an
    unlabelled strip at either end. `finalize_figure` calls `lock_axis_ends_all`
    automatically, and `check_wxl_style` fails a figure whose axis ends are not on
@@ -132,7 +132,7 @@ These rules supersede any conflicting style text in `references/` or in upstream
 |---|---|---|
 | Chart type | which chart, how many panels | grouped bar / trend / ... |
 | Axis labels | x and y text, units, italic or not | italic symbol, upright unit |
-| Line style | markers, width, dash pattern | open white markers 5.0 pt, 2.0 pt, solid |
+| Line style | markers, width, dash pattern | open white markers 3.5 pt, 1.5 pt, solid |
 | Colours | per-series colours; colormap for matrices | soft science `WXL_PALETTE` |
 
 For a variable, italicise the symbol and keep the unit upright, e.g.

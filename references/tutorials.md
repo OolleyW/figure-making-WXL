@@ -141,7 +141,7 @@ Points worth noticing:
   panel of a paper.
 - Cell annotations stay at 11 pt; stop annotating beyond 8 × 8.
 - The colorbar axes is exempt from the full-box rule but keeps inward ticks and
-  a 0.8 pt outline.
+  a 0.5 pt outline.
 
 ---
 

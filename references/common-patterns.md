@@ -197,7 +197,7 @@ cb.outline.set_linewidth(0.8)
 - Use `wxl_div_rose_blue` for signed data and `wxl_seq_blue` for non-negative fields.
 - Annotate cells only when the matrix is 8 × 8 or smaller.
 - Colorbar axes are exempt from the full-box check but must still use inward
-  ticks and a 0.8 pt outline.
+  ticks and a 0.5 pt outline.
 
 ## 8) Dual axes
 
@@ -222,7 +222,7 @@ both units in the caption.
 
 - Beyond four series, vary marker shape (`o`, `s`, `^`, `D`) and add hatch
   (`//`, `\\`, `..`) instead of introducing new hues.
-- Keep bar edges black at 0.8 pt so adjacent bars stay separated in grayscale.
+- Keep bar edges black at 0.5 pt so adjacent bars stay separated in grayscale.
 - Avoid alpha below 0.6 for data marks; light fills are for bands only.
 
 ## 10) Headless and batch runs

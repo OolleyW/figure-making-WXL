@@ -11,13 +11,13 @@ skill's `assets/` directory to `sys.path`.
 
 ```python
 WXL_PALETTE = {
-    "primary":   "#8FA2D6",   # Periwinkle Blue - proposed method / main series
-    "secondary": "#6A5C95",   # Lavender Dusk   - supporting series
-    "contrast":  "#D99AAE",   # Coral Bloom     - baseline / competing method
-    "improve":   "#A9CBB8",   # Seafoam Mist    - improvement / positive variant
-    "accent":    "#E7A889",   # Coral Peach     - emphasis, annotations
-    "neutral":   "#5B608C",   # Slate Violet    - reference lines, grid, background
-    "light":     "#CFE3E6",   # Pale Aqua       - light fill, uncertainty bands
+    "primary":   "#B6C3E4",   # Periwinkle Blue - proposed method / main series
+    "secondary": "#9E95BA",   # Lavender Dusk   - supporting series
+    "contrast":  "#E6BDCA",   # Coral Bloom     - baseline / competing method
+    "improve":   "#C7DDD1",   # Seafoam Mist    - improvement / positive variant
+    "accent":    "#EFC6B2",   # Coral Peach     - emphasis, annotations
+    "neutral":   "#9498B4",   # Slate Violet    - reference lines, grid, background
+    "light":     "#E0EDEF",   # Pale Aqua       - light fill, uncertainty bands
 }
 ```
 
@@ -117,7 +117,7 @@ vector export options, `pdf.fonttype = 42`). Call once before creating figures.
 ### framed_legend(ax, **kwargs)
 
 Builds a legend **inside** the axes with an opaque white face and a black
-0.8 pt border. Pass `loc`, `ncol`, `handles`, `labels` as usual. The position is
+0.5 pt border. Pass `loc`, `ncol`, `handles`, `labels` as usual. The position is
 refined later by `place_all_legends`, so `loc="best"` is a fine starting point.
 
 ```python

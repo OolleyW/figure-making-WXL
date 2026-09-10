@@ -33,20 +33,20 @@ from matplotlib.font_manager import findfont
 # Constants
 # --------------------------------------------------------------------------
 
-#: Soft pastel science palette. The seven colours are the "extracted core
-#: palette" supplied by the user: a diffuse lavender / deep slate pair for the
-#: main roles, a coral pair (bloom / peach) and a seafoam for the comparison and
-#: gain roles, and a pale aqua for light fills. The light members carry the large
-#: areas so a big bar or stacked area stays calm; the two deep violets are kept
-#: for thin lines, emphasis and references.
+#: Soft pastel science palette, lifted for an airy print look. The "extracted
+#: core palette" seven colours are taken 35 % toward white (hue unchanged), so a
+#: large fill never reads as a heavy mass: measured on a stacked bar the mean
+#: luminance of the non-white pixels rises from 141 to 165. The light members
+#: still carry the biggest areas; the two violets stay on thin lines, emphasis
+#: and references.
 WXL_PALETTE = {
-    "primary": "#8FA2D6",    # Periwinkle Blue - proposed method / main series
-    "secondary": "#6A5C95",  # Lavender Dusk   - supporting series
-    "contrast": "#D99AAE",   # Coral Bloom     - baseline / competing method
-    "improve": "#A9CBB8",    # Seafoam Mist    - improvement / positive variant
-    "accent": "#E7A889",     # Coral Peach     - emphasis, annotations
-    "neutral": "#5B608C",    # Slate Violet    - reference lines, grid, background
-    "light": "#CFE3E6",      # Pale Aqua       - light fill, uncertainty bands
+    "primary": "#B6C3E4",    # Periwinkle Blue - proposed method / main series
+    "secondary": "#9E95BA",  # Lavender Dusk   - supporting series
+    "contrast": "#E6BDCA",   # Coral Bloom     - baseline / competing method
+    "improve": "#C7DDD1",    # Seafoam Mist    - improvement / positive variant
+    "accent": "#EFC6B2",     # Coral Peach     - emphasis, annotations
+    "neutral": "#9498B4",    # Slate Violet    - reference lines, grid, background
+    "light": "#E0EDEF",      # Pale Aqua       - light fill, uncertainty bands
 }
 
 #: Ink for text: axis labels, tick labels and annotations. Pure black, so the
@@ -64,9 +64,9 @@ WXL_FRAME = "#000000"
 #: clear -> periwinkle through a neutral centre (signed data); ``seq`` runs
 #: near-white -> seafoam -> periwinkle -> slate violet (single-sided magnitudes).
 WXL_CMAP_STOPS = {
-    "div_rose_blue": ["#C9738F", "#D99AAE", "#F2DEE4", "#F6F7FA", "#C9D4EE",
-                      "#8FA2D6", "#6E86C4"],
-    "seq_blue": ["#F5F7FC", "#D7E6EA", "#A9CBB8", "#8FA2D6", "#5B608C"],
+    "div_rose_blue": ["#D8A0B3", "#E6BDCA", "#F3E7EC", "#F7F9FC", "#DDE4F2",
+                      "#B6C3E4", "#9E95BA"],
+    "seq_blue": ["#F7FAFB", "#E0EDEF", "#C7DDD1", "#B6C3E4", "#9498B4"],
 }
 for _name, _stops in WXL_CMAP_STOPS.items():
     matplotlib.colormaps.register(
@@ -151,11 +151,11 @@ class WXLStyle:
     tick_size: float = 11.0
     legend_size: float = 10.0
     annot_size: float = 11.0
-    axes_linewidth: float = 0.8
-    line_width: float = 2.0
-    marker_size: float = 5.0
-    bar_edge_width: float = 0.8
-    error_linewidth: float = 0.8
+    axes_linewidth: float = 0.5
+    line_width: float = 1.5
+    marker_size: float = 3.5
+    bar_edge_width: float = 0.5
+    error_linewidth: float = 0.5
     capsize: float = 2.0
     figsize: tuple = WXL_FIGSIZE["double"]
     dpi: int = 600
@@ -243,7 +243,7 @@ def framed_legend(ax, **kwargs):
     kwargs.setdefault("loc", "best")
     leg = ax.legend(frameon=True, **kwargs)
     leg.get_frame().set_edgecolor(WXL_FRAME)
-    leg.get_frame().set_linewidth(0.8)
+    leg.get_frame().set_linewidth(0.5)
     leg.get_frame().set_alpha(1.0)
     return leg
 
@@ -424,7 +424,7 @@ def _legend_right_panel(fig, ax, leg):
                             handlelength=1.6, handletextpad=0.6,
                             borderaxespad=0.0)
     new_leg.get_frame().set_edgecolor(WXL_FRAME)
-    new_leg.get_frame().set_linewidth(0.8)
+    new_leg.get_frame().set_linewidth(0.5)
     new_leg.get_frame().set_alpha(1.0)
     # tight_layout would reset the manual positions and hide the panel again
     fig._wxl_no_tight = True
