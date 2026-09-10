@@ -100,5 +100,5 @@ choice stays unanswered, ask again; do not assume.
 ## Related files
 
 - [../SKILL.md](../SKILL.md) — hard rule 12 (ask before you plot)
-- [demos.md](demos.md) — the 21 chart types and their widths
+- [demos.md](demos.md) — the 22 chart types and their widths
 - [design-theory.md](design-theory.md) — palette semantics, type scale

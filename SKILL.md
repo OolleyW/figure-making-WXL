@@ -7,7 +7,7 @@ description: >-
   framed in-plot legends, inward ticks, no grid, captions below the figure, and
   figure widths fixed to the final print width (90 / 140 / 190 mm). Before
   plotting it always asks the user for the chart type, the x/y axis labels (and
-  whether each symbol is italic), the line style and the colours. Covers 21
+  whether each symbol is italic), the line style and the colours. Covers 22
   chart types (grouped/stacked/horizontal bars, trend lines, uncertainty bands,
   stacked areas, scatter, bubble, error bars, box, violin, histogram + KDE,
   ECDF, strip+mean, heatmap, filled contour, radar, donut, dual axis, multi
@@ -81,7 +81,7 @@ These rules supersede any conflicting style text in `references/` or in upstream
    Exceptions: polar axes (radar), axes with `axison = False` (pie/donut) and
    colorbar axes.
 6. **Legend inside the axes, framed, and never covering data.** Opaque white
-   face, black 0.8 pt border, `framealpha = 1`. Placement is automatic:
+   face, ink (#2E3142) 0.8 pt border, `framealpha = 1`. Placement is automatic:
    `prepare_figure` (called by `finalize_figure`) measures the real overlap
    between the legend box and the plotted lines, bars and points, tries the nine
    candidate positions, and if none is clear it grows the y-range and retries.
@@ -170,7 +170,7 @@ assert report["ok"], report["problems"]
 finalize_figure(fig, "figures/accuracy", formats=["png", "pdf"], dpi=600)
 ```
 
-The 21 chart types the style covers, each with its core call, are listed in
+The 22 chart types the style covers, each with its core call, are listed in
 `references/demos.md`; runnable code for all of them lives in
 `examples/gallery.py`.
 
@@ -238,7 +238,7 @@ axis ends on tick values, the 90 / 140 / 190 mm width calibration, and a
   reports that must match the WXL look (11 pt Times, deep blue, full box).
 - Requests for **论文配图 / 科研绘图 / 画图** where the figure will be pasted
   into Word and should match 11 pt body text.
-- Any of the 21 chart types in `references/demos.md`, or multi-panel layouts.
+- Any of the 22 chart types in `references/demos.md`, or multi-panel layouts.
 
 ## When not to load
 
@@ -256,11 +256,11 @@ axis ends on tick values, the 90 / 140 / 190 mm width calibration, and a
 | [references/design-theory.md](references/design-theory.md) | Why 11 pt, Word insertion, palette semantics, print widths, exceptions |
 | [references/common-patterns.md](references/common-patterns.md) | Legend placement, panel tags, multi-panel, print-safe encoding |
 | [references/tutorials.md](references/tutorials.md) | End-to-end walkthroughs (bar, trend + band, heatmap) |
-| [references/demos.md](references/demos.md) | The 21 chart types and where the runnable code lives |
+| [references/demos.md](references/demos.md) | The 22 chart types and where the runnable code lives |
 | `assets/wxl_style.py` | The importable style module (rcParams, palette, helpers, audit) |
 | `assets/wxl_docx.py` | Word assembly: 100 % insertion, captions, three-line tables |
 | `scripts/check_wxl_style.py` | Run `python scripts/check_wxl_style.py` to self-test the install |
-| `examples/gallery.py` | Render all 21 chart types plus an HTML preview gallery |
+| `examples/gallery.py` | Render all 22 chart types plus an HTML preview gallery |
 | `examples/word_report.py` | Render figures and assemble a Word report end to end |
-| `examples/column_gallery.py` | All 21 chart types at 90 mm and 190 mm in one Word document |
+| `examples/column_gallery.py` | All 22 chart types at 90 mm and 190 mm in one Word document |
 | `requirements.txt` | Python dependencies (matplotlib, numpy, Pillow; python-docx optional) |

@@ -21,7 +21,22 @@ WXL_PALETTE = {
 }
 ```
 
-Only these colors plus black and white are allowed. `check_wxl_style` enforces it.
+Only these colors plus the ink `#2E3142`, black and white are allowed.
+`check_wxl_style` enforces it.
+
+### WXL_INK
+
+```python
+WXL_INK = "#2E3142"
+```
+
+The colour for text, axis labels, tick labels, annotations, spines, tick marks,
+the legend border and every bar / marker outline. A deep slate instead of pure
+black, so the line work reads calmer against the pastel fills while keeping
+near-black contrast. `apply_wxl_style` installs it for `text.color`,
+`axes.labelcolor`, `axes.edgecolor`, `xtick.color`, `ytick.color` and
+`legend.edgecolor`; pass `edgecolor=WXL_INK` on patches and markers. Pure black
+is still accepted by the audit.
 
 ### WXL_CMAP / WXL_CMAPS
 
@@ -371,4 +386,4 @@ patch by more than 5 % of the legend area.
 - [design-theory.md](design-theory.md) — rationale for 11 pt, palette, widths
 - [common-patterns.md](common-patterns.md) — layout patterns
 - [tutorials.md](tutorials.md) — worked examples
-- [demos.md](demos.md) — the 21 chart types
+- [demos.md](demos.md) — the 22 chart types

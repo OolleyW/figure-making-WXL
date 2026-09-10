@@ -91,7 +91,7 @@ at most a two-entry legend. If a panel feels crowded at 90 mm, move it to
 A soft, low-saturation "science" set of seven colours, in the spirit of the soft
 pastel palettes used by modern journal-figure libraries (for example SciPalette's
 pastel sets, the AAAS/Nature palettes in `ggsci`, and the `science` preset in
-`plotstyle`). Muted fills with black edges keep the figures calm and print-safe.
+`plotstyle`). Muted fills with ink edges keep the figures calm and print-safe.
 
 | Key | Hex | Name | Meaning | Typical use |
 |---|---|---|---|---|
@@ -116,8 +116,12 @@ Design intent:
 - Seafoam marks gain; peach marks emphasis. Do not use them as a second baseline.
 - Slate violet is the deliberate low-chroma one: it is the only colour used for
   reference lines and grids, so nothing in the data competes with it.
-- These are 300 dpi-ready pastels, so the 0.8 pt black edge on every patch does
+- These are 300 dpi-ready pastels, so the 0.8 pt ink edge on every patch does
   the definition work that a saturated fill would otherwise do.
+- **Ink, not black.** Text, axes, annotations and every outline use
+  `WXL_INK = "#2E3142"`, a deep slate. It keeps near-black contrast but reads
+  calmer against the pastels than pure black. The audit accepts pure black too,
+  so existing figures do not break.
 - Grayscale safety: the set separates by lightness as well as hue, so the figure
   survives a black-and-white print. When more than four series are needed, add
   hatch or marker-shape encoding rather than new hues.
@@ -149,7 +153,7 @@ and more contrast is needed.
 - **Line width**: 1.5 pt for data curves, 0.8 pt for error bars and edges.
 - **Markers**: 4 pt, white fill, 0.9 pt colored edge, so overlapping points stay
   distinguishable.
-- **Bars**: 0.8 pt black edge. In grouped bars, bar width 0.26 of the category
+- **Bars**: 0.8 pt ink edge. In grouped bars, bar width 0.26 of the category
   spacing leaves a visible gap without looking sparse.
 
 ## 4) Layout
@@ -192,7 +196,7 @@ fixed bounding box would clip it.
 ## 7) Reproduction checklist
 
 1. Pick the width preset, then `apply_wxl_style()`.
-2. Draw with `WXL_PALETTE` colors only; black edges on bars and markers.
+2. Draw with `WXL_PALETTE` colors only; ink edges on bars and markers.
 3. Legend inside, framed; loosen limits so it never covers data.
 4. Caption below via `add_caption`; panel tags below their panels.
 5. `report = check_wxl_style(fig)`; fix every problem before saving.
@@ -203,4 +207,4 @@ fixed bounding box would clip it.
 - [../SKILL.md](../SKILL.md) — the hard rules
 - [api.md](api.md) — signatures and constants
 - [common-patterns.md](common-patterns.md) — operational patterns
-- [demos.md](demos.md) — the 21 chart types
+- [demos.md](demos.md) — the 22 chart types

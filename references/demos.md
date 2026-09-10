@@ -1,4 +1,4 @@
-# Demos: the 21 chart types
+# Demos: the 22 chart types
 
 All 21 are implemented in `examples/gallery.py` and rendered by
 
@@ -21,9 +21,17 @@ below gives the figure id, the width preset used, and the core call to copy.
 
 | id | Chart | Width | Core call |
 |---|---|---|---|
+| `line_markers` | Multi-curve marker chart: one marker shape and fill per series | double | `ax.plot(x, y, "-", marker=mk, mfc=key if solid else "white", mec=key)` |
 | `line_trend` | Multi-series trend with markers | double | `ax.plot(x, y, "-o", mfc="white", mew=0.9)` |
 | `line_band` | Trend with uncertainty band | double | `ax.fill_between(x, y-sd, y+sd, alpha=0.35)` |
-| `stacked_area` | Stacked area | double | `ax.stackplot(x, *series, edgecolor="black")` |
+| `stacked_area` | Stacked area | double | `ax.stackplot(x, *series, edgecolor=WXL_INK)` |
+
+`line_markers` is the type to reach for when several curves share one axes: give
+each series a distinct marker shape (circle, square, triangle, diamond,
+down-triangle) and a distinct fill (solid colour, hollow white, or half-filled
+via `fillstyle`), so the curves stay separable even in a black-and-white print.
+Keep the legend to two columns and leave headroom on the y-axis — a five-entry
+legend is wider than it looks inside the 75 × 55 mm single-column frame.
 
 ## Relationship family
 

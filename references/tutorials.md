@@ -155,7 +155,7 @@ python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
 `~/.dsh/skills/figure-making-wxl`. The default `--out` is `~/wxl_gallery`, so
 the flag is optional.
 
-This renders all 21 chart types to `<out>/figs/*.png` (300 dpi) and
+This renders all 22 chart types to `<out>/figs/*.png` (300 dpi) and
 `*.pdf` (vector), runs `check_wxl_style` on each, and writes
 `<out>/index.html` — a gallery that shows every figure with its category, its
 core API call and its audit result. The script exits non-zero if any figure
@@ -177,4 +177,4 @@ or a metric-compatible fallback such as `nimbusroman-regular.otf` elsewhere, and
 - [../SKILL.md](../SKILL.md) — hard rules
 - [api.md](api.md) — signatures
 - [common-patterns.md](common-patterns.md) — more recipes
-- [demos.md](demos.md) — the 21 chart types
+- [demos.md](demos.md) — the 22 chart types

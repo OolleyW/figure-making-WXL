@@ -3,7 +3,7 @@
     pip install python-docx
     python column_gallery.py --out ./wxl_columns
 
-Renders all 21 chart types twice (single column 90 mm, double column 190 mm),
+Renders all 22 chart types twice (single column 90 mm, double column 190 mm),
 audits each render, then assembles a Word document with the paper layout
 contract applied through ``assets/wxl_docx.py``: one page per chart type showing
 both variants stacked, a cover page with a three-line summary table, figure

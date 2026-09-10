@@ -52,7 +52,7 @@ No9 L / Liberation Serif.
 ### 4. What the agent must do to stay on-style
 
 1. `apply_wxl_style()` before creating any figure.
-2. Draw only with `WXL_PALETTE` colors, black edges, no custom fonts or sizes.
+2. Draw only with `WXL_PALETTE` colors, ink edges, no custom fonts or sizes.
 3. `prepare_figure(fig)` then `check_wxl_style(fig)`; fix every reported problem.
 4. `finalize_figure(fig, ..., target_width_mm=WXL_WIDTH_MM[preset])`.
 5. Insert the PNG into Word at 100 %, or assemble the document with
@@ -76,7 +76,7 @@ the colours — the skill never decides these for them. See `references/preferen
 | Type scale | 11 pt body, legend 10 pt |
 | Palette | soft science 7-colour set: Periwinkle Blue `#8FA2D6` primary, Coral Bloom `#D99AAE` contrast, Seafoam Mist `#A9CBB8` improve, Coral Peach `#E7A889` accent, Lavender Dusk `#6A5C95` secondary, Slate Violet `#5B608C` neutral, Pale Aqua `#CFE3E6` light |
 | Axes | full box, 0.8 pt spines |
-| Legend | inside the axes, white face, black 0.8 pt border |
+| Legend | inside the axes, white face, ink (#2E3142) 0.8 pt border |
 | Ticks | inward, no grid, both axis ends land on a tick label |
 | Caption | below the figure, centered |
 | Width | single 90 mm / onehalf 140 mm / double 190 mm |
@@ -104,7 +104,7 @@ publication figure / 科研绘图 / 论文配图, then follows `SKILL.md`:
    (text, units, and whether each symbol is italic), the line style, and the
    colours. Do not decide these for them — see `references/preferences.md`.
 2. `apply_wxl_style()`.
-3. Draw with `WXL_PALETTE` colours and black edges; every label at 11 pt.
+3. Draw with `WXL_PALETTE` colours and ink edges; every label at 11 pt.
 4. `prepare_figure(fig)` then `check_wxl_style(fig)`; fix every reported problem.
 5. `finalize_figure(fig, ..., target_width_mm=WXL_WIDTH_MM[preset])`.
 6. Insert the PNG into Word at 100 %, or assemble the document with
@@ -153,7 +153,7 @@ A text variable goes in `$...$` (italic), a unit stays outside and upright:
 # verify the install on this machine
 python "<skill-dir>/scripts/check_wxl_style.py"
 
-# render all 21 chart types + an HTML gallery
+# render all 22 chart types + an HTML gallery
 python "<skill-dir>/examples/gallery.py" --out ./wxl_gallery
 
 # every chart type at 90 mm and 190 mm in one Word document
@@ -167,7 +167,8 @@ python "<skill-dir>/examples/word_report.py" --out ./wxl_report
 ## Chart types (21)
 
 Bar: grouped with error bars, stacked, horizontal.
-Line: multi-series trend, trend + uncertainty band, stacked area.
+Line: multi-curve marker chart (distinct marker style and fill per series),
+multi-series trend, trend + uncertainty band, stacked area.
 Relationship: scatter + fit, bubble, bidirectional error bars.
 Distribution: box, violin, histogram + KDE, ECDF, strip + mean.
 Matrix: annotated heatmap, filled contour.
@@ -195,6 +196,10 @@ layouts, `multi_panel` and `multi_panel_1x3`, keep their full width).
 | Multi-series trend | Trend + uncertainty band | Stacked area |
 |---|---|---|
 | <img src="preview/line_trend.png" width="300"> | <img src="preview/line_band.png" width="300"> | <img src="preview/stacked_area.png" width="300"> |
+
+| **Multi-curve marker chart** — five curves, each with its own marker shape and fill |
+|---|
+| <img src="preview/line_markers.png" width="420"> |
 
 ### Relationship
 
@@ -252,23 +257,35 @@ never Helvetica, Arial or DejaVu Sans. CJK falls back to SimSun.
 | Frame | all four spines, 0.8 pt |
 | Ticks | inward, 3 pt long |
 | Grid | none (radar chart is the exception) |
-| Legend | inside the axes, opaque white face, black 0.8 pt border |
+| Legend | inside the axes, opaque white face, ink (#2E3142) 0.8 pt border |
 | Axis ends | on a tick value (no unlabelled strip) |
 | Export | PNG 600 dpi + vector PDF |
 | Single-column black frame | one fixed 75 × 55 mm box in every figure |
+
+### Ink
+
+| Role | Colour |
+|---|---|
+| Text, axis labels, tick labels, annotations | `#2E3142` |
+| Spines, ticks, legend border, bar / marker outlines | `#2E3142` |
+
+A deep slate rather than pure black: it keeps near-black contrast but reads
+calmer against the pastel fills. The constant is `WXL_INK`; pure black stays
+accepted by the audit for backward compatibility.
 
 ### Line styles
 
 | Attribute | Options |
 |---|---|
-| Markers | open circle (default, white fill), square, triangle, diamond, or none for dense data |
+| Markers | open circle (default, white fill), square, triangle, diamond, down-triangle, or none for dense data |
+| Marker fill | solid colour, hollow white, or half-filled (`fillstyle`) — vary it per series so a black-and-white print still separates them |
 | Line width | 1.5 pt (default), 1.0 pt for many series, 2.0 pt for the key curve |
 | Dash | solid (default) for the main series; dashed for a reference / baseline |
 | Marker frequency | every point (default), every 2nd–5th for dense data |
 
 ### Colour palette
 
-The only colours allowed are the palette, black and white.
+The only colours allowed are the palette, the ink `#2E3142`, black and white.
 
 ![WXL_PALETTE](img/palette.png)
 
@@ -321,15 +338,15 @@ The skill never picks these for you.
 | `references/design-theory.md` | why 11 pt, the tight-crop trap, palette semantics, exceptions |
 | `references/common-patterns.md` | legend placement, multi-panel, dual axes, print-safe encoding |
 | `references/tutorials.md` | three end-to-end walkthroughs |
-| `references/demos.md` | the 21 chart types with core calls |
+| `references/demos.md` | the 22 chart types with core calls |
 | `assets/wxl_style.py` | importable style module (rcParams, palette, helpers, audit) |
 | `assets/wxl_docx.py` | Word assembly: 100 % insertion, captions, three-line tables |
 | `scripts/check_wxl_style.py` | installation self-test |
-| `examples/gallery.py` | render all 21 types + an HTML gallery |
+| `examples/gallery.py` | render all 22 types + an HTML gallery |
 | `examples/word_report.py` | render figures and assemble a Word report |
-| `examples/column_gallery.py` | all 21 types at 90 mm and 190 mm in one Word document |
+| `examples/column_gallery.py` | all 22 types at 90 mm and 190 mm in one Word document |
 | `requirements.txt` | dependencies (python-docx optional) |
-| `preview/*.png` | 300 dpi previews of the 21 chart types |
+| `preview/*.png` | 300 dpi previews of the 22 chart types |
 
 ## Regenerate
 

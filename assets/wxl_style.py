@@ -9,7 +9,7 @@ Hard rules (see SKILL.md):
   * Uniform 11 pt text (caption / axis label / tick / legend / annotation).
   * Soft science palette only (muted pastel series; see WXL_PALETTE).
   * Full box on every Cartesian axes (all four spines).
-  * Legend inside the axes, opaque white face, black 0.8 pt border.
+  * Legend inside the axes, opaque white face, ink (#2E3142) 0.8 pt border.
   * Ticks point inward, no grid.
   * Figure caption below the figure via add_caption (never fig.suptitle).
   * Figure width equals the final print width (90 / 140 / 190 mm).
@@ -45,6 +45,11 @@ WXL_PALETTE = {
     "neutral": "#5B608C",    # Slate Violet     - reference lines, grid, background
     "light": "#CFE3E6",      # Pale Aqua        - light fill, uncertainty bands
 }
+
+#: Ink for text, axes, annotations and every outline. A deep slate rather than
+#: pure black, so the line work reads calmer against the pastel fills while
+#: keeping the contrast of a near-black.
+WXL_INK = "#2E3142"
 
 #: Default diverging colour map for matrices and correlation heatmaps.
 WXL_CMAP = "RdBu_r"
@@ -132,7 +137,7 @@ class WXLStyle:
     figsize: tuple = WXL_FIGSIZE["double"]
     dpi: int = 600
     full_box: bool = True          # all four spines on every Cartesian axes
-    legend_framed: bool = True     # legend inside axes, black 0.8 pt border
+    legend_framed: bool = True     # legend inside axes, ink (#2E3142) 0.8 pt border
     ticks_in: bool = True
     grid: bool = False
 
@@ -158,6 +163,13 @@ def apply_wxl_style(style: WXLStyle | None = None) -> WXLStyle:
         "xtick.labelsize": st.tick_size,
         "ytick.labelsize": st.tick_size,
         "legend.fontsize": st.legend_size,
+        # ink: text, axes and annotations use the deep slate instead of pure
+        # black, which reads softer on screen and in print
+        "text.color": WXL_INK,
+        "axes.labelcolor": WXL_INK,
+        "axes.edgecolor": WXL_INK,
+        "xtick.color": WXL_INK,
+        "ytick.color": WXL_INK,
         "axes.linewidth": st.axes_linewidth,
         "axes.spines.top": st.full_box,
         "axes.spines.right": st.full_box,
@@ -175,7 +187,7 @@ def apply_wxl_style(style: WXLStyle | None = None) -> WXLStyle:
         "errorbar.capsize": st.capsize,
         "patch.linewidth": st.bar_edge_width,
         "legend.frameon": st.legend_framed,
-        "legend.edgecolor": "black",
+        "legend.edgecolor": WXL_INK,
         "legend.framealpha": 1.0,
         "legend.fancybox": False,
         "figure.dpi": 110,
@@ -199,14 +211,14 @@ def create_subplots(nrows: int = 1, ncols: int = 1, figsize=None, **kwargs):
 
 
 def framed_legend(ax, **kwargs):
-    """Legend inside the axes with an opaque white face and black 0.8 pt border.
+    """Legend inside the axes with an opaque white face and 0.8 pt ink border.
 
     The position is refined later by :func:`place_all_legends`, which measures
     the real overlap between the legend box and the plotted data.
     """
     kwargs.setdefault("loc", "best")
     leg = ax.legend(frameon=True, **kwargs)
-    leg.get_frame().set_edgecolor("black")
+    leg.get_frame().set_edgecolor(WXL_INK)
     leg.get_frame().set_linewidth(0.8)
     leg.get_frame().set_alpha(1.0)
     return leg
@@ -387,7 +399,7 @@ def _legend_right_panel(fig, ax, leg):
                             fontsize=WXL_FONTSIZE["legend"], ncol=1,
                             handlelength=1.6, handletextpad=0.6,
                             borderaxespad=0.0)
-    new_leg.get_frame().set_edgecolor("black")
+    new_leg.get_frame().set_edgecolor(WXL_INK)
     new_leg.get_frame().set_linewidth(0.8)
     new_leg.get_frame().set_alpha(1.0)
     # tight_layout would reset the manual positions and hide the panel again
@@ -1429,8 +1441,9 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
         if not frame.get_visible():
             problems.append(f"axes[{i}]: legend frame hidden")
         ec = to_hex(frame.get_edgecolor(), keep_alpha=False).upper()
-        if ec != "#000000":
-            problems.append(f"axes[{i}]: legend border is {ec}, expected #000000")
+        if ec not in (WXL_INK.upper(), "#000000"):
+            problems.append(
+                f"axes[{i}]: legend border is {ec}, expected {WXL_INK}")
         if float(frame.get_alpha() or 1.0) < 0.999:
             problems.append(f"axes[{i}]: legend frame is transparent")
         # soft check: the legend should sit on empty canvas
@@ -1464,7 +1477,8 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
             soft.append(f"axes[{i}]: adjacent tick labels overlap")
 
     # ---- colours -------------------------------------------------------
-    allowed_colors = {v.upper() for v in WXL_PALETTE.values()} | {"#000000", "#FFFFFF"}
+    allowed_colors = ({v.upper() for v in WXL_PALETTE.values()}
+                      | {WXL_INK.upper(), "#000000", "#FFFFFF"})
     for art in fig.findobj(lambda a: isinstance(a, matplotlib.lines.Line2D)):
         if not art.get_visible():
             continue
