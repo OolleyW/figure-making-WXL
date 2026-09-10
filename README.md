@@ -74,7 +74,7 @@ the colours — the skill never decides these for them. See `references/preferen
 | Target | Elsevier / IEEE / Springer |
 | Font | Times New Roman + STIX math, SimSun for CJK |
 | Type scale | 11 pt body, legend 10 pt |
-| Palette | soft science 7-colour set: Periwinkle Blue `#9FB2DD` primary, Coral Bloom `#E69AB0` contrast, Seafoam Mist `#B8D3C4` improve, Coral Peach `#EEBEA8` accent, Lavender Dusk `#8780B8` secondary, Slate Violet `#555C82` neutral, Pale Aqua `#E0E6F4` light |
+| Palette | soft science 7-colour set: Periwinkle Blue `#1875BA` primary, Coral Bloom `#C21F30` contrast, Seafoam Mist `#0C8B94` improve, Coral Peach `#E7674A` accent, Lavender Dusk `#68A8CC` secondary, Slate Violet `#777F85` neutral, Pale Aqua `#FCB796` light |
 | Axes | full box, 0.8 pt spines |
 | Legend | inside the axes, white face, ink (#2E3142) 0.8 pt border |
 | Ticks | inward, no grid, both axis ends land on a tick label |
@@ -279,7 +279,8 @@ accepted by the audit for backward compatibility.
 |---|---|
 | Markers | open circle (default), square, triangle, diamond, down-triangle, or none for dense data |
 | Marker fill | white fill with a coloured edge, so only the shape carries the series identity and the figure survives a black-and-white print |
-| Line width | 1.5 pt (default), 1.0 pt for many series, 2.0 pt for the key curve |
+| Marker size | 5.0 pt (house default) |
+| Line width | 2.0 pt (house default); 1.2 pt for a fitted or reference line |
 | Dash | solid (default) for the main series; dashed for a reference / baseline |
 | Marker frequency | every point (default), every 2nd–5th for dense data |
 
@@ -291,13 +292,13 @@ The only colours allowed are the palette, the ink `#2E3142`, black and white.
 
 | Key | Hex | Name | Meaning | Typical use |
 |---|---|---|---|---|
-| `primary` | `#9FB2DD` | Periwinkle Blue | the method you argue for | main bars, main curve |
-| `secondary` | `#8780B8` | Lavender Dusk | supporting series | extra series |
-| `contrast` | `#E69AB0` | Coral Bloom | baseline / competitor | comparison bars / curves |
-| `improve` | `#B8D3C4` | Seafoam Mist | improvement / variant | ablation, positive deltas |
-| `accent` | `#EEBEA8` | Coral Peach | emphasis | annotations, highlighted points |
-| `neutral` | `#555C82` | Slate Violet | reference / background | gridlines, target lines |
-| `light` | `#E0E6F4` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
+| `primary` | `#1875BA` | Periwinkle Blue | the method you argue for | main bars, main curve |
+| `secondary` | `#68A8CC` | Lavender Dusk | supporting series | extra series |
+| `contrast` | `#C21F30` | Coral Bloom | baseline / competitor | comparison bars / curves |
+| `improve` | `#0C8B94` | Seafoam Mist | improvement / variant | ablation, positive deltas |
+| `accent` | `#E7674A` | Coral Peach | emphasis | annotations, highlighted points |
+| `neutral` | `#777F85` | Slate Violet | reference / background | gridlines, target lines |
+| `light` | `#FCB796` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
 
 The light members carry the area and the two deep violets carry the lines: only
 Lavender Dusk and Slate Violet are dark (luminance ≈ 99/255), so the large fills

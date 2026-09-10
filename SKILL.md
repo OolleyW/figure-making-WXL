@@ -132,7 +132,7 @@ These rules supersede any conflicting style text in `references/` or in upstream
 |---|---|---|
 | Chart type | which chart, how many panels | grouped bar / trend / ... |
 | Axis labels | x and y text, units, italic or not | italic symbol, upright unit |
-| Line style | markers, width, dash pattern | open markers, 1.5 pt, solid |
+| Line style | markers, width, dash pattern | open white markers 5.0 pt, 2.0 pt, solid |
 | Colours | per-series colours; colormap for matrices | soft science `WXL_PALETTE` |
 
 For a variable, italicise the symbol and keep the unit upright, e.g.

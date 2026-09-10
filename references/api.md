@@ -11,13 +11,13 @@ skill's `assets/` directory to `sys.path`.
 
 ```python
 WXL_PALETTE = {
-    "primary":   "#9FB2DD",   # Periwinkle Blue - proposed method / main series
-    "secondary": "#8780B8",   # Lavender Dusk   - supporting series
-    "contrast":  "#E69AB0",   # Coral Bloom     - baseline / competing method
-    "improve":   "#B8D3C4",   # Seafoam Mist    - improvement / positive variant
-    "accent":    "#EEBEA8",   # Coral Peach     - emphasis, annotations
-    "neutral":   "#555C82",   # Slate Violet    - reference lines, grid, background
-    "light":     "#E0E6F4",   # Pale Aqua       - light fill, uncertainty bands
+    "primary":   "#1875BA",   # Periwinkle Blue - proposed method / main series
+    "secondary": "#68A8CC",   # Lavender Dusk   - supporting series
+    "contrast":  "#C21F30",   # Coral Bloom     - baseline / competing method
+    "improve":   "#0C8B94",   # Seafoam Mist    - improvement / positive variant
+    "accent":    "#E7674A",   # Coral Peach     - emphasis, annotations
+    "neutral":   "#777F85",   # Slate Violet    - reference lines, grid, background
+    "light":     "#FCB796",   # Pale Aqua       - light fill, uncertainty bands
 }
 ```
 

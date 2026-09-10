@@ -33,35 +33,41 @@ from matplotlib.font_manager import findfont
 # Constants
 # --------------------------------------------------------------------------
 
-#: Soft science palette (muted pastel series, journal-figure look). The light
-#: members carry the large fills, so a big bar or stacked area stays calm; the
-#: two deep violets are kept for thin lines, emphasis and references. The seven
-#: values were sampled off the reference stacked-bar chart (mode colour of each
-#: segment) and adopted as-is; ``light`` is a 68 %-toward-white tint of
-#: ``primary``, since the reference chart has no light fill role.
+#: Spectra-derived science palette. The six colours were sampled off a
+#: multi-panel XRD / FTIR / XPS / Raman figure: a deep blue and a light blue for
+#: the two main traces, a dark red for the reference / competitor trace, a teal
+#: for the fitted components, an orange for the Raman bands and a peach for the
+#: light fit fills. The sheet has no grey, so ``neutral`` is derived from the
+#: primary by dropping its saturation to 10 % at value 0.52.
 WXL_PALETTE = {
-    "primary": "#9FB2DD",    # Periwinkle Blue  - proposed method / main series
-    "secondary": "#8780B8",  # Lavender Dusk    - supporting series
-    "contrast": "#E69AB0",   # Coral Bloom      - baseline / competing method
-    "improve": "#B8D3C4",    # Seafoam Mist     - improvement / positive variant
-    "accent": "#EEBEA8",     # Coral Peach      - emphasis, annotations
-    "neutral": "#555C82",    # Slate Violet     - reference lines, grid, background
-    "light": "#E0E6F4",      # pale Periwinkle  - light fill, uncertainty bands
+    "primary": "#1875BA",    # deep blue   - proposed method / main series
+    "secondary": "#68A8CC",  # light blue  - supporting series
+    "contrast": "#C21F30",   # dark red    - baseline / competing method
+    "improve": "#0C8B94",    # teal        - improvement / positive variant
+    "accent": "#E7674A",     # orange      - emphasis, annotations
+    "neutral": "#777F85",    # derived grey- reference lines, grid, background
+    "light": "#FCB796",      # peach       - light fill, uncertainty bands
 }
 
-#: Ink for text, axes, annotations and every outline. A deep slate rather than
-#: pure black, so the line work reads calmer against the pastel fills while
-#: keeping the contrast of a near-black.
-WXL_INK = "#2E3142"
+#: Ink for text: axis labels, tick labels and annotations. Pure black, so the
+#: type sits at maximum contrast against the fills.
+WXL_INK = "#000000"
+
+#: The frame: axes spines, tick marks, the legend border and every bar / marker
+#: outline. Also pure black, so the box that delimits the data stays crisp.
+#: Kept as a separate constant so the frame and the type can be told apart again
+#: later (for example a deep slate frame with black text).
+WXL_FRAME = "#000000"
 
 #: Colour-map stops, interpolated from the palette so a heatmap or contour is
-#: always the same family as the line work around it. ``div`` runs rose -> clear
-#: -> periwinkle through a neutral centre (signed data); ``seq`` runs near-white
-#: -> periwinkle -> deep slate violet (single-sided magnitudes).
+#: always the same family as the line work around it. ``div`` runs dark red ->
+#: peach -> clear -> light blue -> deep blue through a neutral centre (signed
+#: data); ``seq`` runs near-white -> light blue -> deep blue (single-sided
+#: magnitudes).
 WXL_CMAP_STOPS = {
-    "div_rose_blue": ["#C9738F", "#E69AB0", "#F2DEE4", "#F6F7FA",
-                      "#C9D4EE", "#9FB2DD", "#6E86C4"],
-    "seq_blue": ["#F5F7FC", "#D3DCF1", "#9FB2DD", "#8780B8", "#555C82"],
+    "div_rose_blue": ["#C21F30", "#E7674A", "#FCB796", "#F6F7F9", "#8FC0DA",
+                      "#1875BA"],
+    "seq_blue": ["#F6F9FC", "#CFE3F0", "#68A8CC", "#1875BA", "#0F4670"],
 }
 for _name, _stops in WXL_CMAP_STOPS.items():
     matplotlib.colormaps.register(
@@ -147,8 +153,8 @@ class WXLStyle:
     legend_size: float = 10.0
     annot_size: float = 11.0
     axes_linewidth: float = 0.8
-    line_width: float = 1.5
-    marker_size: float = 4.0
+    line_width: float = 2.0
+    marker_size: float = 5.0
     bar_edge_width: float = 0.8
     error_linewidth: float = 0.8
     capsize: float = 2.0
@@ -181,13 +187,14 @@ def apply_wxl_style(style: WXLStyle | None = None) -> WXLStyle:
         "xtick.labelsize": st.tick_size,
         "ytick.labelsize": st.tick_size,
         "legend.fontsize": st.legend_size,
-        # ink: text, axes and annotations use the deep slate instead of pure
-        # black, which reads softer on screen and in print
+        # ink: all type is black; the frame (spines, ticks, legend border and
+        # every outline) is black too, and the two are kept as separate
+        # constants so they can diverge later
         "text.color": WXL_INK,
         "axes.labelcolor": WXL_INK,
-        "axes.edgecolor": WXL_INK,
-        "xtick.color": WXL_INK,
-        "ytick.color": WXL_INK,
+        "axes.edgecolor": WXL_FRAME,
+        "xtick.color": WXL_FRAME,
+        "ytick.color": WXL_FRAME,
         "axes.linewidth": st.axes_linewidth,
         "axes.spines.top": st.full_box,
         "axes.spines.right": st.full_box,
@@ -205,7 +212,7 @@ def apply_wxl_style(style: WXLStyle | None = None) -> WXLStyle:
         "errorbar.capsize": st.capsize,
         "patch.linewidth": st.bar_edge_width,
         "legend.frameon": st.legend_framed,
-        "legend.edgecolor": WXL_INK,
+        "legend.edgecolor": WXL_FRAME,
         "legend.framealpha": 1.0,
         "legend.fancybox": False,
         "figure.dpi": 110,
@@ -236,7 +243,7 @@ def framed_legend(ax, **kwargs):
     """
     kwargs.setdefault("loc", "best")
     leg = ax.legend(frameon=True, **kwargs)
-    leg.get_frame().set_edgecolor(WXL_INK)
+    leg.get_frame().set_edgecolor(WXL_FRAME)
     leg.get_frame().set_linewidth(0.8)
     leg.get_frame().set_alpha(1.0)
     return leg
@@ -417,7 +424,7 @@ def _legend_right_panel(fig, ax, leg):
                             fontsize=WXL_FONTSIZE["legend"], ncol=1,
                             handlelength=1.6, handletextpad=0.6,
                             borderaxespad=0.0)
-    new_leg.get_frame().set_edgecolor(WXL_INK)
+    new_leg.get_frame().set_edgecolor(WXL_FRAME)
     new_leg.get_frame().set_linewidth(0.8)
     new_leg.get_frame().set_alpha(1.0)
     # tight_layout would reset the manual positions and hide the panel again
@@ -1459,9 +1466,9 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
         if not frame.get_visible():
             problems.append(f"axes[{i}]: legend frame hidden")
         ec = to_hex(frame.get_edgecolor(), keep_alpha=False).upper()
-        if ec not in (WXL_INK.upper(), "#000000"):
+        if ec not in (WXL_FRAME.upper(), WXL_INK.upper()):
             problems.append(
-                f"axes[{i}]: legend border is {ec}, expected {WXL_INK}")
+                f"axes[{i}]: legend border is {ec}, expected {WXL_FRAME}")
         if float(frame.get_alpha() or 1.0) < 0.999:
             problems.append(f"axes[{i}]: legend frame is transparent")
         # soft check: the legend should sit on empty canvas
@@ -1496,7 +1503,7 @@ def check_wxl_style(fig, style: WXLStyle | None = None, strict_sizes: bool = Tru
 
     # ---- colours -------------------------------------------------------
     allowed_colors = ({v.upper() for v in WXL_PALETTE.values()}
-                      | {WXL_INK.upper(), "#000000", "#FFFFFF"})
+                      | {WXL_FRAME.upper(), WXL_INK.upper(), "#FFFFFF"})
     for art in fig.findobj(lambda a: isinstance(a, matplotlib.lines.Line2D)):
         if not art.get_visible():
             continue

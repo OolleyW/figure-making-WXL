@@ -98,13 +98,13 @@ ink edges keep the figures print-safe.
 
 | Key | Hex | Name | Meaning | Typical use |
 |---|---|---|---|---|
-| `primary` | `#9FB2DD` | Periwinkle Blue | the method or series you are arguing for | main bars, main curve |
-| `secondary` | `#8780B8` | Lavender Dusk | supporting role | extra series |
-| `contrast` | `#E69AB0` | Coral Bloom | baseline or competitor | comparison bars/curves |
-| `improve` | `#B8D3C4` | Seafoam Mist | improvement, variant | ablation, positive deltas |
-| `accent` | `#EEBEA8` | Coral Peach | emphasis | annotations, highlighted points |
-| `neutral` | `#555C82` | Slate Violet | reference, background | gridlines, target lines |
-| `light` | `#E0E6F4` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
+| `primary` | `#1875BA` | Periwinkle Blue | the method or series you are arguing for | main bars, main curve |
+| `secondary` | `#68A8CC` | Lavender Dusk | supporting role | extra series |
+| `contrast` | `#C21F30` | Coral Bloom | baseline or competitor | comparison bars/curves |
+| `improve` | `#0C8B94` | Seafoam Mist | improvement, variant | ablation, positive deltas |
+| `accent` | `#E7674A` | Coral Peach | emphasis | annotations, highlighted points |
+| `neutral` | `#777F85` | Slate Violet | reference, background | gridlines, target lines |
+| `light` | `#FCB796` | Pale Aqua | fill, low-emphasis mass | histograms, bands |
 
 Design intent:
 
@@ -153,7 +153,8 @@ and more contrast is needed.
 - **Grid**: none. Tick values plus the full box carry the reading task. The only
   exception is the radar chart, where a light `neutral` grid at 35 % alpha is
   required to read values off the polar axes.
-- **Line width**: 1.5 pt for data curves, 0.8 pt for error bars and edges.
+- **Line width**: 2.0 pt for data curves (1.2 pt for a fitted or reference
+  line), 0.8 pt for error bars and edges.
 - **Markers**: 4 pt, white fill, 0.9 pt colored edge, so overlapping points stay
   distinguishable.
 - **Bars**: 0.8 pt ink edge. In grouped bars, bar width 0.26 of the category

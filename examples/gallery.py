@@ -62,8 +62,8 @@ def _kde(x, grid, bw=None):
         "一张图叠放五条测量曲线，每条曲线的标记形状都不同、统一白色填充，"
         "即使黑白打印也能靠点形区分。",
         'for name, key, mk, vals in series:\n'
-        '    ax.plot(x, vals, "-", marker=mk, color=PALETTE[key], lw=1.5,\n'
-        '            mfc="white", mec=PALETTE[key], mew=0.9, ms=4.2, label=name)')
+        '    ax.plot(x, vals, "-", marker=mk, color=PALETTE[key], lw=2.0,\n'
+        '            mfc="white", mec=PALETTE[key], mew=0.9, ms=5.0, label=name)')
 def fig_line_markers():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["single"])
     x = np.linspace(0, 10, 11)
@@ -82,7 +82,7 @@ def fig_line_markers():
          [0.22, 0.34, 0.44, 0.53, 0.60, 0.66, 0.71, 0.76, 0.80, 0.83, 0.86]),
     ]
     for name, key, mk, vals in series:
-        ax.plot(x, vals, "-", marker=mk, color=P[key], lw=1.5, ms=4.2,
+        ax.plot(x, vals, "-", marker=mk, color=P[key], lw=2.0, ms=5.0,
                 mfc="white", mec=P[key], mew=0.9, label=name)
     ax.set_xlabel("Age (d)")
     ax.set_ylabel("Degree of hydration (-)")
@@ -184,7 +184,7 @@ def fig_horizontal_bar():
 # --------------------------------------------------------------------------
 @figure("line_trend", "多序列折线图（带标记）", "line",
         "最常见的趋势图，四组方法随 epoch 变化，标记点区分序列。",
-        'ax.plot(x, y, "-o", color=PALETTE[key], lw=1.5, ms=3.2,\n'
+        'ax.plot(x, y, "-o", color=PALETTE[key], lw=2.0, ms=5.0,\n'
         '        mfc="white", mew=0.9, label=name)')
 def fig_line_trend():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
@@ -193,7 +193,7 @@ def fig_line_trend():
               ("Method C", "improve", 0.54, 0.020), ("Method D", "accent", 0.50, 0.015)]
     for name, key, base, slope in curves:
         y = base + slope * x + RNG.normal(0, 0.005, x.size)
-        ax.plot(x, y, "-o", color=P[key], lw=1.5, ms=3.2, mfc="white",
+        ax.plot(x, y, "-o", color=P[key], lw=2.0, ms=5.0, mfc="white",
                 mew=0.9, label=name)
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Score")
@@ -207,7 +207,7 @@ def fig_line_trend():
         "用 fill_between 画置信区间或标准差带，主曲线压在上层。",
         'ax.fill_between(x, y-sd, y+sd, color=PALETTE["light"],\n'
         '                edgecolor=PALETTE["primary"], linewidth=0.6)\n'
-        'ax.plot(x, y, "-", color=PALETTE["primary"], lw=1.5)')
+        'ax.plot(x, y, "-", color=PALETTE["primary"], lw=2.0)')
 def fig_line_band():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     x = np.linspace(0, 10, 60)
@@ -217,7 +217,7 @@ def fig_line_band():
         band = sd * (1 + 0.12 * x)
         ax.fill_between(x, y - band, y + band, color=P["light"] if key == "primary"
                         else P["neutral"], alpha=0.35, edgecolor=P[key], linewidth=0.6)
-        ax.plot(x, y, "-", color=P[key], lw=1.5, label=label)
+        ax.plot(x, y, "-", color=P[key], lw=2.0, label=label)
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Response (mV)")
     framed_legend(ax, loc="upper left")
@@ -295,7 +295,7 @@ def fig_bubble():
 @figure("errorbar", "误差棒图（x、y 双向）", "rel",
         "实验点同时带 x 和 y 方向误差，常用于标定曲线。",
         'ax.errorbar(x, y, xerr=xe, yerr=ye, fmt="o", color=PALETTE["primary"],\n'
-        '            mfc="white", ms=4, elinewidth=0.8, capsize=2)')
+        '            mfc="white", ms=5.0, elinewidth=0.8, capsize=2)')
 def fig_errorbar():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     x = np.linspace(1, 9, 9)
@@ -303,9 +303,9 @@ def fig_errorbar():
     xe = np.full_like(x, 0.25)
     ye = np.full_like(x, 0.18)
     ax.errorbar(x, y, xerr=xe, yerr=ye, fmt="o", color=P["primary"],
-                mfc="white", ms=4.0, mew=0.9, elinewidth=0.8, capsize=2,
+                mfc="white", ms=5.0, mew=0.9, elinewidth=0.8, capsize=2,
                 label="Measured")
-    ax.plot(x, 1.8 * np.log(x) + 0.9, "-", color=P["contrast"], lw=1.5,
+    ax.plot(x, 1.8 * np.log(x) + 0.9, "-", color=P["contrast"], lw=2.0,
             label="Model")
     ax.set_xlabel("Strain (%)")
     ax.set_ylabel("Stress (MPa)")
@@ -376,14 +376,14 @@ def fig_violin():
         "直方图用浅色填充黑边，核密度曲线叠加显示分布形态。",
         'ax.hist(data, bins=20, color=PALETTE["light"], edgecolor=WXL_INK,\n'
         '        linewidth=0.6, label="Histogram")\n'
-        'ax.plot(grid, kde, color=PALETTE["primary"], lw=1.5, label="KDE")')
+        'ax.plot(grid, kde, color=PALETTE["primary"], lw=2.0, label="KDE")')
 def fig_hist_kde():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     data = np.concatenate([RNG.normal(0, 1.0, 400), RNG.normal(3.2, 0.8, 160)])
     ax.hist(data, bins=22, density=True, color=P["light"], edgecolor=WXL_INK,
             linewidth=0.6, label="Histogram")
     grid = np.linspace(data.min() - 0.5, data.max() + 0.5, 400)
-    ax.plot(grid, _kde(data, grid), "-", color=P["primary"], lw=1.5, label="KDE")
+    ax.plot(grid, _kde(data, grid), "-", color=P["primary"], lw=2.0, label="KDE")
     ax.axvline(float(np.mean(data)), color=P["contrast"], lw=1.2, ls="--",
                label="Mean")
     ax.set_xlabel("Residual (mm)")
@@ -396,7 +396,7 @@ def fig_hist_kde():
 @figure("ecdf", "经验累积分布（ECDF）", "dist",
         "比直方图更稳健的分布比较，用阶梯线绘制。",
         'ax.step(x_sorted, np.arange(1, n+1)/n, where="post",\n'
-        '        color=PALETTE[key], lw=1.5, label=name)',
+        '        color=PALETTE[key], lw=2.0, label=name)',
         width="single")
 def fig_ecdf():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["single"])
@@ -404,7 +404,7 @@ def fig_ecdf():
                               ("Set B", "contrast", 0.8, 1.2)]:
         x = np.sort(RNG.normal(mu, sd, 220))
         ax.step(x, np.arange(1, x.size + 1) / x.size, where="post",
-                color=P[key], lw=1.5, label=name)
+                color=P[key], lw=2.0, label=name)
     ax.set_xlabel("Value")
     ax.set_ylabel("Cumulative probability")
     ax.set_ylim(0, 1.02)
@@ -430,7 +430,7 @@ def fig_strip_mean():
                    alpha=0.6, edgecolor=WXL_INK, linewidth=0.3,
                    label=labels[i])
     ax.errorbar(np.arange(4), means, yerr=sds, fmt="s", color=WXL_INK,
-                ms=4, elinewidth=1.0, capsize=3)
+                ms=5.0, elinewidth=1.0, capsize=3)
     ax.set_xticks(np.arange(4))
     ax.set_xticklabels(labels)
     ax.set_ylabel("Measured value")
@@ -496,7 +496,7 @@ def fig_contour():
 @figure("radar", "雷达图（极坐标）", "special",
         "多指标综合对比，极坐标例外地保留浅灰网格以便读数。只出单栏版。",
         'ax = fig.add_subplot(projection="polar")\n'
-        'ax.plot(theta, values, "-o", color=PALETTE[key], lw=1.5, ms=3.5)',
+        'ax.plot(theta, values, "-o", color=PALETTE[key], lw=2.0, ms=5.0)',
         width="single")
 def fig_radar():
     fig = plt.figure(figsize=WXL_FIGSIZE["double"])
@@ -508,7 +508,7 @@ def fig_radar():
     for name, key, vals in [("Mix A", "primary", [0.85, 0.72, 0.90, 0.55, 0.80]),
                             ("Mix B", "contrast", [0.70, 0.88, 0.65, 0.78, 0.60])]:
         v = np.concatenate([vals, vals[:1]])
-        ax.plot(theta, v, "-o", color=P[key], lw=1.5, ms=3.5, mfc="white",
+        ax.plot(theta, v, "-o", color=P[key], lw=2.0, ms=5.0, mfc="white",
                 mew=0.9, label=name)
         ax.fill(theta, v, color=P[key], alpha=0.12)
     ax.set_xticks(theta[:-1])
@@ -549,7 +549,7 @@ def fig_donut():
         "两个量纲不同的变量共用横轴，右轴用强调色区分。",
         'ax2 = ax.twinx()\n'
         'ax.bar(x, a, color=PALETTE["light"], edgecolor=WXL_INK)\n'
-        'ax2.plot(x, b, "-o", color=PALETTE["contrast"], lw=1.5)')
+        'ax2.plot(x, b, "-o", color=PALETTE["contrast"], lw=2.0)')
 def fig_dual_axis():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     x = np.arange(6)
@@ -563,7 +563,7 @@ def fig_dual_axis():
     ax.set_xlabel("Time (h)")
     ax.set_ylim(0, 95)
     ax2 = ax.twinx()
-    ax2.plot(x, temp, "-o", color=P["contrast"], lw=1.5, ms=4, mfc="white",
+    ax2.plot(x, temp, "-o", color=P["contrast"], lw=2.0, ms=5.0, mfc="white",
              mew=0.9, label="Temperature")
     ax2.set_ylabel("Temperature (C)")
     ax2.set_ylim(0, 110)
@@ -613,9 +613,9 @@ def fig_multi_panel():
 
     ax = axes[1]
     x = np.linspace(0, 10, 11)
-    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=1.5, ms=3.2,
+    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=2.0, ms=5.0,
             mfc="white", mew=0.9, label="Curve 1")
-    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=1.5, ms=3.2,
+    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=2.0, ms=5.0,
             mfc="white", mew=0.9, label="Curve 2")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
@@ -681,9 +681,9 @@ def fig_multi_panel_1x3():
 
     ax = axes[1]
     x = np.linspace(0, 10, 11)
-    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=1.5, ms=3.2,
+    ax.plot(x, 0.5 + 0.03 * x, "-o", color=P["primary"], lw=2.0, ms=5.0,
             mfc="white", mew=0.9, label="Curve 1")
-    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=1.5, ms=3.2,
+    ax.plot(x, 0.45 + 0.02 * x, "-s", color=P["improve"], lw=2.0, ms=5.0,
             mfc="white", mew=0.9, label="Curve 2")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
@@ -746,7 +746,7 @@ HTML_HEAD = """<!doctype html>
   .card .head{display:flex;justify-content:space-between;align-items:baseline;
               gap:10px;padding:9px 12px 6px;border-bottom:1px solid #e6e6e6}
   .card .head h3{margin:0;font-family:"Times New Roman",serif;font-size:15px}
-  .card .cat{font-size:11.5px;color:#fff;background:#8780B8;padding:1px 7px;border-radius:2px}
+  .card .cat{font-size:11.5px;color:#fff;background:#68A8CC;padding:1px 7px;border-radius:2px}
   .card img{width:100%;height:auto;display:block;background:#fff;cursor:zoom-in;
             border-bottom:1px solid #e6e6e6}
   .card .body{padding:9px 12px 12px;font-size:12.5px;color:#333}
