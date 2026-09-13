@@ -296,11 +296,14 @@ def paint_markers(ax, x, y, color, style=None, ms=None, mew=None, gap=None,
     Draw the line first (``ax.plot(x, y, "-", ...)``) and the points on top at a
     higher ``zorder``; that ordering is what makes the halo erase the line.
 
-    ``marker`` selects the shape. The highlight layers reuse it, so a triangle
-    gets a lit facet rather than a round glint spilling past its edges.
+    ``marker`` selects the shape. The glossy ball is a ball, so it only applies to
+    circles: any other shape is drawn flat, because a specular highlight on a
+    square or a triangle reads as a smudge. A figure that distinguishes its
+    series by shape therefore goes flat throughout - pass ``gloss=False`` so the
+    whole set matches instead of mixing one glossy circle with flat shapes.
 
     The halo is white paint, not a geometric break, so whatever sits behind the
-    series must be white. Set ``gloss=False`` for a flat white-cored marker.
+    series must be white.
 
     Returns nothing; use :func:`marker_handle` for a matching legend entry.
     """
@@ -309,6 +312,7 @@ def paint_markers(ax, x, y, color, style=None, ms=None, mew=None, gap=None,
     mew = st.marker_edge_width if mew is None else mew
     gap = st.marker_gap if gap is None else gap
     gloss = st.marker_gloss if gloss is None else gloss
+    gloss = bool(gloss) and marker == "o"      # the highlight is circle-only
     x = np.asarray(x, float)
     y = np.asarray(y, float)
 
@@ -332,21 +336,22 @@ def paint_markers(ax, x, y, color, style=None, ms=None, mew=None, gap=None,
                path_effects=halo)
 
 
-def marker_handle(color, label, style=None, ms=None, mew=None):
+def marker_handle(color, label, style=None, ms=None, mew=None, marker: str = "o"):
     """Legend handle matching :func:`paint_markers`.
 
     A legend entry cannot host the offset highlight layers, so a glossy series
-    gets a flat solid dot of the same colour and size.
+    gets a flat solid dot of the same colour; a non-circle marker is flat with a
+    white core, matching how it is drawn.
     """
     st = style or DEFAULT_STYLE
     ms = st.marker_size if ms is None else ms
     mew = st.marker_edge_width if mew is None else mew
     # ``color`` matters even with linestyle="none": the style audit reads
     # get_color(), and an unset colour falls back to the default tab:blue.
-    if st.marker_gloss:
-        return Line2D([], [], linestyle="none", marker="o", ms=ms,
+    if st.marker_gloss and marker == "o":
+        return Line2D([], [], linestyle="none", marker=marker, ms=ms,
                       color=color, mfc=color, mec=color, mew=0.0, label=label)
-    return Line2D([], [], linestyle="none", marker="o", ms=ms, color=color,
+    return Line2D([], [], linestyle="none", marker=marker, ms=ms, color=color,
                   mfc="white", mec=color, mew=mew, label=label)
 
 
@@ -356,12 +361,14 @@ def plot_series(ax, x, y, color, label=None, style=None, lw=None, ms=None,
     """The house line-plus-points call: a curve with WXL markers on top.
 
     Equivalent to ``ax.plot(x, y, "-", color=color, lw=lw)`` followed by
-    :func:`paint_markers`, and returns a legend handle for the pair.
+    :func:`paint_markers`, and returns a legend handle for the pair. The glossy
+    ball is circle-only, so a shape-distinguished figure wants ``gloss=False`` on
+    every series instead of mixing one glossy circle with flat shapes.
     """
     st = style or DEFAULT_STYLE
     lw = st.line_width if lw is None else lw
     ms = st.marker_size if ms is None else ms
-    glossy = st.marker_gloss if gloss is None else gloss
+    glossy = (st.marker_gloss if gloss is None else gloss) and marker == "o"
     ax.plot(x, y, linestyle, color=color, lw=lw, zorder=zorder)
     paint_markers(ax, x, y, color, style=st, ms=ms, mew=mew, gap=gap,
                   gloss=gloss, marker=marker, zorder=zorder + 1.0)

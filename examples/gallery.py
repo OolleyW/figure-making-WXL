@@ -87,7 +87,10 @@ def fig_line_markers():
     ]
     handles = []
     for name, key, mk, vals in series:
-        handles.append(plot_series(ax, x, vals, PL[key], label=name, marker=mk))
+        # shapes carry the identity here, so the whole figure goes flat: the
+        # glossy ball is circle-only
+        handles.append(plot_series(ax, x, vals, PL[key], label=name, marker=mk,
+                                   gloss=False))
     ax.set_xlabel("Age (d)")
     ax.set_ylabel("Degree of hydration (-)")
     ax.set_xlim(0, 10)
@@ -203,7 +206,8 @@ def fig_line_trend():
     handles = []
     for name, key, mk, base, slope in curves:
         y = base + slope * x + RNG.normal(0, 0.005, x.size)
-        handles.append(plot_series(ax, x, y, PL[key], label=name, marker=mk))
+        handles.append(plot_series(ax, x, y, PL[key], label=name, marker=mk,
+                                   gloss=False))
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Score")
     framed_legend(ax, handles=handles, loc="upper left", ncol=2,
@@ -633,9 +637,9 @@ def fig_multi_panel():
     ax = axes[1]
     x = np.linspace(0, 10, 11)
     handles = [plot_series(ax, x, 0.5 + 0.03 * x, PL["primary"], label="Curve 1",
-                           marker="o"),
+                           marker="o", gloss=False),
                plot_series(ax, x, 0.45 + 0.02 * x, PL["improve"], label="Curve 2",
-                           marker="s")]
+                           marker="s", gloss=False)]
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
     framed_legend(ax, handles=handles, loc="upper left")
@@ -701,9 +705,9 @@ def fig_multi_panel_1x3():
     ax = axes[1]
     x = np.linspace(0, 10, 11)
     handles = [plot_series(ax, x, 0.5 + 0.03 * x, PL["primary"], label="Curve 1",
-                           marker="o"),
+                           marker="o", gloss=False),
                plot_series(ax, x, 0.45 + 0.02 * x, PL["improve"], label="Curve 2",
-                           marker="s")]
+                           marker="s", gloss=False)]
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
     ax.set_ylim(0.35, 0.95)

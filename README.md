@@ -280,7 +280,7 @@ accepted by the audit for backward compatibility.
 | Attribute | Options |
 |---|---|
 | Markers | open circle (default), square, triangle, diamond, down-triangle, or none for dense data |
-| Marker fill | glossy ball (a filled circle with a soft specular highlight); optionally a flat white core with a coloured edge, which survives a black-and-white print best |
+| Marker fill | glossy ball - **circle only** (a filled circle with a soft specular highlight); every other shape is flat with a white core and a coloured edge, which also survives a black-and-white print best |
 | Marker size | 6.4 pt (house default); smaller for a point cloud (see below) |
 | Marker edge | 0.9 pt (house default) |
 | Marker gap | 1.2 pt of line erased around every marker, so the line reads as stopping short of each point |
@@ -305,16 +305,20 @@ every marker instead of running through it. Use `paint_markers` directly when th
 points are not threaded on a line (for example a scatter with a separate fit), and
 `marker_handle` for a matching legend entry.
 
-Three things to know:
+Four things to know:
 
+- **The glossy ball is circle-only.** A specular highlight on a square or a
+  triangle reads as a smudge, so `paint_markers` and `plot_series` silently draw
+  any non-circle marker flat. Because of that, **a figure that distinguishes its
+  series by shape must go flat throughout** - pass `gloss=False` on every series
+  rather than mixing one glossy circle with flat squares and triangles.
 - **The gap is white paint, not a geometric break.** Whatever sits behind the
   series must be white, or the halo will erase it too.
-- **A legend cannot host the offset highlight**, so a legend entry is a flat
-  solid dot of the same colour and size.
+- **A legend cannot host the offset highlight**, so a glossy series gets a flat
+  solid dot of the same colour and size, and a flat series gets its white core.
 - **The highlight only reads at larger sizes.** Below roughly 5 pt it looks like a
   plain filled dot, and it degrades in greyscale or CMYK print. For a figure that
-  must survive black-and-white printing, pass `gloss=False` for a flat white core,
-  where only the marker shape separates the series.
+  must survive black-and-white printing, pass `gloss=False`.
 
 Point clouds (a 45-point scatter, a jittered strip) pass an explicit smaller `ms`,
 because 6.4 pt across a few dozen points becomes a blob; `scatter_fit`, `bubble`

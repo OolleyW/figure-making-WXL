@@ -121,6 +121,11 @@ Draws one series' points only - the glossy ball plus the white gap halo - for th
 case where the points are not threaded on a line (a scatter with a separate fit
 line, a strip plot). Draw the line first at a lower `zorder`.
 
+The glossy ball is **circle-only**: `marker` selects the shape, and any non-circle
+shape is drawn flat with a white core, because a specular highlight on a square or
+a triangle reads as a smudge. A figure that tells its series apart by shape
+therefore passes `gloss=False` on every series.
+
 ```python
 ax.plot(x, y, "-", color=PL["primary"], lw=1.2, zorder=2)
 paint_markers(ax, x, y, PL["primary"])

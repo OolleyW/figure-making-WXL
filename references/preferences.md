@@ -56,7 +56,7 @@ Ask markers, line width, and dash pattern per series.
 
 | Attribute | Default | Alternatives |
 |---|---|---|
-| markers | glossy ball, `ms=6.4`, `mew=0.9`, `gap=1.2` pt | flat white core, square `s`, triangle `^`, diamond `D`, or none for dense data |
+| markers | glossy ball (circle only), `ms=6.4`, `mew=0.9`, `gap=1.2` pt | flat white core for shape-distinguished series, or none for dense data |
 | line width | 1.2 pt | 1.2 pt (fixed; a heavier line reads as emphasis by accident) |
 | dash | solid for the main series | dashed `--` for a reference / baseline / fitted model |
 | marker frequency | every point | every 2nd-5th for dense data, or markers on a subset |
