@@ -64,42 +64,44 @@ def _kde(x, grid, bw=None):
 @figure("line_markers", "多曲线点线图（点形区分 + 光泽球）", "line",
         "一张图叠放六条测量曲线：前五条用不同点形、扁平白心，靠形状区分；"
         "第六条改用光泽球（圆点），对比两种点样式的实际观感。"
-        "每个点周围留 1.2 pt 空隙，线在点前断开。",
-        'for name, key, mk in series:\n'
-        '    ball = mk == "o" and name.startswith("Mix F")\n'
-        '    handles.append(plot_series(ax, x, vals, PL[key], label=name,\n'
-        '                               marker=mk, gloss=ball or False))\n'
-        'framed_legend(ax, handles=handles, loc="upper left", ncol=2)')
+        "六条线按等间距垂直铺开，每个点周围留 1.2 pt 空隙，线在点前断开。",
+        'shape = a shared saturating curve\n'
+        'for name, key, mk, base, rise in series:     # even vertical offset\n'
+        '    handles.append(plot_series(ax, x, base + rise * shape, PL[key],\n'
+        '                               label=name, marker=mk, gloss=ball))\n'
+        'framed_legend(ax, handles=handles, loc="upper left", ncol=3)')
 def fig_line_markers():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["single"])
     x = np.linspace(0, 10, 11)
-    # (label, palette key, marker, values). Mixes A-E carry the series identity
-    # through the marker shape and are therefore flat; Mix F is the glossy-ball
-    # series, shown so the two marker treatments can be compared side by side.
+    # One shared saturating shape plus an even vertical offset and a slightly
+    # different rise per series: the six curves stay parallel and evenly spaced
+    # instead of clumping into a band, which is what makes the marker styles
+    # readable. Mixes A-E carry the series identity through the marker shape and
+    # are therefore flat; Mix F is the glossy-ball series, shown alongside so the
+    # two marker treatments can be compared.
+    shape = np.array([0.00, 0.30, 0.51, 0.66, 0.76, 0.83, 0.88, 0.92, 0.95,
+                      0.97, 0.99])
+    # The three blue-family keys (primary / neutral / secondary) are kept apart in
+    # the stack, so no two neighbouring curves read as the same colour.
     series = [
-        ("Mix A", "primary", "o",
-         [0.30, 0.43, 0.54, 0.62, 0.69, 0.75, 0.79, 0.83, 0.86, 0.89, 0.91]),
-        ("Mix B", "contrast", "s",
-         [0.15, 0.26, 0.36, 0.44, 0.51, 0.57, 0.62, 0.67, 0.71, 0.75, 0.78]),
-        ("Mix C", "improve", "^",
-         [0.08, 0.17, 0.25, 0.32, 0.38, 0.44, 0.49, 0.54, 0.58, 0.62, 0.66]),
-        ("Mix D", "accent", "D",
-         [0.38, 0.52, 0.63, 0.72, 0.78, 0.83, 0.87, 0.90, 0.92, 0.94, 0.95]),
-        ("Mix E", "secondary", "v",
-         [0.22, 0.34, 0.44, 0.53, 0.60, 0.66, 0.71, 0.76, 0.80, 0.83, 0.86]),
-        ("Mix F", "neutral", "o",
-         [0.26, 0.40, 0.52, 0.61, 0.66, 0.70, 0.73, 0.75, 0.77, 0.78, 0.79]),
+        ("Mix A", "primary", "o", 0.04, 0.13),
+        ("Mix B", "contrast", "s", 0.20, 0.14),
+        ("Mix C", "neutral", "^", 0.36, 0.15),
+        ("Mix D", "improve", "D", 0.52, 0.14),
+        ("Mix E", "accent", "v", 0.68, 0.13),
+        ("Mix F", "secondary", "o", 0.84, 0.11),
     ]
     handles = []
-    for name, key, mk, vals in series:
+    for name, key, mk, base, rise in series:
+        vals = base + rise * shape
         ball = name == "Mix F"          # the one series drawn with the glossy ball
         handles.append(plot_series(ax, x, vals, PL[key], label=name, marker=mk,
                                    gloss=ball or False))
     ax.set_xlabel("Age (d)")
     ax.set_ylabel("Degree of hydration (-)")
     ax.set_xlim(0, 10)
-    # generous headroom so the six-entry legend clears the top curve
-    ax.set_ylim(0, 1.62)
+    # headroom for the six-entry legend; the curves themselves stop at 0.95
+    ax.set_ylim(0, 1.45)
     framed_legend(ax, handles=handles, loc="upper left", ncol=3,
                   columnspacing=0.8, handlelength=1.2, handletextpad=0.4,
                   labelspacing=0.3)
