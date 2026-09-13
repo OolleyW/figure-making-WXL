@@ -61,18 +61,21 @@ def _kde(x, grid, bw=None):
 # --------------------------------------------------------------------------
 # line / marker family (shown first)
 # --------------------------------------------------------------------------
-@figure("line_markers", "多曲线点线图（不同点样式）", "line",
-        "一张图叠放五条测量曲线，每条曲线的标记形状都不同、统一白色填充，"
-        "即使黑白打印也能靠点形区分。",
-        'for name, key, mk, vals in series:\n'
+@figure("line_markers", "多曲线点线图（点形区分 + 光泽球）", "line",
+        "一张图叠放六条测量曲线：前五条用不同点形、扁平白心，靠形状区分；"
+        "第六条改用光泽球（圆点），对比两种点样式的实际观感。"
+        "每个点周围留 1.2 pt 空隙，线在点前断开。",
+        'for name, key, mk in series:\n'
+        '    ball = mk == "o" and name.startswith("Mix F")\n'
         '    handles.append(plot_series(ax, x, vals, PL[key], label=name,\n'
-        '                               marker=mk))\n'
+        '                               marker=mk, gloss=ball or False))\n'
         'framed_legend(ax, handles=handles, loc="upper left", ncol=2)')
 def fig_line_markers():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["single"])
     x = np.linspace(0, 10, 11)
-    # (label, palette key, marker, values) - the marker shape carries the series
-    # identity, so the set still separates in greyscale
+    # (label, palette key, marker, values). Mixes A-E carry the series identity
+    # through the marker shape and are therefore flat; Mix F is the glossy-ball
+    # series, shown so the two marker treatments can be compared side by side.
     series = [
         ("Mix A", "primary", "o",
          [0.30, 0.43, 0.54, 0.62, 0.69, 0.75, 0.79, 0.83, 0.86, 0.89, 0.91]),
@@ -84,22 +87,23 @@ def fig_line_markers():
          [0.38, 0.52, 0.63, 0.72, 0.78, 0.83, 0.87, 0.90, 0.92, 0.94, 0.95]),
         ("Mix E", "secondary", "v",
          [0.22, 0.34, 0.44, 0.53, 0.60, 0.66, 0.71, 0.76, 0.80, 0.83, 0.86]),
+        ("Mix F", "neutral", "o",
+         [0.26, 0.40, 0.52, 0.61, 0.66, 0.70, 0.73, 0.75, 0.77, 0.78, 0.79]),
     ]
     handles = []
     for name, key, mk, vals in series:
-        # shapes carry the identity here, so the whole figure goes flat: the
-        # glossy ball is circle-only
+        ball = name == "Mix F"          # the one series drawn with the glossy ball
         handles.append(plot_series(ax, x, vals, PL[key], label=name, marker=mk,
-                                   gloss=False))
+                                   gloss=ball or False))
     ax.set_xlabel("Age (d)")
     ax.set_ylabel("Degree of hydration (-)")
     ax.set_xlim(0, 10)
-    # generous headroom so the five-entry legend clears the top curve
-    ax.set_ylim(0, 1.55)
-    framed_legend(ax, handles=handles, loc="upper left", ncol=2,
-                  columnspacing=0.9, handlelength=1.3, handletextpad=0.5,
-                  labelspacing=0.35)
-    add_caption_below(fig, r"$\mathbf{Fig.}$  1  Multi-series line chart with distinct marker shapes.")
+    # generous headroom so the six-entry legend clears the top curve
+    ax.set_ylim(0, 1.62)
+    framed_legend(ax, handles=handles, loc="upper left", ncol=3,
+                  columnspacing=0.8, handlelength=1.2, handletextpad=0.4,
+                  labelspacing=0.3)
+    add_caption_below(fig, r"$\mathbf{Fig.}$  1  Multi-series line chart, flat shapes plus one glossy marker series.")
     return fig
 
 
