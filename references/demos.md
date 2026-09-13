@@ -21,8 +21,8 @@ below gives the figure id, the width preset used, and the core call to copy.
 
 | id | Chart | Width | Core call |
 |---|---|---|---|
-| `line_markers` | Multi-curve marker chart: one white-filled marker shape per series | double | `ax.plot(x, y, "-", marker=mk, mfc="white", mec=key, mew=0.9, ms=4.2)` |
-| `line_trend` | Multi-series trend with markers | double | `ax.plot(x, y, "-o", mfc="white", mew=0.6, ms=3.5, lw=1.5)` |
+| `line_markers` | Multi-curve marker chart: one marker shape per series | single | `plot_series(ax, x, y, PL[key], label=name, marker=mk)` |
+| `line_trend` | Multi-series trend with markers | double | `plot_series(ax, x, y, PL[key], label=name, marker=mk)` |
 | `line_band` | Trend with uncertainty band | double | `ax.fill_between(x, y-sd, y+sd, alpha=0.35)` |
 | `stacked_area` | Stacked area | double | `ax.stackplot(x, *series, edgecolor=WXL_INK)` |
 

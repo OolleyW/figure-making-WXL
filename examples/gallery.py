@@ -18,6 +18,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
 SKILL = Path(__file__).resolve().parents[1]
@@ -27,7 +28,8 @@ from wxl_style import (  # noqa: E402
     WXL_AXES_PANEL_MM, WXL_CMAP, WXL_CMAPS, WXL_FIGSIZE, WXL_FONTSIZE, WXL_INK,
     WXL_LINE_PALETTE, WXL_PALETTE, WXL_WIDTH_MM, add_caption, add_caption_below,
     annotate_bars, apply_wxl_style, center_grid, check_wxl_style, create_subplots,
-    finalize_figure, framed_legend, measure_width_mm, panel_tag, prepare_figure,
+    finalize_figure, framed_legend, marker_handle, measure_width_mm,
+    paint_markers, panel_tag, plot_series, prepare_figure,
 )
 
 P = WXL_PALETTE          # light fills
@@ -63,13 +65,14 @@ def _kde(x, grid, bw=None):
         "一张图叠放五条测量曲线，每条曲线的标记形状都不同、统一白色填充，"
         "即使黑白打印也能靠点形区分。",
         'for name, key, mk, vals in series:\n'
-        '    ax.plot(x, vals, "-", marker=mk, color=PALETTE[key], lw=1.5,\n'
-        '            mfc="white", mec=PALETTE[key], mew=0.6, ms=3.5, label=name)')
+        '    handles.append(plot_series(ax, x, vals, PL[key], label=name,\n'
+        '                               marker=mk))\n'
+        'framed_legend(ax, handles=handles, loc="upper left", ncol=2)')
 def fig_line_markers():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["single"])
     x = np.linspace(0, 10, 11)
-    # (label, palette key, marker, values) - every marker is white-filled, so
-    # only the shape carries the series identity
+    # (label, palette key, marker, values) - the marker shape carries the series
+    # identity, so the set still separates in greyscale
     series = [
         ("Mix A", "primary", "o",
          [0.30, 0.43, 0.54, 0.62, 0.69, 0.75, 0.79, 0.83, 0.86, 0.89, 0.91]),
@@ -82,16 +85,17 @@ def fig_line_markers():
         ("Mix E", "secondary", "v",
          [0.22, 0.34, 0.44, 0.53, 0.60, 0.66, 0.71, 0.76, 0.80, 0.83, 0.86]),
     ]
+    handles = []
     for name, key, mk, vals in series:
-        ax.plot(x, vals, "-", marker=mk, color=PL[key], lw=2.0, ms=5.0,
-                mfc="white", mec=PL[key], mew=0.6, label=name)
+        handles.append(plot_series(ax, x, vals, PL[key], label=name, marker=mk))
     ax.set_xlabel("Age (d)")
     ax.set_ylabel("Degree of hydration (-)")
     ax.set_xlim(0, 10)
     # generous headroom so the five-entry legend clears the top curve
     ax.set_ylim(0, 1.55)
-    framed_legend(ax, loc="upper left", ncol=2, columnspacing=0.9,
-                  handlelength=1.3, handletextpad=0.5, labelspacing=0.35)
+    framed_legend(ax, handles=handles, loc="upper left", ncol=2,
+                  columnspacing=0.9, handlelength=1.3, handletextpad=0.5,
+                  labelspacing=0.35)
     add_caption_below(fig, r"$\mathbf{Fig.}$  1  Multi-series line chart with distinct marker shapes.")
     return fig
 
@@ -186,8 +190,9 @@ def fig_horizontal_bar():
 @figure("line_trend", "多序列折线图（带标记）", "line",
         "最常见的趋势图，四组方法随 epoch 变化，每条曲线用不同的点形区分，"
         "黑白打印也能读。",
-        'ax.plot(x, y, "-", marker=mk, color=PALETTE[key], lw=1.5, ms=3.5,\n'
-        '        mfc="white", mew=0.6, label=name)')
+        'for name, key, mk, base, slope in curves:\n'
+        '    handles.append(plot_series(ax, x, y, PL[key], label=name,\n'
+        '                               marker=mk))')
 def fig_line_trend():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     x = np.linspace(0, 10, 11)
@@ -195,14 +200,14 @@ def fig_line_trend():
               ("Method B", "contrast", "s", 0.58, 0.024),
               ("Method C", "improve", "^", 0.54, 0.020),
               ("Method D", "accent", "D", 0.50, 0.015)]
+    handles = []
     for name, key, mk, base, slope in curves:
         y = base + slope * x + RNG.normal(0, 0.005, x.size)
-        ax.plot(x, y, "-", marker=mk, color=PL[key], lw=1.5, ms=3.5, mfc="white",
-                mew=0.6, label=name)
+        handles.append(plot_series(ax, x, y, PL[key], label=name, marker=mk))
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Score")
-    framed_legend(ax, loc="upper left", ncol=2, columnspacing=1.0,
-                  handlelength=1.6, handletextpad=0.5)
+    framed_legend(ax, handles=handles, loc="upper left", ncol=2,
+                  columnspacing=1.0, handlelength=1.6, handletextpad=0.5)
     add_caption_below(fig, r"$\mathbf{Fig.}$  5  Multi-series trend lines with distinct markers.")
     return fig
 
@@ -254,8 +259,8 @@ def fig_stacked_area():
 # --------------------------------------------------------------------------
 @figure("scatter_fit", "散点 + 拟合线", "rel",
         "两组样本的实测 vs 预测，配一条最小二乘拟合线。",
-        'ax.scatter(x, y, s=14, color=PALETTE[key], edgecolor=WXL_INK,\n'
-        '           linewidth=0.4, label=name)\n'
+        'ax.scatter(x, y, s=14, color=WXL_LINE_PALETTE[key],\n'
+        '           edgecolor=WXL_INK, linewidth=0.4, label=name)\n'
         'ax.plot(xs, k*xs+b, "-", color=PALETTE[key], lw=1.2)')
 def fig_scatter_fit():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
@@ -263,14 +268,18 @@ def fig_scatter_fit():
                                     ("Group II", "accent", 0.86, 0.9)]:
         x = RNG.uniform(2, 9, 45)
         y = slope * x + RNG.normal(0, noise, x.size)
-        ax.scatter(x, y, s=14, color=PL[key], edgecolor=WXL_INK, linewidth=0.4,
-                   alpha=0.85, label=name)
         k, b = np.polyfit(x, y, 1)
         xs = np.linspace(x.min(), x.max(), 50)
         ax.plot(xs, k * xs + b, "-", color=PL[key], lw=1.2)
+        # no gap here: the points are not threaded on the line, so breaking the
+        # fit around all 45 of them would shred it
+        paint_markers(ax, x, y, PL[key], gap=0.0)
     ax.set_xlabel("Measured")
     ax.set_ylabel("Predicted")
-    framed_legend(ax, loc="upper left")
+    framed_legend(ax, handles=[marker_handle(PL[k], n)
+                               for n, k in (("Group I", "primary"),
+                                            ("Group II", "accent"))],
+                  loc="upper left")
     add_caption_below(fig, r"$\mathbf{Fig.}$  8  Scatter plot with least-squares fits.")
     return fig
 
@@ -298,22 +307,25 @@ def fig_bubble():
 
 @figure("errorbar", "误差棒图（x、y 双向）", "rel",
         "实验点同时带 x 和 y 方向误差，常用于标定曲线。",
-        'ax.errorbar(x, y, xerr=xe, yerr=ye, fmt="o", color=PALETTE["primary"],\n'
-        '            mfc="white", ms=3.5, elinewidth=0.5, capsize=2)')
+        'ax.errorbar(x, y, xerr=xe, yerr=ye, fmt="none",\n'
+        '            ecolor=WXL_LINE_PALETTE["primary"], elinewidth=0.5, capsize=2)\n'
+        'paint_markers(ax, x, y, WXL_LINE_PALETTE["primary"])')
 def fig_errorbar():
     fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
     x = np.linspace(1, 9, 9)
     y = 1.8 * np.log(x) + 0.9
     xe = np.full_like(x, 0.25)
     ye = np.full_like(x, 0.18)
-    ax.errorbar(x, y, xerr=xe, yerr=ye, fmt="o", color=PL["primary"],
-                mfc="white", ms=3.5, mew=0.6, elinewidth=0.5, capsize=2,
-                label="Measured")
-    ax.plot(x, 1.8 * np.log(x) + 0.9, "-", color=PL["contrast"], lw=1.5,
+    ax.errorbar(x, y, xerr=xe, yerr=ye, fmt="none", ecolor=PL["primary"],
+                elinewidth=0.5, capsize=2, zorder=1)
+    paint_markers(ax, x, y, PL["primary"])
+    ax.plot(x, 1.8 * np.log(x) + 0.9, "-", color=PL["contrast"], lw=1.2,
             label="Model")
     ax.set_xlabel("Strain (%)")
     ax.set_ylabel("Stress (MPa)")
-    framed_legend(ax, loc="lower right")
+    framed_legend(ax, handles=[marker_handle(PL["primary"], "Measured"),
+                               Line2D([], [], color=PL["contrast"], lw=1.2,
+                                      label="Model")], loc="lower right")
     add_caption_below(fig, r"$\mathbf{Fig.}$  10  Error bars in both x and y directions.")
     return fig
 
@@ -500,7 +512,8 @@ def fig_contour():
 @figure("radar", "雷达图（极坐标）", "special",
         "多指标综合对比，极坐标例外地保留浅灰网格以便读数。只出单栏版。",
         'ax = fig.add_subplot(projection="polar")\n'
-        'ax.plot(theta, values, "-o", color=PALETTE[key], lw=1.5, ms=3.5)',
+        'ax.plot(theta, values, "-", color=WXL_LINE_PALETTE[key], lw=1.2)\n'
+        'paint_markers(ax, theta, values, WXL_LINE_PALETTE[key])',
         width="single")
 def fig_radar():
     fig = plt.figure(figsize=WXL_FIGSIZE["double"])
@@ -509,12 +522,14 @@ def fig_radar():
     n = len(labels)
     theta = np.linspace(0, 2 * np.pi, n, endpoint=False)
     theta = np.concatenate([theta, theta[:1]])
+    handles = []
     for name, key, vals in [("Mix A", "primary", [0.85, 0.72, 0.90, 0.55, 0.80]),
                             ("Mix B", "contrast", [0.70, 0.88, 0.65, 0.78, 0.60])]:
         v = np.concatenate([vals, vals[:1]])
-        ax.plot(theta, v, "-o", color=PL[key], lw=1.5, ms=3.5, mfc="white",
-                mew=0.6, label=name)
+        ax.plot(theta, v, "-", color=PL[key], lw=1.2, zorder=2)
         ax.fill(theta, v, color=P[key], alpha=0.12)
+        paint_markers(ax, theta, v, PL[key])
+        handles.append(marker_handle(PL[key], name))
     ax.set_xticks(theta[:-1])
     ax.set_xticklabels(labels)
     ax.set_ylim(0, 1.05)
@@ -522,7 +537,7 @@ def fig_radar():
     ax.set_yticklabels(["0.25", "0.50", "0.75", "1.00"])
     ax.grid(True, color=PL["neutral"], alpha=0.35, linewidth=0.5)
     ax.tick_params(direction="in")
-    framed_legend(ax, loc="lower right", bbox_to_anchor=(1.16, -0.08))
+    framed_legend(ax, handles=handles, loc="lower right", bbox_to_anchor=(1.16, -0.08))
     add_caption_below(fig, r"$\mathbf{Fig.}$  18  Radar chart of five performance indices.")
     return fig
 
@@ -567,8 +582,8 @@ def fig_dual_axis():
     ax.set_xlabel("Time (h)")
     ax.set_ylim(0, 95)
     ax2 = ax.twinx()
-    ax2.plot(x, temp, "-o", color=P["contrast"], lw=1.5, ms=3.5, mfc="white",
-             mew=0.6, label="Temperature")
+    ax2.plot(x, temp, "-", color=PL["contrast"], lw=1.2, zorder=2)
+    paint_markers(ax2, x, temp, PL["contrast"])
     ax2.set_ylabel("Temperature (C)")
     ax2.set_ylim(0, 110)
     for side in ("top", "bottom", "left", "right"):
@@ -577,8 +592,8 @@ def fig_dual_axis():
     ax2.tick_params(direction="in", width=0.8)
     ax2.grid(False)
     h1, l1 = ax.get_legend_handles_labels()
-    h2, l2 = ax2.get_legend_handles_labels()
-    framed_legend(ax, handles=h1 + h2, labels=l1 + l2, loc="upper left")
+    framed_legend(ax, handles=h1 + [marker_handle(PL["contrast"], "Temperature")],
+                  labels=l1 + ["Temperature"], loc="upper left")
     add_caption_below(fig, r"$\mathbf{Fig.}$  20  Dual-axis chart with bars and a line series.")
     return fig
 
@@ -617,13 +632,13 @@ def fig_multi_panel():
 
     ax = axes[1]
     x = np.linspace(0, 10, 11)
-    ax.plot(x, 0.5 + 0.03 * x, "-o", color=PL["primary"], lw=1.5, ms=3.5,
-            mfc="white", mew=0.6, label="Curve 1")
-    ax.plot(x, 0.45 + 0.02 * x, "-s", color=PL["improve"], lw=1.5, ms=3.5,
-            mfc="white", mew=0.6, label="Curve 2")
+    handles = [plot_series(ax, x, 0.5 + 0.03 * x, PL["primary"], label="Curve 1",
+                           marker="o"),
+               plot_series(ax, x, 0.45 + 0.02 * x, PL["improve"], label="Curve 2",
+                           marker="s")]
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
-    framed_legend(ax, loc="upper left")
+    framed_legend(ax, handles=handles, loc="upper left")
     panel_tag(ax, "(b)", "Trend lines")
 
     ax = axes[2]
@@ -685,14 +700,15 @@ def fig_multi_panel_1x3():
 
     ax = axes[1]
     x = np.linspace(0, 10, 11)
-    ax.plot(x, 0.5 + 0.03 * x, "-o", color=PL["primary"], lw=1.5, ms=3.5,
-            mfc="white", mew=0.6, label="Curve 1")
-    ax.plot(x, 0.45 + 0.02 * x, "-s", color=PL["improve"], lw=1.5, ms=3.5,
-            mfc="white", mew=0.6, label="Curve 2")
+    handles = [plot_series(ax, x, 0.5 + 0.03 * x, PL["primary"], label="Curve 1",
+                           marker="o"),
+               plot_series(ax, x, 0.45 + 0.02 * x, PL["improve"], label="Curve 2",
+                           marker="s")]
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Amplitude")
     ax.set_ylim(0.35, 0.95)
-    framed_legend(ax, loc="upper left", ncol=2, columnspacing=0.8, handlelength=1.2)
+    framed_legend(ax, handles=handles, loc="upper left", ncol=2, columnspacing=0.8,
+                  handlelength=1.2)
     panel_tag(ax, "(b)", "Trend lines")
 
     ax = axes[2]

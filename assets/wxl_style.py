@@ -22,12 +22,15 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import matplotlib
+import matplotlib.patheffects as mpatheffects
 import matplotlib.pyplot as plt
 import matplotlib.transforms
 import numpy as np
 from matplotlib import text as mtext
-from matplotlib.colors import LinearSegmentedColormap, to_hex
+from matplotlib.colors import LinearSegmentedColormap, to_hex, to_rgb
 from matplotlib.font_manager import findfont
+from matplotlib.lines import Line2D
+from matplotlib.transforms import ScaledTranslation
 
 # --------------------------------------------------------------------------
 # Constants
@@ -46,17 +49,19 @@ WXL_PALETTE = {
     "light": "#ECFEFF",      # Pale Aqua       - light fill, uncertainty bands
 }
 
-#: Line palette (deep). The darker twin of each fill colour, used for curves,
+#: Line palette (deep). The deep twin of each fill colour, used for curves,
 #: markers, marker edges, error bars and reference lines, so lines stay crisp
-#: and coloured instead of grey against the light fills.
+#: and coloured instead of grey against the light fills. Hand-tuned rather than
+#: computed, so the fills above can be softened without dragging the line work
+#: along with them.
 WXL_LINE_PALETTE = {
-    "primary": "#4E76C1",    # deep blue
-    "secondary": "#392A86",  # deep violet
-    "contrast": "#C35D86",   # deep rose
-    "improve": "#80B793",    # green
-    "accent": "#D05D38",     # burnt orange
-    "neutral": "#2F3D7E",    # navy
-    "light": "#AACDCF",      # teal
+    "primary": "#577CD8",    # blue
+    "secondary": "#472F96",  # violet
+    "contrast": "#DB698F",   # rose
+    "improve": "#8FCDA9",    # green
+    "accent": "#E9743E",     # orange
+    "neutral": "#343F8D",    # navy
+    "light": "#BEE4E8",      # aqua
 }
 
 #: Ink for text: axis labels, tick labels and annotations. Pure black, so the
@@ -69,14 +74,36 @@ WXL_INK = "#000000"
 #: later (for example a deep slate frame with black text).
 WXL_FRAME = "#000000"
 
-#: Colour-map stops, interpolated from the palette so a heatmap or contour is
-#: always the same family as the line work around it. ``div`` runs coral bloom ->
-#: clear -> periwinkle through a neutral centre (signed data); ``seq`` runs
-#: near-white -> seafoam -> periwinkle -> slate violet (single-sided magnitudes).
+def _mix(a: str, b: str, t: float) -> str:
+    """Linear sRGB blend; ``t`` is the share of ``b``."""
+    ra, ga, ba = to_rgb(a)
+    rb, gb, bb = to_rgb(b)
+    return to_hex((ra + (rb - ra) * t, ga + (gb - ga) * t, ba + (bb - ba) * t))
+
+
+#: Colour-map stops, interpolated from the palettes so a heatmap or contour is
+#: always the same family as the line work around it. ``div`` runs the contrast
+#: rose -> clear -> the primary blue through white (signed data); ``seq`` runs
+#: near-white -> primary blue -> navy (single-sided magnitudes). The stops are
+#: computed from :data:`WXL_LINE_PALETTE`, so re-tuning the line colours moves the
+#: maps with them instead of leaving stale hexes behind.
 WXL_CMAP_STOPS = {
-    "div_rose_blue": ["#D8A0B3", "#E6BDCA", "#F3E7EC", "#F7F9FC", "#DDE4F2",
-                      "#B6C3E4", "#9E95BA"],
-    "seq_blue": ["#F7FAFB", "#E0EDEF", "#C7DDD1", "#B6C3E4", "#9498B4"],
+    "div_rose_blue": [
+        WXL_LINE_PALETTE["contrast"],
+        _mix(WXL_LINE_PALETTE["contrast"], "#FFFFFF", 0.45),
+        _mix(WXL_LINE_PALETTE["contrast"], "#FFFFFF", 0.82),
+        "#FAFBFD",
+        _mix(WXL_LINE_PALETTE["primary"], "#FFFFFF", 0.82),
+        _mix(WXL_LINE_PALETTE["primary"], "#FFFFFF", 0.45),
+        WXL_LINE_PALETTE["primary"],
+    ],
+    "seq_blue": [
+        "#FAFBFD",
+        _mix(WXL_LINE_PALETTE["primary"], "#FFFFFF", 0.72),
+        _mix(WXL_LINE_PALETTE["primary"], "#FFFFFF", 0.38),
+        WXL_LINE_PALETTE["primary"],
+        _mix(WXL_LINE_PALETTE["primary"], WXL_LINE_PALETTE["neutral"], 0.5),
+    ],
 }
 for _name, _stops in WXL_CMAP_STOPS.items():
     matplotlib.colormaps.register(
@@ -168,8 +195,11 @@ class WXLStyle:
     legend_size: float = 10.0
     annot_size: float = 11.0
     axes_linewidth: float = 0.5
-    line_width: float = 1.5
-    marker_size: float = 3.5
+    line_width: float = 1.2
+    marker_size: float = 6.4
+    marker_edge_width: float = 0.9  # mew, the ring around a marker
+    marker_gap: float = 1.2        # pt of line erased around each marker
+    marker_gloss: bool = True      # specular highlight ball instead of a flat dot
     bar_edge_width: float = 0.5
     error_linewidth: float = 0.5
     capsize: float = 2.0
@@ -224,6 +254,7 @@ def apply_wxl_style(style: WXLStyle | None = None) -> WXLStyle:
         "ytick.major.size": 3.0,
         "lines.linewidth": st.line_width,
         "lines.markersize": st.marker_size,
+        "lines.markeredgewidth": st.marker_edge_width,
         "errorbar.capsize": st.capsize,
         "patch.linewidth": st.bar_edge_width,
         "legend.frameon": st.legend_framed,
@@ -238,6 +269,106 @@ def apply_wxl_style(style: WXLStyle | None = None) -> WXLStyle:
         "ps.fonttype": 42,
     })
     return st
+
+
+# --------------------------------------------------------------------------
+# Marker style: glossy ball, with a gap that breaks the line around each point
+# --------------------------------------------------------------------------
+
+#: Specular highlight offset, in multiples of the marker size, up and to the left.
+WXL_GLOSS_OFFSET = (-0.19, 0.19)
+
+#: Highlight layers as ``(area fraction of the marker, alpha)``, biggest and
+#: softest first. Stacked vector circles (rather than a pasted bitmap) keep the
+#: marker vector in PDF / EPS output and tint-proof against the series colour.
+WXL_GLOSS_LAYERS = ((0.30, 0.18), (0.17, 0.32), (0.07, 0.55))
+
+
+def paint_markers(ax, x, y, color, style=None, ms=None, mew=None, gap=None,
+                  gloss=None, marker: str = "o", zorder: float = 3.0):
+    """Draw one series' data points in the WXL marker style.
+
+    The point is a glossy ball - a filled circle carrying a soft specular
+    highlight - and it stands on a white halo ``gap`` pt wide that paints the
+    connecting line out from under it, so the line reads as stopping short of
+    every marker instead of running through it.
+
+    Draw the line first (``ax.plot(x, y, "-", ...)``) and the points on top at a
+    higher ``zorder``; that ordering is what makes the halo erase the line.
+
+    ``marker`` selects the shape. The highlight layers reuse it, so a triangle
+    gets a lit facet rather than a round glint spilling past its edges.
+
+    The halo is white paint, not a geometric break, so whatever sits behind the
+    series must be white. Set ``gloss=False`` for a flat white-cored marker.
+
+    Returns nothing; use :func:`marker_handle` for a matching legend entry.
+    """
+    st = style or DEFAULT_STYLE
+    ms = st.marker_size if ms is None else ms
+    mew = st.marker_edge_width if mew is None else mew
+    gap = st.marker_gap if gap is None else gap
+    gloss = st.marker_gloss if gloss is None else gloss
+    x = np.asarray(x, float)
+    y = np.asarray(y, float)
+
+    halo = ([mpatheffects.withStroke(linewidth=2 * gap, foreground="white")]
+            if gap > 0 else None)
+    if gloss:
+        ax.scatter(x, y, s=ms ** 2, facecolor=color, edgecolor=color,
+                   linewidth=mew, marker=marker, zorder=zorder,
+                   path_effects=halo)
+        for frac, alpha in WXL_GLOSS_LAYERS:
+            off = (ax.transData
+                   + ScaledTranslation(WXL_GLOSS_OFFSET[0] * ms / 72.0,
+                                       WXL_GLOSS_OFFSET[1] * ms / 72.0,
+                                       ax.figure.dpi_scale_trans))
+            ax.scatter(x, y, s=ms ** 2 * frac, facecolor="white", alpha=alpha,
+                       edgecolor="none", marker=marker, transform=off,
+                       zorder=zorder + 0.1)
+        return
+    ax.scatter(x, y, s=max(ms - mew, 0.2) ** 2, facecolor="white",
+               edgecolor=color, linewidth=mew, marker=marker, zorder=zorder,
+               path_effects=halo)
+
+
+def marker_handle(color, label, style=None, ms=None, mew=None):
+    """Legend handle matching :func:`paint_markers`.
+
+    A legend entry cannot host the offset highlight layers, so a glossy series
+    gets a flat solid dot of the same colour and size.
+    """
+    st = style or DEFAULT_STYLE
+    ms = st.marker_size if ms is None else ms
+    mew = st.marker_edge_width if mew is None else mew
+    # ``color`` matters even with linestyle="none": the style audit reads
+    # get_color(), and an unset colour falls back to the default tab:blue.
+    if st.marker_gloss:
+        return Line2D([], [], linestyle="none", marker="o", ms=ms,
+                      color=color, mfc=color, mec=color, mew=0.0, label=label)
+    return Line2D([], [], linestyle="none", marker="o", ms=ms, color=color,
+                  mfc="white", mec=color, mew=mew, label=label)
+
+
+def plot_series(ax, x, y, color, label=None, style=None, lw=None, ms=None,
+                mew=None, gap=None, gloss=None, marker: str = "o",
+                linestyle: str = "-", zorder: float = 2.0):
+    """The house line-plus-points call: a curve with WXL markers on top.
+
+    Equivalent to ``ax.plot(x, y, "-", color=color, lw=lw)`` followed by
+    :func:`paint_markers`, and returns a legend handle for the pair.
+    """
+    st = style or DEFAULT_STYLE
+    lw = st.line_width if lw is None else lw
+    ms = st.marker_size if ms is None else ms
+    glossy = st.marker_gloss if gloss is None else gloss
+    ax.plot(x, y, linestyle, color=color, lw=lw, zorder=zorder)
+    paint_markers(ax, x, y, color, style=st, ms=ms, mew=mew, gap=gap,
+                  gloss=gloss, marker=marker, zorder=zorder + 1.0)
+    if label is None:
+        return None
+    return Line2D([], [], color=color, lw=lw, marker=marker, ms=ms,
+                  mfc=color if glossy else "white", mec=color, label=label)
 
 
 # --------------------------------------------------------------------------

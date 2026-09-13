@@ -122,14 +122,16 @@ SKILL = Path(os.environ.get(
     "WXL_SKILL_DIR", Path.home() / ".dsh" / "skills" / "figure-making-wxl"))
 sys.path.insert(0, str(SKILL / "assets"))
 
-from wxl_style import (WXL_PALETTE as P, WXL_FIGSIZE, WXL_WIDTH_MM, apply_wxl_style,
-                       create_subplots, framed_legend, add_caption_below,
-                       finalize_figure, check_wxl_style, prepare_figure)
+from wxl_style import (WXL_LINE_PALETTE as PL, WXL_FIGSIZE, WXL_WIDTH_MM,
+                       apply_wxl_style, create_subplots, framed_legend,
+                       add_caption_below, finalize_figure, check_wxl_style,
+                       plot_series, prepare_figure)   # noqa: E501
 
 apply_wxl_style()
 fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
-ax.plot([1, 2, 3], [0.7, 0.85, 0.92], "-o", color=P["primary"], lw=1.5,
-        ms=3.2, mfc="white", mew=0.9, label="Proposed")
+# line + glossy markers + the 1.2 pt gap that breaks the line at each point
+handle = plot_series(ax, [1, 2, 3], [0.7, 0.85, 0.92], PL["primary"],
+                     label="Proposed")
 ax.set_xlabel(r"Slip $s$ (mm)")          # symbol italic, unit upright
 ax.set_ylabel(r"Bond stress $\tau$ (MPa)")
 ax.set_ylim(0, 1.2)
@@ -278,11 +280,45 @@ accepted by the audit for backward compatibility.
 | Attribute | Options |
 |---|---|
 | Markers | open circle (default), square, triangle, diamond, down-triangle, or none for dense data |
-| Marker fill | white fill with a coloured edge, so only the shape carries the series identity and the figure survives a black-and-white print |
-| Marker size | 3.5 pt (house default) |
-| Line width | 1.5 pt (house default); 1.2 pt for a fitted or reference line |
+| Marker fill | glossy ball (a filled circle with a soft specular highlight); optionally a flat white core with a coloured edge, which survives a black-and-white print best |
+| Marker size | 6.4 pt (house default); smaller for a point cloud (see below) |
+| Marker edge | 0.9 pt (house default) |
+| Marker gap | 1.2 pt of line erased around every marker, so the line reads as stopping short of each point |
+| Line width | 1.2 pt (house default) |
 | Dash | solid (default) for the main series; dashed for a reference / baseline |
 | Marker frequency | every point (default), every 2nd–5th for dense data |
+
+### Markers: the glossy ball and the gap
+
+`plot_series` is the house call for a curve with points. It draws the line, then
+the markers on top, and returns a legend handle:
+
+```python
+handles.append(plot_series(ax, x, y, PL["primary"], label="Proposed", marker="o"))
+framed_legend(ax, handles=handles, loc="upper left")
+```
+
+Each point is a **glossy ball** - a filled circle carrying a soft specular
+highlight up and to the left - and it sits on a white halo `marker_gap` pt wide
+that paints the line out from under it, so the line reads as stopping short of
+every marker instead of running through it. Use `paint_markers` directly when the
+points are not threaded on a line (for example a scatter with a separate fit), and
+`marker_handle` for a matching legend entry.
+
+Three things to know:
+
+- **The gap is white paint, not a geometric break.** Whatever sits behind the
+  series must be white, or the halo will erase it too.
+- **A legend cannot host the offset highlight**, so a legend entry is a flat
+  solid dot of the same colour and size.
+- **The highlight only reads at larger sizes.** Below roughly 5 pt it looks like a
+  plain filled dot, and it degrades in greyscale or CMYK print. For a figure that
+  must survive black-and-white printing, pass `gloss=False` for a flat white core,
+  where only the marker shape separates the series.
+
+Point clouds (a 45-point scatter, a jittered strip) pass an explicit smaller `ms`,
+because 6.4 pt across a few dozen points becomes a blob; `scatter_fit`, `bubble`
+and `strip_mean` in the gallery show this.
 
 ### Colour palette
 
@@ -294,13 +330,13 @@ point stays crisp and coloured.
 
 | Key | Fill `WXL_PALETTE` | Line `WXL_LINE_PALETTE` | Meaning |
 |---|---|---|---|
-| `primary` | `#B7CCF2` | `#4E76C1` | the method you argue for |
-| `secondary` | `#968EBE` | `#392A86` | supporting series |
-| `contrast` | `#F5C0D5` | `#C35D86` | baseline / competitor |
-| `improve` | `#CDE9D7` | `#80B793` | improvement / variant |
-| `accent` | `#FFC4B1` | `#D05D38` | emphasis |
-| `neutral` | `#8D95B6` | `#2F3D7E` | reference / background |
-| `light` | `#ECFEFF` | `#AACDCF` | light fill / faint line |
+| `primary` | `#B7CCF2` | `#577CD8` | the method you argue for |
+| `secondary` | `#968EBE` | `#472F96` | supporting series |
+| `contrast` | `#F5C0D5` | `#DB698F` | baseline / competitor |
+| `improve` | `#CDE9D7` | `#8FCDA9` | improvement / variant |
+| `accent` | `#FFC4B1` | `#E9743E` | emphasis |
+| `neutral` | `#8D95B6` | `#343F8D` | reference / background |
+| `light` | `#ECFEFF` | `#BEE4E8` | light fill / faint line |
 
 - Bars, stacked areas, violin bodies, histograms, box fills, uncertainty bands
   and pies take the **fill** colour, with the 0.5 pt ink outline on top.

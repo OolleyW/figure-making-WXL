@@ -133,7 +133,7 @@ or a small-multiples grid.
 ```python
 ax.fill_between(x, y - band, y + band, color=P["light"], alpha=0.35,
                 edgecolor=P["primary"], linewidth=0.6)
-ax.plot(x, y, "-", color=P["primary"], lw=1.5, label="Proposed")
+plot_series(ax, x, y, PL["primary"], label="Proposed")
 ```
 
 Draw the band first so the curve stays on top. Use `light` for the primary
@@ -203,7 +203,8 @@ cb.outline.set_linewidth(0.8)
 
 ```python
 ax2 = ax.twinx()
-ax2.plot(x, temp, "-o", color=P["contrast"], lw=1.5, ms=4, mfc="white", mew=0.9)
+ax2.plot(x, temp, "-", color=PL["contrast"], lw=1.2)
+paint_markers(ax2, x, temp, PL["contrast"])
 ax2.set_ylabel("Temperature (C)")
 for side in ("top", "bottom", "left", "right"):
     ax2.spines[side].set_visible(True)      # twinx hides some spines by default

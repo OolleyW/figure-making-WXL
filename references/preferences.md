@@ -56,8 +56,8 @@ Ask markers, line width, and dash pattern per series.
 
 | Attribute | Default | Alternatives |
 |---|---|---|
-| markers | open circle `o`, `ms=3.2`, white fill, `mew=0.9` | square `s`, triangle `^`, diamond `D`, or none for dense data |
-| line width | 1.5 pt | 1.2 pt for a fitted or reference line |
+| markers | glossy ball, `ms=6.4`, `mew=0.9`, `gap=1.2` pt | flat white core, square `s`, triangle `^`, diamond `D`, or none for dense data |
+| line width | 1.2 pt | 1.2 pt (fixed; a heavier line reads as emphasis by accident) |
 | dash | solid for the main series | dashed `--` for a reference / baseline / fitted model |
 | marker frequency | every point | every 2nd-5th for dense data, or markers on a subset |
 
@@ -91,7 +91,7 @@ Ask the per-series colour mapping, and for matrices the colormap.
  1. chart type        -> [grouped bar (recommended) | stacked | ...]
  2. x-axis label      -> text: 'Slip $s$ (mm)'?  italic symbol s?
     y-axis label      -> text: 'Bond stress $\\tau$ (MPa)'?  italic symbol τ?
- 3. line style        -> [open white markers 3.5 pt, 1.5 pt, solid (recommended) | dashed | ...]
+ 3. line style        -> [glossy markers 6.4 pt with a 1.2 pt gap, 1.2 pt line, solid (recommended) | dashed | ...]
  4. colours           -> [soft science house palette (recommended) | keyword | custom]"
 ```
 

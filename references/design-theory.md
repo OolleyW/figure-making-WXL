@@ -97,13 +97,13 @@ point stays crisp and coloured.
 
 | Key | Fill | Line | Meaning |
 |---|---|---|---|
-| `primary` | `#B7CCF2` | `#4E76C1` | the method or series you are arguing for |
-| `secondary` | `#968EBE` | `#392A86` | supporting role |
-| `contrast` | `#F5C0D5` | `#C35D86` | baseline or competitor |
-| `improve` | `#CDE9D7` | `#80B793` | improvement, variant |
-| `accent` | `#FFC4B1` | `#D05D38` | emphasis |
-| `neutral` | `#8D95B6` | `#2F3D7E` | reference, background |
-| `light` | `#ECFEFF` | `#AACDCF` | fill / faint line |
+| `primary` | `#B7CCF2` | `#577CD8` | the method or series you are arguing for |
+| `secondary` | `#968EBE` | `#472F96` | supporting role |
+| `contrast` | `#F5C0D5` | `#DB698F` | baseline or competitor |
+| `improve` | `#CDE9D7` | `#8FCDA9` | improvement, variant |
+| `accent` | `#FFC4B1` | `#E9743E` | emphasis |
+| `neutral` | `#8D95B6` | `#343F8D` | reference, background |
+| `light` | `#ECFEFF` | `#BEE4E8` | fill / faint line |
 
 Design intent:
 
@@ -147,7 +147,7 @@ and more contrast is needed.
 - **Grid**: none. Tick values plus the full box carry the reading task. The only
   exception is the radar chart, where a light `neutral` grid at 35 % alpha is
   required to read values off the polar axes.
-- **Line width**: 1.5 pt for data curves (1.2 pt for a fitted or reference
+- **Line width**: 1.2 pt for data curves (fitted and reference lines match it).
   line), 0.5 pt for error bars and edges.
 - **Markers**: 4 pt, white fill, 0.9 pt colored edge, so overlapping points stay
   distinguishable.

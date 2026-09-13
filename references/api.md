@@ -19,9 +19,9 @@ WXL_PALETTE = {                       # light fills
     "light":     "#ECFEFF",
 }
 WXL_LINE_PALETTE = {                  # deep lines / markers
-    "primary":   "#4E76C1", "secondary": "#392A86", "contrast": "#C35D86",
-    "improve":   "#80B793", "accent":    "#D05D38", "neutral":  "#2F3D7E",
-    "light":     "#AACDCF",
+    "primary":   "#577CD8", "secondary": "#472F96", "contrast": "#DB698F",
+    "improve":   "#8FCDA9", "accent":    "#E9743E", "neutral":  "#343F8D",
+    "light":     "#BEE4E8",
 }
 ```
 
@@ -83,16 +83,19 @@ Uniform 11 pt for body text, 10 pt for the legend. The audit fails on any other 
 ```python
 @dataclass(frozen=True)
 class WXLStyle:
-    font_size: float = 10.0
-    caption_size: float = 10.0
-    tick_size: float = 10.0
+    font_size: float = 11.0
+    caption_size: float = 11.0
+    tick_size: float = 11.0
     legend_size: float = 10.0
-    annot_size: float = 10.0
-    axes_linewidth: float = 0.8
-    line_width: float = 1.5
-    marker_size: float = 4.0
-    bar_edge_width: float = 0.8
-    error_linewidth: float = 0.8
+    annot_size: float = 11.0
+    axes_linewidth: float = 0.5
+    line_width: float = 1.2
+    marker_size: float = 6.4
+    marker_edge_width: float = 0.9
+    marker_gap: float = 1.2
+    marker_gloss: bool = True
+    bar_edge_width: float = 0.5
+    error_linewidth: float = 0.5
     capsize: float = 2.0
     figsize: tuple = WXL_FIGSIZE["double"]
     dpi: int = 600
@@ -101,6 +104,47 @@ class WXLStyle:
     ticks_in: bool = True
     grid: bool = False
 ```
+
+### plot_series(ax, x, y, color, label=None, style=None, lw=None, ms=None, mew=None, gap=None, gloss=None, marker="o", linestyle="-", zorder=2.0)
+
+The house call for a curve with points: draws the line, then the markers on top,
+and returns a legend handle (or `None` when `label` is omitted). `lw`, `ms`,
+`mew`, `gap` and `gloss` default to the `WXLStyle` fields.
+
+```python
+handle = plot_series(ax, x, y, PL["primary"], label="Proposed", marker="o")
+```
+
+### paint_markers(ax, x, y, color, style=None, ms=None, mew=None, gap=None, gloss=None, zorder=3.0)
+
+Draws one series' points only - the glossy ball plus the white gap halo - for the
+case where the points are not threaded on a line (a scatter with a separate fit
+line, a strip plot). Draw the line first at a lower `zorder`.
+
+```python
+ax.plot(x, y, "-", color=PL["primary"], lw=1.2, zorder=2)
+paint_markers(ax, x, y, PL["primary"])
+paint_markers(ax, xs, ys, PL["accent"], gap=0.0)     # a cloud: no gap
+```
+
+The halo is white paint rather than a geometric break, so the background behind
+the series must be white.
+
+### marker_handle(color, label, style=None, ms=None, mew=None)
+
+A legend handle matching `paint_markers`. A legend cannot host the offset
+highlight layers, so a glossy series gets a flat solid dot of the same colour.
+
+```python
+framed_legend(ax, handles=[marker_handle(PL["primary"], "Measured")],
+              loc="lower right")
+```
+
+### WXL_GLOSS_LAYERS, WXL_GLOSS_OFFSET
+
+The specular highlight: `(area fraction, alpha)` pairs drawn as stacked vector
+circles, and its offset in multiples of the marker size. Tune these to change how
+glossy the ball reads.
 
 Never set `full_box`, `legend_framed`, `ticks_in` or `grid` to anything but
 their defaults under this skill.

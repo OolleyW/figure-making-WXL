@@ -89,7 +89,7 @@ for key, label, base, slope, sd in [("primary", "Proposed", 0.55, 0.035, 0.035),
     ax.fill_between(x, y - band, y + band,
                     color=P["light"] if key == "primary" else P["neutral"],
                     alpha=0.35, edgecolor=P[key], linewidth=0.6)
-    ax.plot(x, y, "-", color=P[key], lw=1.5, label=label)
+    ax.plot(x, y, "-", color=PL[key], lw=1.2, label=label)
 
 ax.set_xlabel("Time (s)")
 ax.set_ylabel("Response (mV)")

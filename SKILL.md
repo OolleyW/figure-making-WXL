@@ -133,7 +133,7 @@ These rules supersede any conflicting style text in `references/` or in upstream
 |---|---|---|
 | Chart type | which chart, how many panels | grouped bar / trend / ... |
 | Axis labels | x and y text, units, italic or not | italic symbol, upright unit |
-| Line style | markers, width, dash pattern | open white markers 3.5 pt, 1.5 pt, solid |
+| Line style | markers, width, dash pattern | glossy markers 6.4 pt, 1.2 pt line, 1.2 pt gap, solid |
 | Colours | per-series colours; colormap for matrices | soft science `WXL_PALETTE` |
 
 For a variable, italicise the symbol and keep the unit upright, e.g.
@@ -154,14 +154,15 @@ sys.path.insert(0, str(SKILL / "assets"))
 
 from wxl_style import (WXL_PALETTE as P, WXL_LINE_PALETTE as PL, WXL_FIGSIZE,
                        apply_wxl_style, create_subplots, framed_legend,
-                       add_caption, finalize_figure, check_wxl_style)
+                       add_caption, finalize_figure, check_wxl_style,
+                       plot_series)
 
 apply_wxl_style()
 fig, (ax,) = create_subplots(figsize=WXL_FIGSIZE["double"])
 ax.bar([1, 2, 3], [0.7, 0.85, 0.92], color=P["primary"],        # light fill
        edgecolor="black", linewidth=0.5, label="Proposed")
-ax.plot([1, 2, 3], [0.6, 0.7, 0.8], "-o", color=PL["contrast"], # deep line
-        mfc="white", mec=PL["contrast"], mew=0.6, ms=3.5, label="Baseline")
+plot_series(ax, [1, 2, 3], [0.6, 0.7, 0.8], PL["contrast"],     # deep line,
+            label="Baseline")                # glossy markers, 1.2 pt gap
 ax.set_xlabel("Scenario")
 ax.set_ylabel("Accuracy")
 ax.set_ylim(0, 1.2)
